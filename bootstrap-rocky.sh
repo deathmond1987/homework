@@ -21,6 +21,7 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
 questions (){
+    #asking questions. store answers in variables
     echo -e "Proxy. Confugure default proxy (10.38.20.253:3128), no proxy or custom proxy with IP:PORT"
     read -rp " Answer (default/d, no/n, ip:port ): " ANSWER
     case $ANSWER in
@@ -84,6 +85,7 @@ questions (){
     unset ANSWER
 
     read -rp "Install postgresql? (yes/y, no/n): " ANSWER
+    #well, there is some shit
     case $ANSWER in
         yes|y) POSTGRESQL_INSTALL=true
              read -rp "Postgresql version? (11 12 13 14 15): " POSTGRESQL_VERSION
@@ -175,27 +177,34 @@ dnf_install_docker () {
     success "Docker installed"
 }
 docker_proxy_config () {
-    #configuring proxy for docker
+    #adding override dir to docker.service and store there proxy config
     mkdir -p /etc/systemd/system/docker.service.d
+    #adding proxy config
     echo -e "[Service]\nEnvironment=\"HTTP_PROXY=$PROXY\"\nEnvironment=\"HTTPS_PROXY=$PROXY\"\nEnvironment=\"NO_PROXY=localhost\"" > /etc/systemd/system/docker.service.d/http-proxy.conf
+    #rebuilding systemd dependency tree and reload docker to apply changes
     systemctl daemon-reload
     systemctl restart docker
     success "Proxy config added to docker"
 }
 
 install_runner () {
-    #installing gitlab-runner
+    #getting gitlab-runner install helper
     curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | bash 
+    #installing gitlab-runner
     dnf install gitlab-runner -y 
     success "Gitlab-runner installed"
 }
 
 install_postgresql () {
-    #adding postgresql repo and install postgresql
+    #adding postgresql repo
     dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
+    #disabling default postgresql in dnf
     dnf -qy module disable postgresql
+    #installing postgresql 
     dnf install -y postgresql"$POSTGRESQL_VERSION"-server 
+    #initializing database
     /usr/pgsql-"$POSTGRESQL_VERSION"/bin/postgresql-"$POSTGRESQL_VERSION"-setup initdb 
+    #starting postgresql service
     systemctl enable --now postgresql-"$POSTGRESQL_VERSION"
 }
 
@@ -203,6 +212,7 @@ install_netdata () {
     #getting netdata installer and install
     echo -e "Installing netdata..."
     wget -O /tmp/netdata-kickstart.sh https://my-netdata.io/kickstart.sh && sh /tmp/netdata-kickstart.sh --disable-telemetry --non-interactive --stable-channel> /dev/null
+    #adding rules to firewalld with netdata port
     firewall-cmd --permanent --add-port=19999/tcp
     firewall-cmd --reload
     success "Netdata installed"
