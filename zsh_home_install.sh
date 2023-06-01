@@ -96,7 +96,7 @@ linux_2023 () {
     alias cat="bat -pp -P"
     alias nano="micro"
     alias ls="lsd"
-    alias ncdu="gdu"' >> .zshrc  
+    alias ncdu="gdu"' >> $HOME/.zshrc  
 }
 
 drop_proxy_config_git () {
