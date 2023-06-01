@@ -1,4 +1,4 @@
-FROM rockylinux:latest
+FROM ubuntu:latest
 RUN dnf update -y
 RUN useradd test; su - test
 COPY ../../zsh_home_install.sh ./
