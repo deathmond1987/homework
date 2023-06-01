@@ -16,7 +16,6 @@ if [ "$EUID" -eq 0 ]; then
 fi
 }
 
-if []
 install_git_zsh () {
     if command -v dnf > /dev/null ; then
         sudo dnf install git zsh -y
