@@ -65,7 +65,7 @@ install_powerlevel () {
 
 fix_zsh_docker () {
     #enabling stacking options for docker suggections. need to docker -it working with autosuggections
-    echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> .zshrc
+    echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> $HOME/.zshrc
 }
 
 config_font() {
