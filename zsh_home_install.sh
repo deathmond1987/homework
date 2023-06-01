@@ -16,15 +16,16 @@ if [ "$EUID" -eq 0 ]; then
 fi
 }
 
+if []
 install_git_zsh () {
     if command -v dnf > /dev/null ; then
-        dnf install git zsh -y
+        sudo dnf install git zsh -y
     elif command -v apt-get > /dev/null ; then
-        apt-get install git zsh -y
+        sudo apt-get install git zsh -y
     elif command -v pacman > /dev/null ; then
-        pacman -S --noconfirm git zsh
+        sudo pacman -S --noconfirm git zsh
     elif command -v zypper > /dev/null ; then
-        zypper install -y git zsh
+        sudo zypper install -y git zsh
     else 
         echo "Package manager not found"
         exit 1
