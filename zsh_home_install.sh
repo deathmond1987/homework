@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euox pipefail
+set -ex
 
 alert_root () {
 if [ "$EUID" -eq 0 ]; then
