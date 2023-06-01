@@ -4,11 +4,13 @@ set -o noglob
 
 reset=$(tput sgr0)
 
+#colors
 red=$(tput setaf 1)
 green=$(tput setaf 2)
 white=$(tput setaf 7)
 tan=$(tput setaf 3)
 
+#set output functions
 info() { printf "${white}➜ %s${reset}\n" "$@"
 }
 success() { printf "${green}✔ %s${reset}\n" "$@"
@@ -121,6 +123,7 @@ questions (){
 }
 
 export_proxy () {
+    #export proxy configs to env and dnf.conf
     export http_proxy="$PROXY"
     export https_proxy="$PROXY"
     export HTTP_PROXY="$PROXY"
@@ -131,19 +134,24 @@ export_proxy () {
 
 add_system_proxy () {
     PROXY_FILE=/etc/profile.d/ksb_proxy.sh
+    #creating ksb_proxy.sh file to store proxy configuration
+    #it will be load when user log in
     echo -e "export http_proxy=$PROXY\nexport https_proxy=$PROXY\nexport HTTP_PROXY=$PROXY\nexport HTTPS_PROXY=$PROXY\nexport NO_PROXY=localhost" > "$PROXY_FILE"
     chmod 644 "$PROXY_FILE"
     success "Proxy settings added to /etc/profile.d/ksb_proxy.sh"
 }
 
 dnf_install_default () {
+    #adding epel repo to system
     dnf update -y && dnf install epel-release -y 
+    #installing minimal tools
     dnf install mc htop telnet nano wget curl traceroute strace ncdu net-tools bind-utils bash-completion -y 
 #    systemctl enable --now systemd-timesyncd.service
     success "bash-completion mc telnet htop nano wget curl traceroute strace ncdu net-tools bind-utils installed"
 }
 
 install_vmtools () {
+#check that this is VM. if so - we will install guest tools
 VIRT=$(systemd-detect-virt)
 if [ "$VIRT" = "vmware" ]; then
     warn "vmware virt detected. Installing guest tools..."
@@ -158,14 +166,16 @@ fi
 }
 
 dnf_install_docker () {
+    #adding docker repo and install it
     dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
     dnf install docker-ce docker-ce-cli docker-compose-plugin -y 
     systemctl enable --now docker 
-    #systemctl status docker
+    #add default dir to store docker projects
     mkdir -p /opt/docker
     success "Docker installed"
 }
 docker_proxy_config () {
+    #configuring proxy for docker
     mkdir -p /etc/systemd/system/docker.service.d
     echo -e "[Service]\nEnvironment=\"HTTP_PROXY=$PROXY\"\nEnvironment=\"HTTPS_PROXY=$PROXY\"\nEnvironment=\"NO_PROXY=localhost\"" > /etc/systemd/system/docker.service.d/http-proxy.conf
     systemctl daemon-reload
@@ -174,12 +184,14 @@ docker_proxy_config () {
 }
 
 install_runner () {
+    #installing gitlab-runner
     curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | bash 
     dnf install gitlab-runner -y 
     success "Gitlab-runner installed"
 }
 
 install_postgresql () {
+    #adding postgresql repo and install postgresql
     dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
     dnf -qy module disable postgresql
     dnf install -y postgresql"$POSTGRESQL_VERSION"-server 
@@ -188,6 +200,7 @@ install_postgresql () {
 }
 
 install_netdata () {
+    #getting netdata installer and install
     echo -e "Installing netdata..."
     wget -O /tmp/netdata-kickstart.sh https://my-netdata.io/kickstart.sh && sh /tmp/netdata-kickstart.sh --disable-telemetry --non-interactive --stable-channel> /dev/null
     firewall-cmd --permanent --add-port=19999/tcp
@@ -196,16 +209,17 @@ install_netdata () {
 }
 
 dnf_remove_proxy () {
+    #removing proxy config from /etc/dnf/dnf.conf
     sed -i "/^proxy*/d" /etc/dnf/dnf.conf
     success "Proxy config removed from /etc/dnf/dnf.conf"
 }
 
-adding_user () {
-    useradd "$USER_NAME" || true
-    echo -e "$USER_NAME:$PASSWORD" chpasswd
-    usermod -aG wheel "$USER_NAME"
-    success "User $USER_NAME added"
-}
+#adding_user () {
+#    useradd "$USER_NAME" || true
+#    echo -e "$USER_NAME:$PASSWORD" chpasswd
+#    usermod -aG wheel "$USER_NAME"
+#    success "User $USER_NAME added"
+#}
 
 main () {
     questions
@@ -237,7 +251,6 @@ main () {
     if [ "$REMOVE_DNF_PROXY" = "true" ]; then
         dnf_remove_proxy
     fi
-
 }
 
 main "$@"
