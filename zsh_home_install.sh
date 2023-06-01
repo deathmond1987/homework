@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 set -xe
 
+alert_root () {
+if [ "$EUID" -e 0 ]; then
+    read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
+    case $ANSWER in
+        yes|y) echo "Oh-my-zsh will be installed in $HOME"
+            ;;
+         no|n) echo "OK. Exiting"
+            ;;
+            *) echo "Unrecognised option"
+               alert_root
+            ;;
+fi
+}
+
 install_git_zsh () {
     if command -v dnf >& ; then
         PACKAGE_MANAGER="dnf install git zsh -y"
@@ -88,6 +102,7 @@ drop_proxy_config_git () {
 }
 
 main () {
+    alert_root
     install_git_zsh
     config_proxy
     install_oh_my_zsh
