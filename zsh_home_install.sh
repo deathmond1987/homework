@@ -2,7 +2,7 @@
 set -xe
 
 alert_root () {
-if [ "$EUID" -e 0 ]; then
+if [ "$EUID" -eq 0 ]; then
     read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
     case $ANSWER in
         yes|y) echo "Oh-my-zsh will be installed in $HOME"
@@ -12,23 +12,27 @@ if [ "$EUID" -e 0 ]; then
             *) echo "Unrecognised option"
                alert_root
             ;;
+    esac
 fi
 }
 
 install_git_zsh () {
-    if command -v dnf >& ; then
-        PACKAGE_MANAGER="dnf install git zsh -y"
-    elif command -v apt-get >& ; then
-        PACKAGE_MANAGER="apt install git zsh -y"
-    elif command -v pacman >&; then
-        PACKAGE_MANAGER="pacman -S --noconfirm git zsh"
-    elif command -v zypper>&; then
-        PACKAGE_MANAGER="zypper install -y git zsh"
+    if command -v dnf > /dev/null ; then
+        dnf install git zsh -y
+    elif command -v apt-get > /dev/null ; then
+        apt-get install git zsh -y
+    elif command -v pacman > /dev/null ; then
+        pacman -S --noconfirm git zsh
+    elif command -v zypper > /dev/null ; then
+        zypper install -y git zsh
+    else 
+        echo "Package manager not found"
+        exit 1
     fi
 }
 
 config_proxy () {
-    if [ -z "$HTTP_PROXY:-" ]; then
+    if [ -n "$HTTP_PROXY" ]; then
         #get oh-my-zsh
         sh -c "$(curl -fsSL -x $PROXY https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
         #config git with proxy
