@@ -100,9 +100,9 @@ linux_2023 () {
 }
 
 drop_proxy_config_git () {
-    git config --global --unset http.proxy 
-    git config --global --unset http.proxyAuthMethod 
-    git config --global --unset http.sslVerify 
+    git config --global --unset http.proxy || true
+    git config --global --unset http.proxyAuthMethod || true
+    git config --global --unset http.sslVerify || true
 }
 
 main () {
