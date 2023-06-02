@@ -14,5 +14,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: prepare image
+      run: docker pull fedora:latest && \
+           docker run fedora:latest bash -c "dnf update -y && adduser test"
+           docker run $(docker container ls --latest -q)
+           
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
