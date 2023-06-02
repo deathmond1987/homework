@@ -75,7 +75,7 @@ config_font() {
 
 change_shell () {
     #changing default shell
-    sudo usermod -s /usr/bin/zsh test
+    sudo usermod -s /usr/bin/zsh "$SUDO_USER"
 }
 
 linux_2023 () {
