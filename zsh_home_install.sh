@@ -25,7 +25,7 @@ install_git_zsh () {
         sudo pacman -S --noconfirm git zsh
     elif command -v zypper > /dev/null ; then
         sudo zypper install -y git zsh
-    else 
+    else
         echo "Package manager not found"
         exit 1
     fi
@@ -35,12 +35,14 @@ config_proxy_oh_my_zsh () {
     if [ -n "$HTTP_PROXY" ]; then
         #config git with proxy
         git config --global http.proxy http://"$HTTP_PROXY"
-        git config --global http.proxyAuthMethod 'basic' 
+        git config --global http.proxyAuthMethod 'basic'
         git config --global http.sslVerify false
         #get oh-my-zsh
         sh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        #since we in proxy default install of gitstatusd not working. disable download
+        echo "POWERLEVEL9K_DISABLE_GITSTATUS=true" >> ~/.zshrc
     else
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended 
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     fi
 }
 
@@ -85,7 +87,7 @@ linux_2023 () {
     https://github.com/muesli/duf/releases
     https://github.com/aristocratos/btop/releases
     https://github.com/dundee/gdu"
-   
+
     #create aliases to links new programs to defaults
     echo -e 'alias yay="sudo dnf update"
     alias htop="btop"
@@ -94,7 +96,7 @@ linux_2023 () {
     alias cat="bat -pp -P"
     alias nano="micro"
     alias ls="lsd"
-    alias ncdu="gdu"' >> $HOME/.zshrc  
+    alias ncdu="gdu"' >> $HOME/.zshrc
 }
 
 drop_proxy_config_git () {
