@@ -108,6 +108,7 @@ drop_proxy_config_git () {
 main () {
     alert_root
     install_git_zsh
+    drop_proxy_config_git
     config_proxy
     install_oh_my_zsh
     install_plugins
