@@ -75,7 +75,7 @@ config_font() {
 
 change_shell () {
     #changing default shell
-    sudo usermod -s /bin/bash test
+    sudo usermod -s /usr/bin/zsh test
 }
 
 linux_2023 () {
@@ -100,9 +100,9 @@ linux_2023 () {
 }
 
 drop_proxy_config_git () {
-    git config --global --unset http.proxy || true
-    git config --global --unset http.proxyAuthMethod || true
-    git config --global --unset http.sslVerify || true
+    git config --global --unset http.proxy 
+    git config --global --unset http.proxyAuthMethod 
+    git config --global --unset http.sslVerify 
 }
 
 main () {
