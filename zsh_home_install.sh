@@ -68,6 +68,8 @@ fix_zsh_docker () {
 }
 
 config_font() {
+    #clear screen to delimint install information and important information
+    clear
     #this need do manually, so asking for that
     echo -e "Default shell now will change to zsh. IMPORTANT:
     You must enable fonts in your terminal
@@ -88,7 +90,7 @@ linux_2023 () {
     https://github.com/bootandy/dust/releases
     https://github.com/muesli/duf/releases
     https://github.com/aristocratos/btop/releases
-    https://github.com/dundee/gdu
+    https://github.com/dundee/gdu/releases
     "
     
     
