@@ -84,7 +84,9 @@ change_shell () {
 
 linux_2023 () {
     #links to new programs
-    echo "You need manually install:
+    echo "
+    
+    You need manually install:
     https://github.com/sharkdp/bat/releases
     https://github.com/lsd-rs/lsd/releases
     https://github.com/bootandy/dust/releases
