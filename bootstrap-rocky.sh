@@ -162,7 +162,8 @@ if [ "$VIRT" = "vmware" ]; then
 elif [ "$VIRT" = "microsoft" ]; then
     warn "microsoft virt detected. Installing guest tools..."
     dnf install hyperv-daemons -y 
-    #systemctl start hypervkvpd hypervvssd
+    #We only enable services. If we start service now - it will be fail? i don`t know why. After restart service seemse working
+    systemctl enable hypervkvpd hypervvssd
 else true
 fi
 }
