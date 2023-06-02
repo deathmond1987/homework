@@ -69,7 +69,9 @@ fix_zsh_docker () {
 
 config_font() {
     #this need do manually, so asking for that
-    echo -e "You must enable fonts in your terminal\nSee here: https://github.com/romkatv/powerlevel10k"
+    echo -e "Default shell now will change to zsh. IMPORTANT:
+    You must enable fonts in your terminal
+    See here: https://github.com/romkatv/powerlevel10k <---"
 }
 
 change_shell () {
@@ -86,8 +88,10 @@ linux_2023 () {
     https://github.com/bootandy/dust/releases
     https://github.com/muesli/duf/releases
     https://github.com/aristocratos/btop/releases
-    https://github.com/dundee/gdu"
-
+    https://github.com/dundee/gdu
+    "
+    
+    
     #create aliases to links new programs to defaults
     echo -e 'alias yay="sudo dnf update"
     alias htop="btop"
