@@ -31,21 +31,17 @@ install_git_zsh () {
     fi
 }
 
-config_proxy () {
+config_proxy_oh_my_zsh () {
     if [ -n "$HTTP_PROXY" ]; then
         #config git with proxy
         git config --global http.proxy http://"$HTTP_PROXY"
         git config --global http.proxyAuthMethod 'basic' 
         git config --global http.sslVerify false
         #get oh-my-zsh
-        sh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
+        sh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    else
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended 
     fi
-}
-
-install_oh_my_zsh () {
-    #get oh-my zsh without proxy
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 }
 
 install_plugins () {
@@ -110,8 +106,7 @@ main () {
     alert_root
     install_git_zsh
     drop_proxy_config_git
-    config_proxy
-    install_oh_my_zsh
+    config_proxy_oh_my_zsh
     install_plugins
     install_powerlevel
     fix_zsh_docker
