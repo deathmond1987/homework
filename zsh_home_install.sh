@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
 alert_root () {
 if [ "$EUID" -eq 0 ]; then
