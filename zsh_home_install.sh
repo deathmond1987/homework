@@ -34,9 +34,9 @@ install_git_zsh () {
 config_proxy () {
     if [ -n "$HTTP_PROXY" ]; then
         #get oh-my-zsh
-        sh -c "$(curl -fsSL -x $PROXY https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        sh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
         #config git with proxy
-        git config --global http.proxy http://"$PROXY"
+        git config --global http.proxy http://"$HTTP_PROXY"
         git config --global http.proxyAuthMethod 'basic' 
         git config --global http.sslVerify false
     fi
