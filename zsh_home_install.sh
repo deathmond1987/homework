@@ -72,7 +72,8 @@ config_font() {
 
 change_shell () {
     #changing default shell
-    sudo usermod -s /usr/bin/zsh "$SUDO_USER"
+    export SUDO_USER=$(whoami)
+    sudo -E usermod -s /usr/bin/zsh "$SUDO_USER"
 }
 
 linux_2023 () {
