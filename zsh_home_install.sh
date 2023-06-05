@@ -89,7 +89,8 @@ config_font() {
     #clear screen to delimint install information and important information
     clear
     #this need do manually, so asking for that
-    info "Default shell now will change to zsh." error "IMPORTANT:"
+    info "Default shell now will change to zsh."
+    error "IMPORTANT:"
     info "You must enable fonts in your terminal"
     info "See here: https://github.com/romkatv/powerlevel10k <---"
 }
