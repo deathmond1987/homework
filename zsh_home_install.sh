@@ -1,4 +1,22 @@
 #!/usr/bin/env bash
+set -o noglob
+
+reset=$(tput sgr0)
+
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+white=$(tput setaf 7)
+tan=$(tput setaf 3)
+
+info() { printf "${white}➜ %s${reset}\n" "$@"
+}
+success() { printf "${green}✔ %s${reset}\n" "$@"
+}
+error() { printf "${red}✖ %s${reset}\n" "$@"
+}
+warn() { printf "${tan}➜ %s${reset}\n" "$@"
+}
+
 set -e
 
 alert_root () {
@@ -71,9 +89,9 @@ config_font() {
     #clear screen to delimint install information and important information
     clear
     #this need do manually, so asking for that
-    echo -e "Default shell now will change to zsh. IMPORTANT:
-    You must enable fonts in your terminal
-    See here: https://github.com/romkatv/powerlevel10k <---"
+    info "Default shell now will change to zsh." error "IMPORTANT:"
+    info "You must enable fonts in your terminal"
+    info "See here: https://github.com/romkatv/powerlevel10k <---"
 }
 
 change_shell () {
@@ -85,7 +103,7 @@ change_shell () {
 
 linux_2023 () {
     #links to new programs
-    echo "
+    info "
     
     You need manually install:
     https://github.com/sharkdp/bat/releases
