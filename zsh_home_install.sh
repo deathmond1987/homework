@@ -78,7 +78,8 @@ config_font() {
 
 change_shell () {
     #changing default shell
-    export SUDO_USER=$(whoami)
+    SUDO_USER=$(whoami)
+    export SUDO_USER
     sudo -E usermod -s /usr/bin/zsh "$SUDO_USER"
 }
 
