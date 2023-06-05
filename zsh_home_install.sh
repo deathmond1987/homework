@@ -36,7 +36,7 @@ fi
 
 install_git_zsh () {
     if command -v dnf > /dev/null ; then
-        sudo dnf install git zsh -y
+        sudo dnf install git zsh ncurses -y
     elif command -v apt-get > /dev/null ; then
         sudo apt-get install git zsh -y
     elif command -v pacman > /dev/null ; then
