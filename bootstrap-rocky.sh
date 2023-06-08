@@ -22,13 +22,13 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 
 questions (){
     #asking questions. store answers in variables
-    echo -e "Proxy. Confugure default proxy (10.38.20.253:3128), no proxy or custom proxy with IP:PORT"
+    echo -e "Proxy. Confugure default proxy (10.38.22.253:3128), no proxy or custom proxy with IP:PORT"
     read -rp " Answer (default/d, no/n, ip:port ): " ANSWER
     case $ANSWER in
         no|n)
             ;;
         default|d)
-             PROXY="10.38.20.253:3128"
+             PROXY="10.38.22.253:3128"
             ;;
         *)
              PROXY=$ANSWER
