@@ -225,13 +225,6 @@ dnf_remove_proxy () {
     success "Proxy config removed from /etc/dnf/dnf.conf"
 }
 
-#adding_user () {
-#    useradd "$USER_NAME" || true
-#    echo -e "$USER_NAME:$PASSWORD" chpasswd
-#    usermod -aG wheel "$USER_NAME"
-#    success "User $USER_NAME added"
-#}
-
 main () {
     questions
     if [ -n "$PROXY" ]; then
