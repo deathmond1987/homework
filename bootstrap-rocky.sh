@@ -34,6 +34,12 @@ echo "              _
                         |||             || ||      || ||
 ------------------------|||-------------||-||------||-||-------
                         |__>            || ||      || ||"
+check_root () {
+if [ "$EUID" -ne 0 ]
+  then echo "Please run this script as root"
+  exit 1
+fi
+}
 
 check_dnf () {
     if ! command -v dnf &> /dev/null ; then
@@ -345,6 +351,7 @@ dnf_remove_proxy () {
 }
 
 main () {
+    check_root
     check_dnf
     questions
     if [ -n "$PROXY" ]; then
