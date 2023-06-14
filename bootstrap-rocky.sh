@@ -20,7 +20,15 @@ error() { printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-questions (){
+check_dnf () {
+    if ! command -v dnf &> /dev/null ; then
+        error "DNF not found. This script for DNF based distros only"
+        exit 1
+    else 
+        success "DNF found. Continue..."
+    fi
+    }
+questions () {
     #asking questions. store answers in variables
     echo -e "Proxy. Confugure default proxy (10.38.22.253:3128), no proxy or custom proxy with IP:PORT"
     read -rp " Answer (default/d, no/n, ip:port ): " ANSWER
@@ -265,6 +273,7 @@ dnf_remove_proxy () {
 }
 
 main () {
+    check_dnf
     questions
     if [ -n "$PROXY" ]; then
         export_proxy
