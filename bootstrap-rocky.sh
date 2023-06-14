@@ -153,18 +153,25 @@ dnf_install_default () {
 }
 
 install_vmtools () {
-#check that this is VM. if so - we will install guest tools
-VIRT=$(systemd-detect-virt)
-if [ "$VIRT" = "vmware" ]; then
-    warn "vmware virt detected. Installing guest tools..."
-    dnf install open-vm-tools -y 
-    systemctl enable --now vmtoolsd
-elif [ "$VIRT" = "microsoft" ]; then
-    warn "microsoft virt detected. Installing guest tools..."
-    dnf install hyperv-daemons -y 
-    #We only enable services. If we start service now - it will be fail? i don`t know why. After restart service seemse working
-    systemctl enable hypervkvpd hypervvssd
-else true
+    #check that this is VM. if so - we will install guest tools
+    VIRT=$(systemd-detect-virt)
+    if [ "$VIRT" = "vmware" ]; then
+        warn "$VIRT virt detected. Installing guest tools..."
+        dnf install open-vm-tools -y 
+        systemctl enable --now vmtoolsd
+    elif [ "$VIRT" = "microsoft" ]; then
+        warn "$VIRT virt detected. Installing guest tools..."
+        dnf install hyperv-daemons -y 
+        #We only enable services. If we start service now - it will be fail? i don`t know why. After restart service seemse working
+        systemctl enable hypervkvpd hypervvssd
+    elif [ "$VIRT" = "qemu" ]; then
+        warn "$VIRT virt detected. Installing guest tools..."
+        dnf install qemu-guest-agent -y
+    elif [ -z "$VIRT" ]; then
+        warn "virt not detected. Nothing to do..."
+    else 
+        warn "Unrecognized virt: $VIRT"
+        warn "You need install guest tools manually"
 fi
 }
 
