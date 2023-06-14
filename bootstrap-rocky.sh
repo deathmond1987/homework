@@ -239,7 +239,7 @@ fi
 
 dnf_install_docker () {
     SERVICE=docker
-    STATUS="$(systemctl is-active $SERVICE.service)"
+    STATUS="$(systemctl is-active $SERVICE.service || true)"
     if [ "$STATUS" = "active" ]; then
         warn "It seems like $SERVICE already installed and running... Nothing to do..."
     else
@@ -265,7 +265,7 @@ docker_proxy_config () {
 
 install_runner () {
     SERVICE=gitlab-runner
-    STATUS="$(systemctl is-active $SERVICE.service)"
+    STATUS="$(systemctl is-active $SERVICE.service || true)"
     if [ "$STATUS" = "active" ]; then
         warn "It seems like $SERVICE already installed and running... Nothing to do..."
     else
@@ -279,7 +279,7 @@ install_runner () {
 
 install_postgresql () {
     SERVICE=postgresql-"$POSTGRESQL_VERSION"
-    STATUS="$(systemctl is-active $SERVICE.service)"
+    STATUS="$(systemctl is-active $SERVICE.service || true)"
     if [ "$STATUS" = "active" ]; then
         warn "It seems like $SERVICE already installed and running... Nothing to do..."
     else
@@ -298,7 +298,7 @@ install_postgresql () {
 
 install_netdata () {
     SERVICE=netdata
-    STATUS="$(systemctl is-active $SERVICE.service)"
+    STATUS="$(systemctl is-active $SERVICE.service || true)"
     if [ "$STATUS" = "active" ]; then
         warn "It seems like $SERVICE already installed and running... Nothing to do..."
     else
@@ -312,6 +312,7 @@ install_netdata () {
                     --non-interactive \
                     --stable-channel> /dev/null
         #adding rules to firewalld with netdata port
+        systemctl enable --now netdata
         firewall-cmd --permanent --add-port=19999/tcp
         firewall-cmd --reload
         success "Netdata installed"
