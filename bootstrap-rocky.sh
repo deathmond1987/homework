@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
-set -e
-set -o noglob
+hi () {
+    set -e
+    set -o noglob
 
-reset=$(tput sgr0)
+    reset=$(tput sgr0)
 
-#colors
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-white=$(tput setaf 7)
-tan=$(tput setaf 3)
+    #colors
+    red=$(tput setaf 1)
+    green=$(tput setaf 2)
+    white=$(tput setaf 7)
+    tan=$(tput setaf 3)
 
-#set output functions
-info() { printf "${white}➜ %s${reset}\n" "$@"
-}
-success() { printf "${green}✔ %s${reset}\n" "$@"
-}
-error() { printf "${red}✖ %s${reset}\n" "$@"
-}
-warn() { printf "${tan}➜ %s${reset}\n" "$@"
-}
+    #set output functions
+    info() { printf "${white}➜ %s${reset}\n" "$@"
+    }
+    success() { printf "${green}✔ %s${reset}\n" "$@"
+    }
+    error() { printf "${red}✖ %s${reset}\n" "$@"
+    }
+    warn() { printf "${tan}➜ %s${reset}\n" "$@"
+    }
 
-echo "              _
+    echo "              _
              | |
              | |===( )   //////
              |_|   |||  | o o|
@@ -34,6 +35,8 @@ echo "              _
                         |||             || ||      || ||
 ------------------------|||-------------||-||------||-||-------
                         |__>            || ||      || ||"
+}
+
 check_root () {
 if [ "$EUID" -ne 0 ]
   then echo "Please run this script as root"
@@ -351,6 +354,7 @@ dnf_remove_proxy () {
 }
 
 main () {
+    hi
     check_root
     check_dnf
     questions
