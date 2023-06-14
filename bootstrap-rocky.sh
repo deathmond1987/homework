@@ -28,6 +28,7 @@ check_dnf () {
         success "DNF found. Continue..."
     fi
     }
+
 questions () {
     #asking questions. store answers in variables
     echo -e "Proxy. Confugure default proxy (10.38.22.253:3128), no proxy or custom proxy with IP:PORT"
