@@ -20,7 +20,7 @@ error() { printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-echo "        _
+echo "              _
              | |
              | |===( )   //////
              |_|   |||  | o o|
