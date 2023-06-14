@@ -254,6 +254,10 @@ install_netdata () {
     success "Netdata installed"
 }
 
+add_temp () {
+    mkdir -p /home/"$SUDO_USER"/temp
+}
+
 dnf_remove_proxy () {
     #removing proxy config from /etc/dnf/dnf.conf
     sed -i "/^proxy*/d" /etc/dnf/dnf.conf
@@ -287,6 +291,7 @@ main () {
     if [ "$NETDATA_INSTALL" = "true" ]; then
         install_netdata
     fi
+    add_temp
     if [ "$REMOVE_DNF_PROXY" = "true" ]; then
         dnf_remove_proxy
     fi
