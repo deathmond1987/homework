@@ -38,10 +38,10 @@ hi () {
 }
 
 check_root () {
-if [ "$EUID" -ne 0 ]
-  then echo "Please run this script as root"
-  exit 1
-fi
+    if [ "$EUID" -ne 0 ]; then 
+        echo "Please run this script as root"
+        exit 1
+    fi
 }
 
 check_dnf () {
