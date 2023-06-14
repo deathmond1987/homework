@@ -194,6 +194,7 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
         #We need true if systemd is not enabled in wsl by default to avoid script failing
         systemctl daemon-reload || true
         systemctl enable --now drop_cache.timer || true
+        warn "Added drop_cache.timer to drop linux caches every 3 minutes to avoid eating windows memory"
     elif [ -z "$VIRT" ]; then
         warn "virt not detected. Nothing to do..."
     else 
