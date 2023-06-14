@@ -293,6 +293,7 @@ install_postgresql () {
         /usr/pgsql-"$POSTGRESQL_VERSION"/bin/postgresql-"$POSTGRESQL_VERSION"-setup initdb 
         #starting postgresql service
         systemctl enable --now postgresql-"$POSTGRESQL_VERSION"
+    fi
 }
 
 install_netdata () {
