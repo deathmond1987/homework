@@ -27,10 +27,9 @@ check_dnf () {
     else 
         success "DNF found. Continue..."
     fi
-    }
+}
 
-questions () {
-    #asking questions. store answers in variables
+questions_proxy () {
     echo -e "Proxy. Confugure default proxy (10.38.22.253:3128), no proxy or custom proxy with IP:PORT"
     read -rp " Answer (default/d, no/n, ip:port ): " ANSWER
     case $ANSWER in
@@ -44,7 +43,9 @@ questions () {
             ;;
     esac
     unset ANSWER
+}
 
+questions_permanent_proxy () {
     if [ -n "$PROXY" ]; then
         read -rp "Add permanent proxy config to system variables? (yes/y, no/n): " ANSWER
         case $ANSWER in
@@ -53,12 +54,14 @@ questions () {
              no|n) ADD_SYSTEM_PROXY=false
                 ;;
               *) error "incorrect option"
-                 exit 1
+                 questions_permanent_proxy
                 ;;
         esac
         unset ANSWER
     fi
+}
 
+questions_docker () {
     read -rp "Install docker? (yes/y, no/n): " ANSWER
     case $ANSWER in
         yes|y) DOCKER_INSTALL=true
@@ -70,17 +73,22 @@ questions () {
                       no|n) DOCKER_PROXY_CONFIG=false
                          ;;
                        *) error "incorrect option"
-                         exit 1
+                         questions_docker
                          ;;
                  esac
                  unset ANSWER
              fi
             ;;
-        *)
+        no|n) DOCKER_INSTALL=false
+            ;;
+           *) error "Incorrect option"
+              questions_docker
             ;;
     esac
     unset ANSWER
+}
 
+questions_gitlab_runner () {
     read -rp "Install gitlab-runner? (yes/y, no/n): " ANSWER
     case $ANSWER in
         yes|y) RUNNER_INSTALL=true
@@ -88,11 +96,13 @@ questions () {
          no|n) RUNNER_INSTALL=false
             ;;
           *) error "incorrect option"
-             exit 1
+             questions_gitlab_runner
              ;;
     esac
     unset ANSWER
+}
 
+questions_postgres () {
     read -rp "Install postgresql? (yes/y, no/n): " ANSWER
     #well, there is some shit
     case $ANSWER in
@@ -102,11 +112,13 @@ questions () {
          no|n) POSTGRESQL_INSTALL=false
             ;;
           *) error "incorrect option"
-             exit 1
+             questions_postgres
             ;;
     esac
     unset ANSWER
+}
 
+questions_netdata () {
     read -rp "Install netdata? (yes/y, no/n): " ANSWER
     case $ANSWER in
         yes|y) NETDATA_INSTALL=true
@@ -114,11 +126,13 @@ questions () {
           no|n) NETDATA_INSTALL=false
             ;;
           *) error "incorrect option"
-             exit 1
+             questions_netdata
             ;;
     esac
     unset ANSWER
+}
 
+questions_remove_dnf_config () {
     read -rp "Remove proxy config from /etc/dnf/dnf.conf? (yes/y, no/n): " ANSWER
     case $ANSWER in
         yes|y) REMOVE_DNF_PROXY=true
@@ -126,11 +140,21 @@ questions () {
          no|n) REMOVE_DNF_PROXY=false
             ;;
           *) error "incorrect option"
-             exit 1
+             questions_remove_dnf_config
             ;;
     esac
     unset ANSWER
+}
 
+questions () {
+    #asking questions. store answers in variables
+    questions_proxy
+    questions_permanent_proxy
+    questions_docker
+    questions_gitlab_runner
+    questions_postgres
+    questions_netdata
+    questions_remove_dnf_config
 }
 
 export_proxy () {
