@@ -178,7 +178,7 @@ add_system_proxy () {
 
 dnf_install_default () {
     #adding epel repo to system
-    dnf update -y && dnf install epel-release -y 
+    dnf install epel-release -y 
     #installing minimal tools
     dnf install mc htop telnet nano wget curl traceroute strace ncdu net-tools bind-utils bash-completion -y 
 #    systemctl enable --now systemd-timesyncd.service
@@ -236,14 +236,21 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
 fi
 }
 
+
 dnf_install_docker () {
-    #adding docker repo and install it
-    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
-    dnf install docker-ce docker-ce-cli docker-compose-plugin -y 
-    systemctl enable --now docker 
-    #add default dir to store docker projects
-    mkdir -p /opt/docker
-    success "Docker installed"
+    SERVICE=docker
+    STATUS="$(systemctl is-active $SERVICE.service)"
+    if [ "$STATUS" = "active" ]; then
+        warn "It seems like $SERVICE already installed and running... Nothing to do..."
+    else
+        #adding docker repo and install it
+        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
+        dnf install docker-ce docker-ce-cli docker-compose-plugin -y 
+        systemctl enable --now docker 
+        #add default dir to store docker projects
+        mkdir -p /opt/docker
+        success "Docker installed"
+    fi
 }
 docker_proxy_config () {
     #adding override dir to docker.service and store there proxy config
@@ -257,34 +264,57 @@ docker_proxy_config () {
 }
 
 install_runner () {
-    #getting gitlab-runner install helper
-    curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | bash 
-    #installing gitlab-runner
-    dnf install gitlab-runner -y 
-    success "Gitlab-runner installed"
+    SERVICE=gitlab-runner
+    STATUS="$(systemctl is-active $SERVICE.service)"
+    if [ "$STATUS" = "active" ]; then
+        warn "It seems like $SERVICE already installed and running... Nothing to do..."
+    else
+        #getting gitlab-runner install helper
+        curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | bash 
+        #installing gitlab-runner
+        dnf install gitlab-runner -y 
+        success "Gitlab-runner installed"
+    fi
 }
 
 install_postgresql () {
-    #adding postgresql repo
-    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
-    #disabling default postgresql in dnf
-    dnf -qy module disable postgresql
-    #installing postgresql 
-    dnf install -y postgresql"$POSTGRESQL_VERSION"-server 
-    #initializing database
-    /usr/pgsql-"$POSTGRESQL_VERSION"/bin/postgresql-"$POSTGRESQL_VERSION"-setup initdb 
-    #starting postgresql service
-    systemctl enable --now postgresql-"$POSTGRESQL_VERSION"
+    SERVICE=postgresql-"$POSTGRESQL_VERSION"
+    STATUS="$(systemctl is-active $SERVICE.service)"
+    if [ "$STATUS" = "active" ]; then
+        warn "It seems like $SERVICE already installed and running... Nothing to do..."
+    else
+        #adding postgresql repo
+        dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
+        #disabling default postgresql in dnf
+        dnf -qy module disable postgresql
+        #installing postgresql 
+        dnf install -y postgresql"$POSTGRESQL_VERSION"-server 
+        #initializing database
+        /usr/pgsql-"$POSTGRESQL_VERSION"/bin/postgresql-"$POSTGRESQL_VERSION"-setup initdb 
+        #starting postgresql service
+        systemctl enable --now postgresql-"$POSTGRESQL_VERSION"
 }
 
 install_netdata () {
-    #getting netdata installer and install
-    echo -e "Installing netdata..."
-    wget -O /tmp/netdata-kickstart.sh https://my-netdata.io/kickstart.sh && sh /tmp/netdata-kickstart.sh --disable-telemetry --non-interactive --stable-channel> /dev/null
-    #adding rules to firewalld with netdata port
-    firewall-cmd --permanent --add-port=19999/tcp
-    firewall-cmd --reload
-    success "Netdata installed"
+    SERVICE=netdata
+    STATUS="$(systemctl is-active $SERVICE.service)"
+    if [ "$STATUS" = "active" ]; then
+        warn "It seems like $SERVICE already installed and running... Nothing to do..."
+    else
+        #getting netdata installer and install
+        echo -e "Installing netdata..."
+        wget -O /tmp/netdata-kickstart.sh \
+                https://my-netdata.io/kickstart.sh \
+                && \
+                sh /tmp/netdata-kickstart.sh \
+                    --disable-telemetry \
+                    --non-interactive \
+                    --stable-channel> /dev/null
+        #adding rules to firewalld with netdata port
+        firewall-cmd --permanent --add-port=19999/tcp
+        firewall-cmd --reload
+        success "Netdata installed"
+    fi
 }
 
 add_temp () {
