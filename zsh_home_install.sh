@@ -36,10 +36,14 @@ fi
 
 install_git_zsh () {
     if command -v dnf > /dev/null ; then
+        if [ -n "$HTTP_PROXY" ]; then
         echo "proxy=$HTTP_PROXY" | sudo tee -a /etc/dnf/dnf.conf
+        fi
         sudo dnf install git zsh ncurses epel-release -y
     elif command -v apt-get > /dev/null ; then
+        if [ -n "$HTTP_PROXY" ]; then
         echo "Acquire::http::Proxy \"http://$HTTP_PROXY\";" | sudo tee -a /etc/apt/apt.conf.d/proxy
+        fi
         sudo apt-get install git zsh -y
     elif command -v pacman > /dev/null ; then
         sudo pacman -S --noconfirm git zsh
