@@ -36,15 +36,17 @@ fi
 
 install_git_zsh () {
     if command -v dnf > /dev/null ; then
-        sudo dnf install git zsh ncurses -y
+        echo "proxy=$HTTP_PROXY" | sudo tee -a /etc/dnf/dnf.conf
+        sudo dnf install git zsh ncurses epel-release -y
     elif command -v apt-get > /dev/null ; then
+        echo "Acquire::http::Proxy \"http://$HTTP_PROXY\";" | sudo tee -a /etc/apt/apt.conf.d/proxy
         sudo apt-get install git zsh -y
     elif command -v pacman > /dev/null ; then
         sudo pacman -S --noconfirm git zsh
     elif command -v zypper > /dev/null ; then
         sudo zypper install -y git zsh
     else
-        echo "Package manager not found"
+        echo "Package manager not known"
         exit 1
     fi
 }
@@ -77,12 +79,12 @@ install_powerlevel () {
     #get powerlevel10k theme for zsh
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     #enable powerlevel10k theme in zsh config
-    sed -i 's:ZSH_THEME="robbyrussell":ZSH_THEME="powerlevel10k/powerlevel10k":g' $HOME/.zshrc
+    sed -i 's:ZSH_THEME="robbyrussell":ZSH_THEME="powerlevel10k/powerlevel10k":g' "$HOME"/.zshrc
 }
 
 fix_zsh_docker () {
     #enabling stacking options for docker suggections. need to docker -it working with autosuggections
-    echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> $HOME/.zshrc
+    echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> "$HOME"/.zshrc
 }
 
 config_font() {
@@ -104,32 +106,45 @@ change_shell () {
 
 linux_2023 () {
     #links to new programs
-APPS=btop dust duf bat micro lsd gdu
-for apps in "${APPS[@]}"; do
-    if command -v dnf > /dev/null ; then
-        sudo dnf install "$apps" -y && echo -e "$apps found and installed" || true
-    elif command -v apt-get > /dev/null ; then
-        sudo apt-get install "$apps" -y && echo -e "$apps found and installed" || true
-    elif command -v pacman > /dev/null ; then
-        sudo pacman -S --noconfirm "$apps" && echo -e "$apps found and installed" || true
-    elif command -v zypper > /dev/null ; then
-        sudo zypper install -y "$apps" && echo -e "$apps found and installed" || true
-    else
-        echo "Package manager not found"
-        exit 1
-    fi
-    
-    info "    
-    You need manually install:
-    https://github.com/sharkdp/bat/releases
-    https://github.com/lsd-rs/lsd/releases
-    https://github.com/bootandy/dust/releases
-    https://github.com/muesli/duf/releases
-    https://github.com/aristocratos/btop/releases
-    https://github.com/dundee/gdu/releases
-    "
-    
-    
+APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
+    for apps in "${APPS[@]}"; do
+        INSTALL=failed
+        if command -v dnf > /dev/null ; then
+            sudo dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
+        elif command -v apt-get > /dev/null ; then
+            sudo apt-get install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+        elif command -v pacman > /dev/null ; then
+            echo y | LANG=C yay \
+            --noprovides \
+            --answerdiff None \
+            --answerclean None \
+            --mflags "--noconfirm" "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+        elif command -v zypper > /dev/null ; then
+            sudo zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
+        else
+            echo "Package manager not known"
+            exit 1
+        fi
+        if [ "$INSTALL" = "failed" ]; then
+            error "$apps not found in repo"
+            if [ "$apps" = "btop" ]; then
+                info "Install $apps manually from https://github.com/aristocratos/btop/releases"
+            elif [ "$apps" = "dust" ]; then 
+                info "Install $apps manually from https://github.com/bootandy/dust/releases"
+            elif [ "$apps" = "duf" ]; then 
+                info "Install $apps manually from https://github.com/muesli/duf/releases"
+            elif [ "$apps" = "bat" ]; then 
+                info "Install $apps manually from https://github.com/sharkdp/bat/releases"
+            elif [ "$apps" = "micro" ]; then 
+                info "Install $apps manually from https://github.com/zyedidia/micro/releases"
+            elif [ "$apps" = "lsd" ]; then 
+                info "Install $apps manually from https://github.com/lsd-rs/lsd/releases"
+            elif [ "$apps" = "gdu" ]; then 
+                info "Install $apps manually from https://github.com/dundee/gdu/releases"
+            fi
+        fi
+    done
+
     #create aliases to links new programs to defaults
     echo -e 'alias yay="sudo dnf update"
     alias htop="btop"
@@ -138,7 +153,7 @@ for apps in "${APPS[@]}"; do
     alias cat="bat -pp -P"
     alias nano="micro"
     alias ls="lsd"
-    alias ncdu="gdu"' >> $HOME/.zshrc
+    alias ncdu="gdu"' >> "$HOME"/.zshrc
 }
 
 drop_proxy_config_git () {
