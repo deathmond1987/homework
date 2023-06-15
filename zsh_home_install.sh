@@ -104,8 +104,22 @@ change_shell () {
 
 linux_2023 () {
     #links to new programs
-    info "
+APPS=btop dust duf bat micro lsd gdu
+for apps in "${APPS[@]}"; do
+    if command -v dnf > /dev/null ; then
+        sudo dnf install "$apps" -y && echo -e "$apps found and installed" || true
+    elif command -v apt-get > /dev/null ; then
+        sudo apt-get install "$apps" -y && echo -e "$apps found and installed" || true
+    elif command -v pacman > /dev/null ; then
+        sudo pacman -S --noconfirm "$apps" && echo -e "$apps found and installed" || true
+    elif command -v zypper > /dev/null ; then
+        sudo zypper install -y "$apps" && echo -e "$apps found and installed" || true
+    else
+        echo "Package manager not found"
+        exit 1
+    fi
     
+    info "    
     You need manually install:
     https://github.com/sharkdp/bat/releases
     https://github.com/lsd-rs/lsd/releases
