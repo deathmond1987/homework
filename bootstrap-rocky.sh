@@ -136,6 +136,7 @@ questions_postgres () {
          no|n) POSTGRESQL_INSTALL=false
             ;;
          11|12|13|14|15) true
+            ;;
           *) error "incorrect option"
              questions_postgres
             ;;
