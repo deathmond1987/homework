@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 set -o noglob
 
 reset=$(tput sgr0)
