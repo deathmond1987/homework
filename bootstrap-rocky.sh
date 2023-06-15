@@ -55,7 +55,7 @@ check_dnf () {
 
 questions_proxy () {
     echo -e "Proxy. Confugure default proxy (10.38.22.253:3128), no proxy or custom proxy with IP:PORT"
-    read -rp " Answer (default/d, no/n, ip:port ): " ANSWER
+    read -rp "  Answer (default/d, no/n, ip:port ): " ANSWER
     case $ANSWER in
         no|n)
             ;;
@@ -135,6 +135,7 @@ questions_postgres () {
             ;;
          no|n) POSTGRESQL_INSTALL=false
             ;;
+         11|12|13|14|15) true
           *) error "incorrect option"
              questions_postgres
             ;;
@@ -195,7 +196,11 @@ add_system_proxy () {
     PROXY_FILE=/etc/profile.d/ksb_proxy.sh
     #creating ksb_proxy.sh file to store proxy configuration
     #it will be load when user log in
-    echo -e "export http_proxy=$PROXY\nexport https_proxy=$PROXY\nexport HTTP_PROXY=$PROXY\nexport HTTPS_PROXY=$PROXY\nexport NO_PROXY=localhost" > "$PROXY_FILE"
+    echo -e "export http_proxy=$PROXY
+    export https_proxy=$PROXY
+    export HTTP_PROXY=$PROXY
+    export HTTPS_PROXY=$PROXY
+    export NO_PROXY=localhost" > "$PROXY_FILE"
     chmod 644 "$PROXY_FILE"
     success "Proxy settings added to /etc/profile.d/ksb_proxy.sh"
 }
@@ -206,7 +211,7 @@ dnf_install_default () {
     #installing minimal tools
     dnf install mc htop telnet nano wget curl traceroute strace ncdu net-tools bind-utils bash-completion -y 
 #    systemctl enable --now systemd-timesyncd.service
-    success "bash-completion mc telnet htop nano wget curl traceroute strace ncdu net-tools bind-utils installed"
+    success "Default system tools installed"
 }
 
 install_vmtools () {
@@ -251,7 +256,7 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
         #We need true if systemd is not enabled in wsl by default to avoid script failing
         systemctl daemon-reload || true
         systemctl enable --now drop_cache.timer || true
-        warn "Added drop_cache.timer to drop linux caches every 3 minutes to avoid eating windows memory"
+        warn "Added drop_cache.timer and drop_cache.service in /etc/systemd to drop linux caches every 3 minutes to avoid eating windows memory"
     elif [ -z "$VIRT" ]; then
         warn "virt not detected. Nothing to do..."
     else 
@@ -280,7 +285,10 @@ docker_proxy_config () {
     #adding override dir to docker.service and store there proxy config
     mkdir -p /etc/systemd/system/docker.service.d
     #adding proxy config
-    echo -e "[Service]\nEnvironment=\"HTTP_PROXY=$PROXY\"\nEnvironment=\"HTTPS_PROXY=$PROXY\"\nEnvironment=\"NO_PROXY=localhost\"" > /etc/systemd/system/docker.service.d/http-proxy.conf
+    echo -e "[Service]
+    Environment=\"HTTP_PROXY=$PROXY\"
+    Environment=\"HTTPS_PROXY=$PROXY\"
+    Environment=\"NO_PROXY=localhost\"" > /etc/systemd/system/docker.service.d/http-proxy.conf
     #rebuilding systemd dependency tree and reload docker to apply changes
     systemctl daemon-reload
     systemctl restart docker
@@ -294,7 +302,8 @@ install_runner () {
         warn "It seems like $SERVICE already installed and running... Nothing to do..."
     else
         #getting gitlab-runner install helper
-        curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | bash 
+        curl -L \
+            "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | bash 
         #installing gitlab-runner
         dnf install gitlab-runner -y 
         success "Gitlab-runner installed"
@@ -308,7 +317,8 @@ install_postgresql () {
         warn "It seems like $SERVICE already installed and running... Nothing to do..."
     else
         #adding postgresql repo
-        dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
+        dnf install -y \
+            https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
         #disabling default postgresql in dnf
         dnf -qy module disable postgresql
         #installing postgresql 
