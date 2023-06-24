@@ -101,14 +101,14 @@ install_powerlevel () {
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     #enable powerlevel10k theme in zsh config
     sed -i 's:ZSH_THEME="robbyrussell":ZSH_THEME="powerlevel10k/powerlevel10k":g' "$HOME"/.zshrc
-    sucess "Done"
+    success "Done"
 }
 
 fix_zsh_docker () {
     warn "fix docker exec -it autocomplete"
     #enabling stacking options for docker suggections. need to docker -it working with autosuggections
     echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> "$HOME"/.zshrc
-    sucess "Done"
+    success "Done"
 }
 
 config_font() {
