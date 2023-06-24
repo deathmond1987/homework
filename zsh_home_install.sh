@@ -25,7 +25,10 @@ termux_install () {
     if [ -n "$TERMUX_VERSION" ]; then
         cd ~
         wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
-        sed -i 's|sudo||g' ./script.sh 
+        #to exit loop we`ll check script name
+        if [ ! "$(basename $0)" = "./script.sh" ]; then 
+            sed -i 's|sudo||g' ./script.sh 
+        fi
         chmod 755 ./script.sh
         exec ./script.sh
         rm ./script.sh
