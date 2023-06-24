@@ -17,7 +17,7 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-set -e
+set -ex
 
 termux_install () {
     if [ -n "$TERMUX_VERSION" ]; then
