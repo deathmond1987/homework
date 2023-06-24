@@ -24,11 +24,11 @@ alert_root () {
 if [ "$EUID" -eq 0 ]; then
     read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
     case $ANSWER in
-        yes|y) echo "Oh-my-zsh will be installed in $HOME"
+        yes|y) warn "Oh-my-zsh will be installed in $HOME"
             ;;
-         no|n) echo "OK. Exiting"
+         no|n) warn "OK. If you want install zsh for your user - re-run this script from your user without sudo"
             ;;
-            *) echo "Unrecognised option"
+            *) error "Unrecognised option"
                alert_root
             ;;
     esac
@@ -38,19 +38,23 @@ fi
 install_git_zsh () {
 #search package manager and config it to use proxy if HTTP_PROXY is not null. after this - installing needed packages
     if command -v dnf > /dev/null ; then
+        success "dnf package manager found. installing zsh..."
         if [ -n "$HTTP_PROXY" ]; then
             echo "proxy=$HTTP_PROXY" | sudo tee -a /etc/dnf/dnf.conf
         fi
         sudo dnf install git zsh -y
         sudo dnf install epel-release -y || true
-    elif command -v apt-get > /dev/null ; then
+    elif command -v apt > /dev/null ; then
+        success "apt package manager found. installing zsh..."
         if [ -n "$HTTP_PROXY" ]; then
             echo "Acquire::http::Proxy \"http://$HTTP_PROXY\";" | sudo tee -a /etc/apt/apt.conf.d/proxy
         fi
-        sudo apt-get install git zsh -y
+        sudo apt install git zsh -y
     elif command -v pacman > /dev/null ; then
+        success "pacman package manager found. installing zsh..."
         sudo pacman -S --noconfirm git zsh
     elif command -v zypper > /dev/null ; then
+        success "zypper package manager found. installing zsh..."
         sudo zypper install -y git zsh
     else
         error "Package manager not known"
