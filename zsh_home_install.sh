@@ -12,7 +12,7 @@ info() { printf "${white}➜ %s${reset}\n" "$@"
 }
 success() { printf "${green}✔ %s${reset}\n" "$@"
 }
-error() { printf "${red}✖ %s${reset}\n" "$@"
+error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 }
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
