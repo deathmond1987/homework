@@ -222,6 +222,8 @@ on_exit () {
     In next login to shell you`ll need to answer few questions to configure powerlevel10k theme.
     But before that you must configure your terminal fonts."
     success "Installing complete!"
+}
+
 main () {
     alert_root
     install_git_zsh
@@ -235,6 +237,7 @@ main () {
     linux_2023
     drop_proxy_config_git
     drop_proxy_pkg_manager_conf
+    on_exit
 }
 
 main "$@"
