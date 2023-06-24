@@ -21,7 +21,7 @@ set -ex
 
 termux_install () {
     if [ -n "$TERMUX_VERSION" ]; then
-        wget -qO https://github.com/deathmond1987/homework/blob/main/zsh_home_install.sh ./script.sh 
+        wget -q https://github.com/deathmond1987/homework/blob/main/zsh_home_install.sh -O ./script.sh 
         sed -i 's|sudo||g' ./script.sh 
         . ./script.sh
         rm 
