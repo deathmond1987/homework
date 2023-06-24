@@ -17,7 +17,7 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-set -ex
+set -exv
 
 termux_install () {
     #in termux virtualenv we can`t use sudo.
