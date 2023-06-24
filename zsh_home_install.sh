@@ -20,6 +20,7 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 set -e
 
 alert_root () {
+#aware user about installing zsh to root
 if [ "$EUID" -eq 0 ]; then
     read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
     case $ANSWER in
@@ -35,15 +36,16 @@ fi
 }
 
 install_git_zsh () {
+#search package manager and config it to use proxy if HTTP_PROXY is not null. after this - installing needed packages
     if command -v dnf > /dev/null ; then
         if [ -n "$HTTP_PROXY" ]; then
-        echo "proxy=$HTTP_PROXY" | sudo tee -a /etc/dnf/dnf.conf
+            echo "proxy=$HTTP_PROXY" | sudo tee -a /etc/dnf/dnf.conf
         fi
         sudo dnf install git zsh -y
         sudo dnf install epel-release -y || true
     elif command -v apt-get > /dev/null ; then
         if [ -n "$HTTP_PROXY" ]; then
-        echo "Acquire::http::Proxy \"http://$HTTP_PROXY\";" | sudo tee -a /etc/apt/apt.conf.d/proxy
+            echo "Acquire::http::Proxy \"http://$HTTP_PROXY\";" | sudo tee -a /etc/apt/apt.conf.d/proxy
         fi
         sudo apt-get install git zsh -y
     elif command -v pacman > /dev/null ; then
@@ -51,12 +53,13 @@ install_git_zsh () {
     elif command -v zypper > /dev/null ; then
         sudo zypper install -y git zsh
     else
-        echo "Package manager not known"
+        error "Package manager not known"
         exit 1
     fi
 }
 
 config_proxy_oh_my_zsh () {
+#if HTTP_PROXY is not null we must config git to use proxy and then install oh-my-zsh
     if [ -n "$HTTP_PROXY" ]; then
         #config git with proxy
         git config --global http.proxy http://"$HTTP_PROXY"
@@ -110,7 +113,7 @@ change_shell () {
 }
 
 linux_2023 () {
-    #links to new programs
+#now we trying to install additional modern unix programs
 APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
     for apps in "${APPS[@]}"; do
         INSTALL=failed
@@ -130,6 +133,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
             error "Package manager not known"
             exit 1
         fi
+        #if program not found in default repo - than we can at least give link to program github homepages
         if [ "$INSTALL" = "failed" ]; then
             error "$apps not found in repo"
             if [ "$apps" = "btop" ]; then
@@ -161,9 +165,29 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
 }
 
 drop_proxy_config_git () {
-    git config --global --unset http.proxy || true
-    git config --global --unset http.proxyAuthMethod || true
-    git config --global --unset http.sslVerify || true
+    #cleanup git config if HTTP_PROXY was configured
+    if [ -n "$HTTP_PROXY" ]; then
+        git config --global --unset http.proxy || true
+        git config --global --unset http.proxyAuthMethod || true
+        git config --global --unset http.sslVerify || true
+    fi
+}
+
+drop_proxy_pkg_manager_conf () {
+if [ -n "$HTTP_PROXY" ]; then
+    if command -v dnf > /dev/null ; then
+        sudo sed -i "s/proxy=$HTTP_PROXY//g" tee -a /etc/dnf/dnf.conf
+    elif command -v apt-get > /dev/null ; then
+        sudo rm /etc/apt/apt.conf.d/proxy
+    elif command -v pacman > /dev/null ; then
+        true
+    elif command -v zypper > /dev/null ; then
+        true
+    else
+        error "Package manager not known"
+        exit 1
+    fi
+fi
 }
 
 main () {
@@ -178,6 +202,7 @@ main () {
     change_shell
     linux_2023
     drop_proxy_config_git
+    drop_proxy_pkg_manager_conf
 }
 
 main "$@"
