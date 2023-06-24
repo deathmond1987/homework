@@ -127,7 +127,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
         elif command -v zypper > /dev/null ; then
             sudo zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
         else
-            echo "Package manager not known"
+            error "Package manager not known"
             exit 1
         fi
         if [ "$INSTALL" = "failed" ]; then
@@ -151,8 +151,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
     done
 
     #create aliases to links new programs to defaults
-    echo -e 'alias yay="sudo dnf update"
-    alias htop="btop"
+    echo -e 'alias htop="btop"
     alias du="dust"
     alias df="duf"
     alias cat="bat -pp -P"
