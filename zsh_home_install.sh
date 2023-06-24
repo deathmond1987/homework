@@ -216,6 +216,12 @@ if [ -n "$HTTP_PROXY" ]; then
 fi
 }
 
+on_exit () {
+    info "
+    
+    In next login to shell you`ll need to answer few questions to configure powerlevel10k theme.
+    But before that you must configure your terminal fonts."
+    success "Installing complete!"
 main () {
     alert_root
     install_git_zsh
