@@ -106,7 +106,10 @@ config_font() {
     info "Default shell now will change to zsh."
     error "IMPORTANT:"
     info "You must enable fonts in your terminal"
-    info "See here: https://github.com/romkatv/powerlevel10k <---"
+    info "See here: https://github.com/romkatv/powerlevel10k <---
+    
+    "
+    sleep 5
 }
 
 change_shell () {
