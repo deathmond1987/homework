@@ -21,8 +21,8 @@ set -ex
 
 termux_install () {
     if [ -n "$TERMUX_VERSION" ]; then
-        sed -i 's|sudo||g' "$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
-        . "$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+        sed -i 's|sudo||g' $(basename $0) 
+        . $(basename $0)
         exit 0
     fi
 }
