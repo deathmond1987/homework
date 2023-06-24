@@ -20,6 +20,8 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 set -ex
 
 termux_install () {
+    #in termux virtualenv we can`t use sudo.
+    #so, we`ll download script, removing all sudo enters and re-run new script
     if [ -n "$TERMUX_VERSION" ]; then
         cd ~
         wget -O ./script.sh https://github.com/deathmond1987/homework/blob/main/zsh_home_install.sh 
