@@ -217,7 +217,7 @@ fi
 }
 
 on_exit () {
-    info "In next login to shell you`ll need to answer few questions to configure powerlevel10k theme."
+    info "In next login to shell you need to answer few questions to configure powerlevel10k theme."
     info "But before that you must configure your terminal fonts."
     success "Installing complete!"
 }
