@@ -24,7 +24,7 @@ termux_install () {
     #so, we`ll download script, removing all sudo enters and re-run new script
     if [ -n "$TERMUX_VERSION" ]; then
         cd ~
-        wget -O ./script.sh https://github.com/deathmond1987/homework/blob/main/zsh_home_install.sh 
+        wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
         sed -i 's|sudo||g' ./script.sh 
         exec ./script.sh
         rm ./script.sh
