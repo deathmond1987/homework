@@ -36,7 +36,7 @@ fi
 }
 
 install_git_zsh () {
-#search package manager and config it to use proxy if HTTP_PROXY is not null. after this - installing needed packages
+    #search package manager and config it to use proxy if HTTP_PROXY is not null. after this - installing needed packages
     if command -v dnf > /dev/null ; then
         success "dnf package manager found. installing zsh..."
         if [ -n "$HTTP_PROXY" ]; then
@@ -60,43 +60,55 @@ install_git_zsh () {
         error "Package manager not known"
         exit 1
     fi
+    success "Dependencies of oh-my-zsh installed"
 }
 
 config_proxy_oh_my_zsh () {
-#if HTTP_PROXY is not null we must config git to use proxy and then install oh-my-zsh
+    #if HTTP_PROXY is not null we must config git to use proxy and then install oh-my-zsh
     if [ -n "$HTTP_PROXY" ]; then
+        warn "HTTP_PROXY found. Configuring proxy for git"
         #config git with proxy
         git config --global http.proxy http://"$HTTP_PROXY"
         git config --global http.proxyAuthMethod 'basic'
         git config --global http.sslVerify false
         #get oh-my-zsh
+        warn "Installing oh-my-zsh"
         sh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
         #since we in proxy default install of gitstatusd not working. disable download
         echo "POWERLEVEL9K_DISABLE_GITSTATUS=true" >> ~/.zshrc
+        success "Done"
     else
+        warn "Installing oh-my-zsh"
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        success "Done"
     fi
 }
 
 install_plugins () {
+    warn "Installing and enabling plugins"
     #get zsh syntax highlightning plugin
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
     #get zsh autosuggections plugin
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     #enabling plugins in .zshrc config file
     sed -i 's/plugins=(git)/plugins=(docker docker-compose systemd git zsh-autosuggestions zsh-syntax-highlighting sudo)/g' $HOME/.zshrc
+    success "Done"
 }
 
 install_powerlevel () {
+    warn "Installing powerlevel10k theme"
     #get powerlevel10k theme for zsh
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     #enable powerlevel10k theme in zsh config
     sed -i 's:ZSH_THEME="robbyrussell":ZSH_THEME="powerlevel10k/powerlevel10k":g' "$HOME"/.zshrc
+    sucess "Done"
 }
 
 fix_zsh_docker () {
+    warn "fix docker exec -it autocomplete"
     #enabling stacking options for docker suggections. need to docker -it working with autosuggections
     echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> "$HOME"/.zshrc
+    sucess "Done"
 }
 
 config_font() {
@@ -114,14 +126,17 @@ config_font() {
 
 change_shell () {
     #changing default shell
+    warn "Changing default shell"
     SUDO_USER=$(whoami)
     export SUDO_USER
     sudo -E usermod -s /usr/bin/zsh "$SUDO_USER"
+    success "Done"
 }
 
-linux_2023 () {
+linux_2023 () { 
 #now we trying to install additional modern unix programs
 APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
+    warn "Installing modern apps"
     for apps in "${APPS[@]}"; do
         INSTALL=failed
         if command -v dnf > /dev/null ; then
@@ -174,14 +189,17 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
 drop_proxy_config_git () {
     #cleanup git config if HTTP_PROXY was configured
     if [ -n "$HTTP_PROXY" ]; then
+        warn "Removeing git proxy config"
         git config --global --unset http.proxy || true
         git config --global --unset http.proxyAuthMethod || true
         git config --global --unset http.sslVerify || true
+        success "Done"
     fi
 }
 
 drop_proxy_pkg_manager_conf () {
 if [ -n "$HTTP_PROXY" ]; then
+    warn "Removing package manager proxy config"
     if command -v dnf > /dev/null ; then
         sudo sed -i "s/proxy=$HTTP_PROXY//g" tee -a /etc/dnf/dnf.conf
     elif command -v apt-get > /dev/null ; then
@@ -194,6 +212,7 @@ if [ -n "$HTTP_PROXY" ]; then
         error "Package manager not known"
         exit 1
     fi
+    success "Done"
 fi
 }
 
