@@ -119,7 +119,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
         elif command -v apt-get > /dev/null ; then
             sudo apt-get install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         elif command -v pacman > /dev/null ; then
-            echo y | LANG=C yay \
+            echo y | LANG=C yay -S \
             --noprovides \
             --answerdiff None \
             --answerclean None \
