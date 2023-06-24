@@ -26,7 +26,7 @@ termux_install () {
         cd ~
         wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
         sed -i 's|sudo||g' ./script.sh 
-        chmod 755 ./cript.sh
+        chmod 755 ./script.sh
         exec ./script.sh
         rm ./script.sh
         exit 0
