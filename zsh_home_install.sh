@@ -19,6 +19,14 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 
 set -e
 
+termux_install () {
+    if [ -n "$TERMUX_VERSION" ]; then
+        sed -i 's|sudo||g' "$BASH_SOURCE"
+        . "$BASH_SOURCE"
+        exit 0
+    fi
+}
+
 alert_root () {
 #aware user about installing zsh to root
 if [ "$EUID" -eq 0 ]; then
@@ -223,6 +231,7 @@ on_exit () {
 }
 
 main () {
+    termux_install
     alert_root
     install_git_zsh
     drop_proxy_config_git
