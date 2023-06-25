@@ -22,18 +22,17 @@ set -exv
 termux_install () {
     #in termux virtualenv we can`t use sudo.
     #so, we`ll download script, removing all sudo enters and re-run new script
-    unset TERMUX_PATCH
-    if [ -n "$TERMUX_PATCH" ]; then
         if [ -n "$TERMUX_VERSION" ]; then
-            wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
-            sed -i 's|sudo||g' ./script.sh
-            export TERMUX_PATCH=true
-            chmod 755 ./script.sh
-            exec ./script.sh
-            exit 0
+            if [ -n "$TERMUX_PATCH" ]; then
+                true
+            else
+                wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
+                sed -i 's|sudo||g' ./script.sh
+                chmod 755 ./script.sh
+                export TERMUX_PATCH=true
+                exec ./script.sh
+            fi
         fi
-    fi
-    
 }
 
 alert_root () {
