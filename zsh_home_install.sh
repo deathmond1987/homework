@@ -143,13 +143,11 @@ change_shell () {
     #changing default shell
     warn "Changing default shell"
     if [ -n "$TERMUX_VERSION" ]; then
-        if command -v chsh > /dev/null ; then
-            chsh -s zsh
-        fi
+            chsh -s $(which zsh)
     else
         SUDO_USER=$(whoami)
         export SUDO_USER
-        sudo -E usermod -s /usr/bin/zsh "$SUDO_USER"
+        sudo -E usermod -s $(which zsh) "$SUDO_USER"
     fi
     success "Done"
 }
