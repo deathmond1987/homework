@@ -17,7 +17,7 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-set -exv
+set -ex
 
 termux_install () {
     #in termux virtualenv we can`t use sudo.
@@ -27,7 +27,7 @@ termux_install () {
                 true
             else
                 wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
-                sed -i 's|sudo -E||g' ./script.sh
+                sed -i 's|sudo -E ||g' ./script.sh
                 sed -i 's|sudo||g' ./script.sh
                 chmod 755 ./script.sh
                 export TERMUX_PATCH=true
