@@ -144,9 +144,13 @@ config_font() {
 change_shell () {
     #changing default shell
     warn "Changing default shell"
-    SUDO_USER=$(whoami)
-    export SUDO_USER
-    sudo -E usermod -s /usr/bin/zsh "$SUDO_USER"
+    if command -v chsh > /dev/null ; then
+        chsh -s zsh
+    else
+        SUDO_USER=$(whoami)
+        export SUDO_USER
+        sudo -E usermod -s /usr/bin/zsh "$SUDO_USER"
+    fi
     success "Done"
 }
 
