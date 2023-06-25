@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -o noglob
 
-reset=$(tput sgr0)
+reset="\033[0m"
 
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-white=$(tput setaf 7)
-tan=$(tput setaf 3)
+red="\033[0;31m"
+green="\033[0;32m"
+white="\033[0;37m"
+tan="\033[0;33m"
 
 info() { printf "${white}➜ %s${reset}\n" "$@"
 }
