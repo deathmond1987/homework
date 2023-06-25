@@ -142,8 +142,10 @@ config_font() {
 change_shell () {
     #changing default shell
     warn "Changing default shell"
-    if command -v chsh > /dev/null ; then
-        sudo chsh -s zsh
+    if [ -n "$TERMUX_VERSION" ]; then
+        if command -v chsh > /dev/null ; then
+            chsh -s zsh
+        fi
     else
         SUDO_USER=$(whoami)
         export SUDO_USER
