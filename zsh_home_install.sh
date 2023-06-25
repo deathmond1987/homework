@@ -145,7 +145,7 @@ change_shell () {
     #changing default shell
     warn "Changing default shell"
     if command -v chsh > /dev/null ; then
-        chsh -s zsh
+        sudo chsh -s zsh
     else
         SUDO_USER=$(whoami)
         export SUDO_USER
