@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo noglob
+set -eo noglob
 
 reset="\033[0m"
 
