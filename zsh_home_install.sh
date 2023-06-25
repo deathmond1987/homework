@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o noglob
+set -euo noglob
 
 reset="\033[0m"
 
@@ -16,8 +16,6 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 }
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
-
-set -ex
 
 termux_install () {
     #in termux virtualenv we can`t use sudo.
