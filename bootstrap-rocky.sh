@@ -39,14 +39,14 @@ hi () {
 
 check_root () {
     if [ "$EUID" -ne 0 ]; then 
-        echo "Please run this script as root"
+        echo "Please run this script as root" >&2
         exit 1
     fi
 }
 
 check_dnf () {
     if ! command -v dnf &> /dev/null ; then
-        error "DNF not found. This script for DNF based distros only"
+        error "DNF not found. This script for DNF based distros only" >&2
         exit 1
     else 
         success "DNF found. Continue..."
@@ -77,7 +77,7 @@ questions_permanent_proxy () {
                 ;;
              no|n) ADD_SYSTEM_PROXY=false
                 ;;
-              *) error "incorrect option"
+              *) error "incorrect option" >&2
                  questions_permanent_proxy
                 ;;
         esac
@@ -96,7 +96,7 @@ questions_docker () {
                          ;;
                       no|n) DOCKER_PROXY_CONFIG=false
                          ;;
-                       *) error "incorrect option"
+                       *) error "incorrect option" >&2
                          questions_docker
                          ;;
                  esac
@@ -105,7 +105,7 @@ questions_docker () {
             ;;
         no|n) DOCKER_INSTALL=false
             ;;
-           *) error "Incorrect option"
+           *) error "Incorrect option" >&2
               questions_docker
             ;;
     esac
@@ -119,7 +119,7 @@ questions_gitlab_runner () {
             ;;
          no|n) RUNNER_INSTALL=false
             ;;
-          *) error "incorrect option"
+          *) error "incorrect option" >&2
              questions_gitlab_runner
              ;;
     esac
@@ -137,7 +137,7 @@ questions_postgres () {
             ;;
          11|12|13|14|15) true
             ;;
-          *) error "incorrect option"
+          *) error "incorrect option" >&2
              questions_postgres
             ;;
     esac
@@ -151,7 +151,7 @@ questions_netdata () {
             ;;
           no|n) NETDATA_INSTALL=false
             ;;
-          *) error "incorrect option"
+          *) error "incorrect option" >&2
              questions_netdata
             ;;
     esac
@@ -165,7 +165,7 @@ questions_remove_dnf_config () {
             ;;
          no|n) REMOVE_DNF_PROXY=false
             ;;
-          *) error "incorrect option"
+          *) error "incorrect option" >&2
              questions_remove_dnf_config
             ;;
     esac
