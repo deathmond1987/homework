@@ -57,20 +57,20 @@ install_git_zsh () {
         if [ -n "$HTTP_PROXY" ]; then
             echo "proxy=$HTTP_PROXY" | sudo tee -a /etc/dnf/dnf.conf
         fi
-        sudo dnf install git zsh -y
-        sudo dnf install epel-release -y || true
+        sudo -E dnf install git zsh -y
+        sudo -E dnf install epel-release -y || true
     elif command -v apt > /dev/null ; then
         success "apt package manager found. installing zsh..."
         if [ -n "$HTTP_PROXY" ]; then
             echo "Acquire::http::Proxy \"http://$HTTP_PROXY\";" | sudo tee -a /etc/apt/apt.conf.d/proxy
         fi
-        sudo apt install git zsh -y
+        sudo -E apt install git zsh -y
     elif command -v pacman > /dev/null ; then
         success "pacman package manager found. installing zsh..."
-        sudo pacman -S --noconfirm git zsh
+        sudo -E pacman -S --noconfirm git zsh
     elif command -v zypper > /dev/null ; then
         success "zypper package manager found. installing zsh..."
-        sudo zypper install -y git zsh
+        sudo -E zypper install -y git zsh
     else
         error "Package manager not known"
         exit 1
@@ -236,7 +236,7 @@ fi
 }
 
 on_exit () {
-    warn ""
+    echo ""
     warn "In next login to shell you need to answer few questions to configure powerlevel10k theme."
     warn "But before that you must configure your terminal fonts."
     success "Installing complete!"
