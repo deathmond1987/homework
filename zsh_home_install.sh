@@ -67,9 +67,11 @@ install_git_zsh () {
         sudo -E apt install git zsh -y
     elif command -v pacman > /dev/null ; then
         success "pacman package manager found. installing zsh..."
+        http_proxy="$HTTP_PROXY"
         sudo -E pacman -S --noconfirm git zsh
     elif command -v zypper > /dev/null ; then
         success "zypper package manager found. installing zsh..."
+        if [ -n "$HTTP_PROXY" ]; then
         sudo -E zypper install -y git zsh
     else
         error "Package manager not known"
