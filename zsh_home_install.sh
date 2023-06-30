@@ -45,6 +45,7 @@ alpine_install () {
             sed -i 's|"${APPS[@]}"|APPS|g' ./script.sh
             chmod 755 ./script.sh
             export ALPINE_PATCH=true
+            exec ./script.sh
         fi
     fi
 }
