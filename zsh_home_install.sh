@@ -37,7 +37,7 @@ termux_install () {
 alpine_install () {
 . /etc/os-release
     if [ "$ID" = "alpine" ]; then
-        if [-n "$ALPINE_PATCH" = "true" ]; then
+        if [ -n "$ALPINE_PATCH" = "true" ]; then
             true
         else
             wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
