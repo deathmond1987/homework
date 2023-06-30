@@ -187,9 +187,9 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
     for apps in "${APPS[@]}"; do
         INSTALL=failed
         if command -v dnf > /dev/null ; then
-            sudo dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
+            dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
         elif command -v apt-get > /dev/null ; then
-            sudo apt-get install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            apt-get install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         elif command -v pacman > /dev/null ; then
             echo y | LANG=C yay -S \
             --noprovides \
@@ -197,9 +197,9 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
             --answerclean None \
             --mflags "--noconfirm" "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         elif command -v zypper > /dev/null ; then
-            sudo zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
+            zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
         elif command -v apk > /dev/null ; then
-            sudo apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         else
             error "Package manager not known"
             exit 1
