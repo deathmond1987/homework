@@ -34,6 +34,7 @@ termux_install () {
         fi
 }
 
+alpine install
 alpine_install () {
 . /etc/os-release
     if [ "$ID" = "alpine" ]; then
