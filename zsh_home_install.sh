@@ -95,6 +95,10 @@ install_git_zsh () {
         sudo zypper install -y git zsh
     elif command -v apk > /dev/null ; then
         success "apk package manager found. installing zsh..."
+        if [ -n "$HTTP_PROXY" ]; then
+            http_proxy="$HTTP_PROXY"
+            https_proxy="$HTTP_PROXY"
+        fi    
         sudo apk add git zsh
     else
         error "Package manager not known"
