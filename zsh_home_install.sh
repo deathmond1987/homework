@@ -37,7 +37,7 @@ termux_install () {
 alpine_install () {
 . /etc/os-release
     if [ "$ID" = "alpine" ]; then
-        if [ -n "$ALPINE_PATCH" = "true" ]; then
+        if [ -n "$ALPINE_PATCH" ]; then
             true
         else
             #getting raw script
