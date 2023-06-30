@@ -285,6 +285,7 @@ main () {
     fix_zsh_docker
     config_font
     change_shell
+    cat ./script.sh
     linux_2023
     drop_proxy_config_git
     drop_proxy_pkg_manager_conf
