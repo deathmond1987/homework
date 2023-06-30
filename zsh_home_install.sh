@@ -49,7 +49,7 @@ alpine_install () {
             sed -i 's|#!/usr/bin/env bash| #!/usr/bin/env ash|g' ./script.sh
             chmod 755 ./script.sh
             export ALPINE_PATCH=true
-            ash -xe ./script.sh
+            ash -xev ./script.sh
         fi
     fi
 }
