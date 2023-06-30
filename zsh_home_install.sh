@@ -201,6 +201,8 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
             sudo zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
         elif command -v apk > /dev/null ; then
             sudo apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+        elif command -v apk > /dev/null ; then
+            sudo apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         else
             error "Package manager not known"
             exit 1
