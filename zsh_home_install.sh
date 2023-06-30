@@ -34,6 +34,21 @@ termux_install () {
         fi
 }
 
+alpine_install () {
+. /etc/os-release
+    if [ "$ID" = "alpine" ]; then
+        if [-n "$ALPINE_PATCH" = "true" ]; then
+            true
+        else
+            wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
+            sed -i 's|APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )|APPS=btop dust duf bat micro lsd gdu fd|g' ./script.sh
+            sed -i 's|"${APPS[@]}"|APPS|g' ./script.sh
+            chmod 755 ./script.sh
+            export ALPINE_PATCH=true
+        fi
+    fi
+}
+
 alert_root () {
 #aware user about installing zsh to root
 if [ "$EUID" -eq 0 ]; then
@@ -159,7 +174,7 @@ change_shell () {
 
 linux_2023 () { 
 #now we trying to install additional modern unix programs
-APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd")
+APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
     warn "Installing modern apps"
     for apps in "${APPS[@]}"; do
         INSTALL=failed
