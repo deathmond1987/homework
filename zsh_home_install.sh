@@ -47,7 +47,8 @@ alpine_install () {
             sed -i "s|    for apps in.*do|    for apps in btop dust duf bat micro lsd gdu fd; do|g" ./script.sh
             chmod 755 ./script.sh
             export ALPINE_PATCH=true
-            ash -xev ./script.sh
+            exec ./script.sh
+            exit 0
         fi
     fi
 }
