@@ -101,7 +101,7 @@ config_proxy_oh_my_zsh () {
 }
 
 install_plugins () {
-    warn "Installing and enabling plugins"
+    warn "Installing and enabling plugins (autosuggestions, syntax-highlighting)"
     #get zsh syntax highlightning plugin
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
     #get zsh autosuggections plugin
@@ -112,7 +112,7 @@ install_plugins () {
 }
 
 install_powerlevel () {
-    warn "Installing powerlevel10k theme"
+    warn "Installing powerlevel10k theme for zsh"
     #get powerlevel10k theme for zsh
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     #enable powerlevel10k theme in zsh config
@@ -122,6 +122,7 @@ install_powerlevel () {
 
 fix_zsh_docker () {
     warn "fix docker exec -it autocomplete"
+    info "by default zsh completions for docker not working after inputting arguments. so, docker exec -ti not shows container names. fixing"
     #enabling stacking options for docker suggections. need to docker -it working with autosuggections
     echo -e "zstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes" >> "$HOME"/.zshrc
     success "Done"
@@ -155,7 +156,7 @@ change_shell () {
 
 linux_2023 () { 
 #now we trying to install additional modern unix programs
-APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" )
+APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd")
     warn "Installing modern apps"
     for apps in "${APPS[@]}"; do
         INSTALL=failed
