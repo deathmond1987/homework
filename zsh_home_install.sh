@@ -257,7 +257,7 @@ if [ -n "$HTTP_PROXY" ]; then
         true
     elif command -v zypper > /dev/null ; then
         true
-    elif comman -v apk > /dev/null ; then
+    elif command -v apk > /dev/null ; then
         true
     else
         error "Package manager not known"
