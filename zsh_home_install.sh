@@ -44,7 +44,7 @@ alpine_install () {
             wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
             #ash not known about bash arrays. patching to line
             sed -i 's|APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )|APPS=btop dust duf bat micro lsd gdu fd|g' ./script.sh
-            sed -i 's|"${APPS[@]}"|$APPS|g' ./script.sh
+            sed -i 's|"\${APPS[@]}"|$APPS|g' ./script.sh
             #oh shi...
             sed -i 's|#!/usr/bin/env bash| #!/usr/bin/env ash|g' ./script.sh
             chmod 755 ./script.sh
