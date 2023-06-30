@@ -201,8 +201,6 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
             sudo zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
         elif command -v apk > /dev/null ; then
             sudo apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
-        elif command -v apk > /dev/null ; then
-            sudo apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         else
             error "Package manager not known"
             exit 1
@@ -259,6 +257,8 @@ if [ -n "$HTTP_PROXY" ]; then
     elif command -v pacman > /dev/null ; then
         true
     elif command -v zypper > /dev/null ; then
+        true
+    elif comman -v apk > /dev/null ; then
         true
     else
         error "Package manager not known"
