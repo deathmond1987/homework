@@ -72,6 +72,9 @@ install_git_zsh () {
     elif command -v zypper > /dev/null ; then
         success "zypper package manager found. installing zsh..."
         sudo zypper install -y git zsh
+    elif command -v apk > /dev/null ; then
+        success "apk package manager found. installing zsh..."
+        sudo apk add git zsh
     else
         error "Package manager not known"
         exit 1
@@ -172,6 +175,8 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd")
             --mflags "--noconfirm" "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         elif command -v zypper > /dev/null ; then
             sudo zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
+        elif command -v apk > /dev/null ; then
+            sudo apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         else
             error "Package manager not known"
             exit 1
