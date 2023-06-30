@@ -96,8 +96,8 @@ install_git_zsh () {
     elif command -v apk > /dev/null ; then
         success "apk package manager found. installing zsh..."
         if [ -n "$HTTP_PROXY" ]; then
-            http_proxy="$HTTP_PROXY"
-            https_proxy="$HTTP_PROXY"
+            http_proxy=http://"$HTTP_PROXY"
+            https_proxy=http://"$HTTP_PROXY"
         fi    
         sudo -E apk add git zsh
     else
