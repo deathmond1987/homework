@@ -34,7 +34,6 @@ termux_install () {
         fi
 }
 
-alpine install
 alpine_install () {
 . /etc/os-release
     if [ "$ID" = "alpine" ]; then
@@ -49,6 +48,7 @@ alpine_install () {
         fi
     fi
 }
+alpine_install
 
 alert_root () {
 #aware user about installing zsh to root
