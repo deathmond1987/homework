@@ -123,13 +123,13 @@ config_proxy_oh_my_zsh () {
         git config --global http.sslVerify false
         #get oh-my-zsh
         warn "Installing oh-my-zsh"
-        sh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        zsh -c "$(curl -fsSL -x "$HTTP_PROXY" https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
         #since we in proxy default install of gitstatusd not working. disable download
         echo "POWERLEVEL9K_DISABLE_GITSTATUS=true" >> ~/.zshrc
         success "Done"
     else
         warn "Installing oh-my-zsh"
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        zsh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
         success "Done"
     fi
 }
