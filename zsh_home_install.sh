@@ -216,19 +216,19 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
         if [ "$INSTALL" = "failed" ]; then
             error "$apps not found in repo"
             if [ "$apps" = "btop" ]; then
-                info "Install $apps manually from https://github.com/aristocratos/btop/releases"
+                info "Install $apps manually from: https://github.com/aristocratos/btop/releases"
             elif [ "$apps" = "dust" ]; then 
-                info "Install $apps manually from https://github.com/bootandy/dust/releases"
+                info "Install $apps manually from: https://github.com/bootandy/dust/releases"
             elif [ "$apps" = "duf" ]; then 
-                info "Install $apps manually from https://github.com/muesli/duf/releases"
+                info "Install $apps manually from: https://github.com/muesli/duf/releases"
             elif [ "$apps" = "bat" ]; then 
-                info "Install $apps manually from https://github.com/sharkdp/bat/releases"
+                info "Install $apps manually from: https://github.com/sharkdp/bat/releases"
             elif [ "$apps" = "micro" ]; then 
-                info "Install $apps manually from https://github.com/zyedidia/micro/releases"
+                info "Install $apps manually from: https://github.com/zyedidia/micro/releases"
             elif [ "$apps" = "lsd" ]; then 
-                info "Install $apps manually from https://github.com/lsd-rs/lsd/releases"
+                info "Install $apps manually from: https://github.com/lsd-rs/lsd/releases"
             elif [ "$apps" = "gdu" ]; then 
-                info "Install $apps manually from https://github.com/dundee/gdu/releases"
+                info "Install $apps manually from: https://github.com/dundee/gdu/releases"
             fi
         fi
     done
