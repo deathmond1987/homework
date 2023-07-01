@@ -46,8 +46,10 @@ alpine_install () {
             sed -i 's|APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )||g' ./script.sh
             sed -i "s|    for apps in.*do|    for apps in btop dust duf bat micro lsd gdu fd; do|g" ./script.sh
             chmod 755 ./script.sh
+            #export variable to stop cycle
             export ALPINE_PATCH=true
-            exec ./script.sh
+            #exec from ash to supress bash shebang in script
+            ash ./script.sh
             exit 0
         fi
     fi
