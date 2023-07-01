@@ -60,7 +60,7 @@ alert_root () {
     #check interactive shell
     if  [ ! -z "$PS1" ]; then
         #aware user about installing zsh to root
-        if [ "$EUID" -eq 0 ]; then
+        if [ "$(id -u)" -eq 0 ]; then
             read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
             case $ANSWER in
                 yes|y) warn "Oh-my-zsh will be installed in $HOME"
