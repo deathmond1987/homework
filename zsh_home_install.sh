@@ -57,19 +57,24 @@ alpine_install () {
 alpine_install
 
 alert_root () {
-#aware user about installing zsh to root
-if [ "$EUID" -eq 0 ]; then
-    read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
-    case $ANSWER in
-        yes|y) warn "Oh-my-zsh will be installed in $HOME"
-            ;;
-         no|n) warn "OK. If you want install zsh for your user - re-run this script from your user without sudo"
-            ;;
-            *) error "Unrecognised option"
-               alert_root
-            ;;
-    esac
-fi
+    #check interactive shell
+    if  [ ! -z "$PS1" ]; then
+        #aware user about installing zsh to root
+        if [ "$EUID" -eq 0 ]; then
+            read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
+            case $ANSWER in
+                yes|y) warn "Oh-my-zsh will be installed in $HOME"
+                    ;;
+                no|n) warn "OK. If you want install zsh for your user - re-run this script from your user without sudo"
+                    ;;
+                    *) error "Unrecognised option"
+                       alert_root
+                    ;;
+            esac
+        fi
+    else
+        warn "zsh will be installed in $HOME !"
+    fi
 }
 
 install_git_zsh () {
