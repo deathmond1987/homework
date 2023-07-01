@@ -105,7 +105,7 @@ install_git_zsh () {
             http_proxy=http://"$HTTP_PROXY"
             https_proxy=http://"$HTTP_PROXY"
         fi    
-        sudo -E apk add git zsh
+        sudo -E apk add git zsh sudo shadow
     else
         error "Package manager not known"
         exit 1
