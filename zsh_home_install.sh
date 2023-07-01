@@ -49,7 +49,7 @@ alpine_install () {
             #export variable to stop cycle
             export ALPINE_PATCH=true
             #exec from ash to supress bash shebang in script
-            ash ./script.sh
+            ash -xv ./script.sh
             exit 0
         fi
     fi
