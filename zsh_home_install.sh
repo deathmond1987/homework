@@ -58,7 +58,7 @@ alpine_install
 
 alert_root () {
     #check interactive shell
-    if  [ ! -z "$PS1" ]; then
+    if  [ "`tty`" != "not a tty" ]; then
         #aware user about installing zsh to root
         if [ "$(id -u)" -eq 0 ]; then
             read -rp "You want install oh-my-zsh to root user? yes(y)/no(n): " ANSWER
