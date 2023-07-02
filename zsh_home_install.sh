@@ -35,6 +35,7 @@ termux_install () {
 }
 
 alpine_install () {
+    #check file os-release exist. that file not exist in that path in termux at least
     if [ -f "/etc/os-release" ]; then
     . /etc/os-release
         if [ "$ID" = "alpine" ]; then
@@ -218,7 +219,11 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
         if [ "$INSTALL" = "failed" ]; then
             error "$apps not found in repo"
             if [ "$apps" = "btop" ]; then
-                info "Install $apps manually from: https://github.com/aristocratos/btop/releases"
+                if [ TERMUX_PATCH=true]; then 
+                    info "btop not working in termux due /proc/stat restricted on android"
+                else 
+                    info "Install $apps manually from: https://github.com/aristocratos/btop/releases"
+                fi
             elif [ "$apps" = "dust" ]; then 
                 info "Install $apps manually from: https://github.com/bootandy/dust/releases"
             elif [ "$apps" = "duf" ]; then 
