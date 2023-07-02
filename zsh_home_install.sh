@@ -35,22 +35,24 @@ termux_install () {
 }
 
 alpine_install () {
-. /etc/os-release
-    if [ "$ID" = "alpine" ]; then
-        if [ "$ALPINE_PATCH" = "true" ]; then
-            true
-        else
-            #getting raw script
-            wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
-            #ash not known about bash arrays. patching to line
-            sed -i 's|APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )||g' ./script.sh
-            sed -i "s|    for apps in.*do|    for apps in btop dust duf bat micro lsd gdu fd; do|g" ./script.sh
-            chmod 755 ./script.sh
-            #export variable to stop cycle
-            export ALPINE_PATCH=true
-            #exec from ash to supress bash shebang in script
-            ash ./script.sh
-            exit 0
+    if [ -f "/etc/os-release" ]; then
+    . /etc/os-release
+        if [ "$ID" = "alpine" ]; then
+            if [ "$ALPINE_PATCH" = "true" ]; then
+                true
+            else
+                #getting raw script
+                wget -O ./script.sh https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh
+                #ash not known about bash arrays. patching to line
+                sed -i 's|APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )||g' ./script.sh
+                sed -i "s|    for apps in.*do|    for apps in btop dust duf bat micro lsd gdu fd; do|g" ./script.sh
+                chmod 755 ./script.sh
+                #export variable to stop cycle
+                export ALPINE_PATCH=true
+                #exec from ash to supress bash shebang in script
+                ash ./script.sh
+                exit 0
+            fi
         fi
     fi
 }
