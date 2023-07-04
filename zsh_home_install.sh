@@ -248,7 +248,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
         if [ "$INSTALL" = "failed" ]; then
             error "$apps not found in repo"
             if [ "$apps" = "btop" ]; then
-                if [ TERMUX_PATCH=true]; then 
+                if [ "$TERMUX_PATCH" = "true" ]; then 
                     info "btop not working in termux due /proc/stat restricted on android"
                 else 
                     info "Install $apps manually from: https://github.com/aristocratos/btop/releases"
