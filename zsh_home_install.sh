@@ -17,7 +17,7 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-hat () {
+info_tips () {
     warn "INFO"
     echo -e "
     This script will install zsh, oh-my-zsh framework for zsh, powerlevel10k theme for zsh, additional plugins for zsh
@@ -315,7 +315,7 @@ on_exit () {
 }
 
 main () {
-    hat
+    info_tips
     termux_install
     alert_root
     install_git_zsh
