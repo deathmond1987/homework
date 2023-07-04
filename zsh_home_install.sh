@@ -17,6 +17,31 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
+hat () {
+    warn "INFO"
+    echo -e "
+    This script will install zsh, oh-my-zsh framework for zsh, powerlevel10k theme for zsh, additional plugins for zsh
+    (zsh syntax highlightning, zsh-autosuggestions) and modern apps to replacing default built-in distributive apps
+    (btop dust duf bat micro lsd gdu fd)."
+    warn "PROXY"
+    echo -e "If we need to use proxy to install - you must declare HTTP_PROXY env variable before run script:
+
+        export HTTP_PROXY=ip:port"
+    echo -e "
+    script will try to install as much modern apps that script will find in repository of current distro.
+    if some of apps will not found - remove aliases for that apps from end of ~/.zshrc file or install it mannualy
+    Otherwise original apps will not work anymore!
+    example .zshrc:
+        alias htop=\"btop\"
+        alias du=\"dust\"
+        alias df=\"duf\" <-- remove this line if duf not found and you not install it mannualy
+        alias cat=\"bat -pp -P\"
+        alias nano=\"micro\"
+        alias ls=\"lsd\"
+        alias ncdu=\"gdu\""
+    sleep 10
+    }
+    
 termux_install () {
     #in termux virtualenv we can`t use sudo.
     #so, we`ll download script, removing all sudo enters and re-run new script
@@ -241,7 +266,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
     done
 
     #create aliases to links new programs to defaults
-    echo -e 'alias htop="btop"
+    echo -e '    alias htop="btop"
     alias du="dust"
     alias df="duf"
     alias cat="bat -pp -P"
@@ -290,6 +315,7 @@ on_exit () {
 }
 
 main () {
+    hat
     termux_install
     alert_root
     install_git_zsh
