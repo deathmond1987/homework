@@ -18,6 +18,8 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
 info_tips () {
+ZSH_SCRIPT_INFO=true
+while [ "$INFO" = "true" ]; do
     warn "INFO"
     echo -e "
     This script will install zsh, oh-my-zsh framework for zsh, powerlevel10k theme for zsh, additional plugins for zsh
@@ -40,6 +42,8 @@ info_tips () {
         alias ls=\"lsd\"
         alias ncdu=\"gdu\""
     sleep 10
+    export ZSH_SCRIPT_INFO=false
+    done
     }
     
 termux_install () {
@@ -308,6 +312,9 @@ fi
 }
 
 on_exit () {
+    unset ZSH_SCRIPT_INFO
+    unset TERMUX_PATCH
+    unset ALPINE_PATCH
     echo ""
     warn "In next login to shell you need to answer few questions to configure powerlevel10k theme."
     warn "But before that you must configure your terminal fonts."
