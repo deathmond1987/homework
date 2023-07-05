@@ -97,7 +97,7 @@ sudo systemctl enable docker
 sudo systemctl enable sshd
 sudo systemctl enable systemd-networkd
 
-#installin grub. extra config needed because we don`t have efivars
+#installin grub. extra config needed because we dont have efivars
 sudo mkdir -p /boot/efi
 sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --force --no-nvram --removable
 sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -110,3 +110,10 @@ su -c "sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPAS
 EOF
 
 losetup -d "$DISK"
+qemu-system-x86_64 \
+    -enable-kvm \
+    -smp cores=4 \
+    -m 8G \
+    -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
+    -device nvme,drive=drive0,serial=badbeef \
+    -drive if=none,id=drive0,file=./vhd.img
