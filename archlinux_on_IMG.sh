@@ -125,8 +125,8 @@ sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: AL
 
 EOF
 
-umount "$DISK/boot"
-umount "$DISK"
+umount "$MOUNT_PATH"/boot
+umount "$MOUNT_PATH"
 losetup -d "$DISK"
 qemu-system-x86_64 \
     -enable-kvm \
