@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -xe
-
+#path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
 
 #for testing. enshure that first loop device is free to mount img there
