@@ -89,18 +89,21 @@ echo "kosh:qwe" |chpasswd
 pacman -S --noconfirm git
 
 #dropping root user bacause makepkg and yay not working from root user
-su - kosh -c "git clone https://aur.archlinux.org/yay-bin && cd yay-bin && \
-                  yes | makepkg -si && \
-                  yay -Y --gendb && \
-                  yay -Syu --devel && \
-                  yay -Y --devel --save && \
-                  yay --editmenu --nodiffmenu --save && \
-                  echo y | LANG=C yay -S \
-                                 --noprovides \
-                                 --answerdiff None \
-                                 --answerclean None \
-                                 --mflags \" --noconfirm\" \
-                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr "
+su - kosh -c "git clone https://aur.archlinux.org/yay-bin && \
+              cd yay-bin && \
+              yes | makepkg -si && \
+              cd .. && \
+              rm -rf yay-bin && \
+              yay -Y --gendb && \
+              yay -Syu --devel && \
+              yay -Y --devel --save && \
+              yay --editmenu --nodiffmenu --save && \
+              echo y | LANG=C yay -S \
+                                  --noprovides \
+                                  --answerdiff None \
+                                  --answerclean None \
+                                  --mflags \" --noconfirm\" \
+                                    docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr "
 
 su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
 
