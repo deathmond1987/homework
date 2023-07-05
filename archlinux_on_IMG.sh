@@ -53,7 +53,7 @@ pacstrap "$MOUNT_PATH" base base-devel
 #mount boot partition
 mount "$DISK"p1 "$MOUNT_PATH"/boot
 # partition tree finished. generating fstab
-genfstab -U -t PARTUUID "$MOUNT_PATH" >> "$MOUNT_PATH"/etc/fstab
+genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 
 #go to arch
 sudo arch-chroot "$MOUNT_PATH" << EOF
@@ -85,30 +85,48 @@ useradd -m -G wheel -s /bin/bash kosh
 echo "-----------------------------------------CHANGING PASSWORDS--------------------------------------------------"
 echo "root:qwe" |chpasswd
 echo "kosh:qwe" |chpasswd
+
 pacman -S --noconfirm git
+
 #dropping root user bacause makepkg and yay not working from root user
-su - kosh
-git clone https://aur.archlinux.org/yay-bin && cd yay-bin && yes | makepkg -si
-yay -Y --gendb && yay -Syu --devel && yay -Y --devel --save && yay --editmenu --nodiffmenu --save
-echo y | LANG=C yay -S --noprovides --answerdiff None --answerclean None --mflags " --noconfirm" docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr systemd-networkd
+su - kosh -c "git clone https://aur.archlinux.org/yay-bin && cd yay-bin && \
+                  yes | makepkg -si && \
+                  yay -Y --gendb && \
+                  yay -Syu --devel && \
+                  yay -Y --devel --save && \
+                  yay --editmenu --nodiffmenu --save && \
+                  echo y | LANG=C yay -S \
+                                 --noprovides \
+                                 --answerdiff None \
+                                 --answerclean None \
+                                 --mflags \" --noconfirm\" \
+                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr "
+
+su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
 
 #enabling units
-sudo systemctl enable docker
-sudo systemctl enable sshd
-sudo systemctl enable systemd-networkd
+systemctl enable docker
+systemctl enable sshd
+systemctl enable systemd-networkd
 
 #installin grub. extra config needed because we dont have efivars
-sudo mkdir -p /boot/efi
-sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --force --no-nvram --removable
-sudo grub-mkconfig -o /boot/grub/grub.cfg
-wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash
+mkdir -p /boot/efi
+grub-install \
+    --target=x86_64-efi \
+    --efi-directory=/boot/efi \
+    --force \
+    --no-nvram \
+    --removable
+grub-mkconfig -o /boot/grub/grub.cfg
 
 #make things normal
-su -c "sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers"
-su -c "sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers"
+sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 EOF
 
+umount "$DISK/boot"
+umount "$DISK"
 losetup -d "$DISK"
 qemu-system-x86_64 \
     -enable-kvm \
