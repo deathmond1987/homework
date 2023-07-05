@@ -86,7 +86,7 @@ echo "-----------------------------------------CHANGING PASSWORDS---------------
 echo "root:qwe" |chpasswd
 echo "kosh:qwe" |chpasswd
 pacman -S --noconfirm git
-#dropping root user `cause makepkg and yay not working from root user
+#dropping root user bacause makepkg and yay not working from root user
 su - kosh
 git clone https://aur.archlinux.org/yay-bin && cd yay-bin && yes | makepkg -si
 yay -Y --gendb && yay -Syu --devel && yay -Y --devel --save && yay --editmenu --nodiffmenu --save
