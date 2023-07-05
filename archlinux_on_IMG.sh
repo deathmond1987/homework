@@ -4,7 +4,7 @@ set -xe
 MOUNT_PATH=/mnt/arch
 
 #for testing. enshure that first loop device is free to mount img there
-losetup -d /dev/loop0 || true
+losetup --detach-all
 
 #installing dependencies
 dnf install arch-install-scripts e2fsprogs dosfstools
