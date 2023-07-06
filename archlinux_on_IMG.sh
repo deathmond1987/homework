@@ -143,14 +143,15 @@ chroot_arch () {
                       yay -Syu --devel && \
                       yay -Y --devel --save && \
                       yay --editmenu --nodiffmenu --save"
-    
+    }
+
     apps_install () {
         echo y | LANG=C yay -S \
                             --noprovides \
                             --answerdiff None \
                             --answerclean None \
                             --mflags \" --noconfirm\" \
-                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit"
+                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit
     }
 
     zsh_install () {
@@ -175,14 +176,14 @@ chroot_arch () {
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
-    postinstall_config () {
-        ex /home/kosh/.zshrc << EOH
-            echo -e "Finishing installing..."
-            echo -e "Enabling autodetect in mkinitcpio..."
-            sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
-            echo -e "Reinstaliing grub loader..."
-            grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-EOH
+#    postinstall_config () {
+#        ex /home/kosh/.zshrc << EOH
+#            echo -e "Finishing installing..."
+#            echo -e "Enabling autodetect in mkinitcpio..."
+#            sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
+#            echo -e "Reinstaliing grub loader..."
+#            grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+#EOH
 }
 
     main () {
@@ -239,4 +240,4 @@ main () {
     run_in_qemu
 }
 
-main "$@"
+main
