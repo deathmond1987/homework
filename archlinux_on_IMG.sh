@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 set -xe
 
 #path where we build new arch linux system
@@ -164,7 +163,7 @@ chroot_arch () {
                                           --mflags \" --noconfirm\" \
                                           docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit"
     }
-    
+
     init_modules_install () {
             su - kosh -c "yes | LANG=C yay -S \
                                           --noprovides \
@@ -173,11 +172,11 @@ chroot_arch () {
                                           --mflags \" --noconfirm\" \
                                           mkinitcpio-firmware"
     }
-    
-    generate_init () { 
+
+    generate_init () {
         mkinitcpio -P
     }
-    
+
     zsh_install () {
         su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
     }
@@ -201,11 +200,20 @@ chroot_arch () {
     }
 
     postinstall_config () {
-        sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc 
+        sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
             echo -e "sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
+            echo generationg initrd image...
+            mkinitcpio -P
+            echo done
+            echo re-installing grub...
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+            echo done...
+            echo changing sudoers...
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers" > /home/kosh/postinstall.sh
+            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+            echo done
+            sed -i '1d' /home/kosh/postinstall.sh
+            rm /home/kosh/postinstall.sh" > /home/kosh/postinstall.sh
             chmod 777 /home/kosh/postinstall.sh
     }
 
