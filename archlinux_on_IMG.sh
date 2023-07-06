@@ -201,7 +201,7 @@ chroot_arch () {
     }
 
     postinstall_config () {
-        sed -i '1s/^/sudo /home/kosh/postinstall.sh\n/' /home/kosh/.zshrc 
+        sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc 
             echo -e "sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
