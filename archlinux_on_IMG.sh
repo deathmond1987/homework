@@ -231,6 +231,8 @@ main () {
     mount_image
     format_image
     mount_root
+    pacstrap_base
+    mount_boot
     chroot_arch
     umount_all
     run_in_qemu
