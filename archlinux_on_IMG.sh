@@ -157,12 +157,12 @@ chroot_arch () {
     }
 
     apps_install () {
-        echo y | LANG=C yay -S \
-                            --noprovides \
-                            --answerdiff None \
-                            --answerclean None \
-                            --mflags " --noconfirm" \
-                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit mkinitcpio-firmware
+        su - kosh -c "echo y | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\" \
+                                          docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit mkinitcpio-firmware"
     }
     
     generate_init () { 
