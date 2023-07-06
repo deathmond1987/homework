@@ -64,7 +64,7 @@ pacstrap_base () {
     #installing base arch files and devel apps
     pacstrap "$MOUNT_PATH" base base-devel
 }
-ma
+
 mount_boot () {
     #mount boot partition
     mount "$DISK"p1 "$MOUNT_PATH"/boot
