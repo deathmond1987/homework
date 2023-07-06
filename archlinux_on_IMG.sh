@@ -150,7 +150,7 @@ chroot_arch () {
                             --noprovides \
                             --answerdiff None \
                             --answerclean None \
-                            --mflags \" --noconfirm\" \
+                            --mflags " --noconfirm" \
                                    docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit
     }
 
