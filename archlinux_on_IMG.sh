@@ -48,11 +48,12 @@ mount_image () {
 }
 
 exit_trap () {
-on_exit () {
-    umount "$MOUNT_PATH"/boot
-    umount "$MOUNT_PATH"
-    losetup -d "$DISK"
-}
+    on_exit () {
+        umount "$MOUNT_PATH"/boot || true
+        umount "$MOUNT_PATH" || true
+        losetup -d "$DISK" || true
+        echo "trap finished"
+    }
 trap "on_exit" EXIT
 }
 
@@ -84,14 +85,14 @@ mount_boot () {
 chroot_arch () {
     #go to arch
     sudo arch-chroot "$MOUNT_PATH" << EOF
-    
+
     sudo_config () {
         sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
     }
-    
+
     mkinitcpio_install () {
         #install kernel and firmware
-        pacman -S --noconfirm mkinitcpio
+        pacman -S --noconfirm mkinitcpio mkinitcpio-firmware
     }
 
     remove_autodetect_hook () {
@@ -113,10 +114,10 @@ chroot_arch () {
 
     locale_config () {
         #add ru locale
-        sed -i 's/#ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/g' /etc/locale.gen 
-        sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen 
+        sed -i 's/#ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/g' /etc/locale.gen
+        sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
         #generating locale
-        locale-gen 
+        locale-gen
     }
 
     language_config () {
@@ -187,15 +188,12 @@ chroot_arch () {
     }
 
     postinstall_config () {
-        ex /home/kosh/.zshrc << EOH
-            echo -e "Finishing installing..."
-            echo -e "Enabling autodetect in mkinitcpio..."
-            sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
-            echo -e "Reinstaliing grub loader..."
+        sed -i '1s/^/sudo /home/kosh/postinstall.sh\n/' /home/kosh/.zshrc 
+            echo -e "sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
-EOH
+            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers" > /home/kosh/postinstall.sh
+            chmod 777 /home/kosh/postinstall.sh
     }
 
     main () {
