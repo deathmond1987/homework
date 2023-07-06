@@ -162,7 +162,16 @@ chroot_arch () {
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" \
-                                          docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit mkinitcpio-firmware"
+                                          docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit"
+    }
+    
+    init_modules_install () {
+            su - kosh -c "yes | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\" \
+                                          mkinitcpio-firmware"
     }
     
     generate_init () { 
@@ -212,6 +221,7 @@ chroot_arch () {
         user_config
         git_install
         yay_install
+   #     init_modules_install
         apps_install
         generate_init
         zsh_install
