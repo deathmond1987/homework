@@ -142,7 +142,8 @@ chroot_arch () {
                       yay -Y --gendb && \
                       yay -Syu --devel && \
                       yay -Y --devel --save && \
-                      yay --editmenu --nodiffmenu --save && \
+                      yay --editmenu --nodiffmenu --save"
+    
     apps_install () {
         echo y | LANG=C yay -S \
                             --noprovides \
