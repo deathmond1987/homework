@@ -236,4 +236,4 @@ main () {
     run_in_qemu
 }
 
-main "@$"
+main "$@"
