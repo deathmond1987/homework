@@ -92,7 +92,7 @@ chroot_arch () {
 
     mkinitcpio_install () {
         #install kernel and firmware
-        pacman -S --noconfirm mkinitcpio mkinitcpio-firmware
+        pacman -S --noconfirm mkinitcpio
     }
 
     remove_autodetect_hook () {
@@ -162,9 +162,13 @@ chroot_arch () {
                             --answerdiff None \
                             --answerclean None \
                             --mflags " --noconfirm" \
-                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit
+                                   docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit mkinitcpio-firmware
     }
-
+    
+    generate_init () { 
+        mkinitcpio -P
+    }
+    
     zsh_install () {
         su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
     }
@@ -209,6 +213,7 @@ chroot_arch () {
         git_install
         yay_install
         apps_install
+        generate_init
         zsh_install
         systemd_units_enable
         grub_install
