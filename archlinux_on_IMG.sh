@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -xe
+
 #path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
 #for testing. enshure that first loop device is free to mount img there
@@ -44,6 +45,15 @@ mount_image () {
     #mount img file to loop and get loop path
     export DISK=$(losetup -P -f --show vhd.img)
     echo -e "USING $DISK <-----------------"
+}
+
+exit_trap () {
+on_exit () {
+    umount "$MOUNT_PATH"/boot
+    umount "$MOUNT_PATH"
+    losetup -d "$DISK"
+}
+trap "on_exit" EXIT
 }
 
 format_image () {
@@ -212,12 +222,6 @@ EOH
 EOF
 }
 
-umount_all () {
-    umount "$MOUNT_PATH"/boot
-    umount "$MOUNT_PATH"
-    losetup -d "$DISK"
-}
-
 run_in_qemu () {
     qemu-system-x86_64 \
         -enable-kvm \
@@ -233,12 +237,12 @@ main () {
     pacman_init
     create_image
     mount_image
+    exit_trap
     format_image
     mount_root
     pacstrap_base
     mount_boot
     chroot_arch
-    umount_all
     run_in_qemu
 }
 
