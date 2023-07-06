@@ -64,7 +64,7 @@ pacstrap_base () {
     #installing base arch files and devel apps
     pacstrap "$MOUNT_PATH" base base-devel
 }
-
+ma
 mount_boot () {
     #mount boot partition
     mount "$DISK"p1 "$MOUNT_PATH"/boot
@@ -74,6 +74,7 @@ mount_boot () {
 chroot_arch () {
     #go to arch
     sudo arch-chroot "$MOUNT_PATH" << EOF
+    
     sudo_config () {
         sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
     }
@@ -116,11 +117,6 @@ chroot_arch () {
     hostname_config () {
         #set hostname
         echo 'home' > /etc/hostname
-    }
- 
-    sudo_config () {
-        #allow grup wheel to sudo
-        sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
     }
 
     user_config () {
@@ -190,7 +186,7 @@ chroot_arch () {
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 EOH
-}
+    }
 
     main () {
         sudo_config
@@ -201,7 +197,6 @@ EOH
         locale_config
         language_config
         hostname_config
-        sudo_config
         user_config
         git_install
         yay_install
