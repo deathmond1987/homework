@@ -42,7 +42,7 @@ EOF
 
 mount_image () {
     #mount img file to loop and get loop path
-    DISK=$(losetup -P -f --show vhd.img)
+    export DISK=$(losetup -P -f --show vhd.img)
     echo -e "USING $DISK <-----------------"
 }
 
