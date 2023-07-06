@@ -46,7 +46,7 @@ mount_image () {
     echo -e "USING $DISK <-----------------"
 }
 
-format_image ()
+format_image () {
     #formatting root partition
     mkfs.ext4 "$DISK"p2
     #formatting boot partition
