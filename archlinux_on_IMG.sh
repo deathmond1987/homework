@@ -74,6 +74,10 @@ mount_boot () {
 chroot_arch () {
     #go to arch
     sudo arch-chroot "$MOUNT_PATH" << EOF
+    sudo_config () {
+        sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+    }
+    
     mkinitcpio_install () {
         #install kernel and firmware
         pacman -S --noconfirm mkinitcpio
@@ -176,17 +180,20 @@ chroot_arch () {
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
-#    postinstall_config () {
-#        ex /home/kosh/.zshrc << EOH
-#            echo -e "Finishing installing..."
-#            echo -e "Enabling autodetect in mkinitcpio..."
-#            sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
-#            echo -e "Reinstaliing grub loader..."
-#            grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-#EOH
+    postinstall_config () {
+        ex /home/kosh/.zshrc << EOH
+            echo -e "Finishing installing..."
+            echo -e "Enabling autodetect in mkinitcpio..."
+            sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
+            echo -e "Reinstaliing grub loader..."
+            grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+            sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+EOH
 }
 
     main () {
+        sudo_config
         mkinitcpio_install
         remove_autodetect_hook
         kernel_install
