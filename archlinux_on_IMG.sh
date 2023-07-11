@@ -7,7 +7,10 @@ losetup --detach-all
 
 prepare_dependecies () {
     #installing dependencies
-    dnf install arch-install-scripts e2fsprogs dosfstools
+    #arch-install-scripts - pacman and his dependencies
+    #e2fsprogs - for making fs in image
+    #dosfstools - for making fat32 fs in image
+    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core
 }
 
 pacman_init () {
