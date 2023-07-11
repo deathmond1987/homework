@@ -71,8 +71,9 @@ format_image () {
     #formatting efi partition
     mkfs.fat -F 32 "$DISK"p2
     pvcreate "$DISK"p3
-    vgcreate arch "$DISK"3
+    vgcreate arch "$DISK"p3
     lvcreate -l 100%FREE arch -n root
+    mkfs.ext4 /mnt/arch/root
 }
 
 mount_root () {
@@ -95,6 +96,7 @@ mount_boot () {
     # partition tree finished. generating fstab
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
+
 chroot_arch () {
     #go to arch
     sudo arch-chroot "$MOUNT_PATH" << EOF
