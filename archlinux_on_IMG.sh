@@ -94,6 +94,7 @@ mount_boot () {
     mkdir -p "$MOUNT_PATH"/boot/efi
     mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
     # partition tree finished. generating fstab
+    swapoff -a
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
 
