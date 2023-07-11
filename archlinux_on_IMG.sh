@@ -201,6 +201,8 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                           --answerclean None \
                                           --mflags \" --noconfirm\" \
                                           lvm2 docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit"
+        #админу локалхоста дозволено:)
+        sudo usermod -aG docker kosh
     }
 
     init_modules_install () {
