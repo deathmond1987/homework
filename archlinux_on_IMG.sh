@@ -151,6 +151,7 @@ chroot_arch () {
         #changing password
         echo "root:qwe" |chpasswd
         echo "kosh:qwe" |chpasswd
+        usermod -s /usr/bin/bash root
     }
 
     git_install () {
