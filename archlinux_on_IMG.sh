@@ -67,7 +67,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        vgreduce arch "$DISK"p3 || true
+        #vgremove arch || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
