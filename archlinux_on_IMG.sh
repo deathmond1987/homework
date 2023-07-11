@@ -73,7 +73,7 @@ format_image () {
     pvcreate "$DISK"p3
     vgcreate arch "$DISK"p3
     lvcreate -l 100%FREE arch -n root
-    mkfs.ext4 /mnt/arch/root
+    mkfs.ext4 /dev/arch/root
 }
 
 mount_root () {
