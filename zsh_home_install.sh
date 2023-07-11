@@ -41,6 +41,11 @@ while [ "$INFO" = "true" ]; do
         alias nano=\"micro\"
         alias ls=\"lsd\"
         alias ncdu=\"gdu\""
+   
+    error "IMPORTANT:"
+    info "You must enable fonts in your terminal"
+    info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
+    
     sleep 10
     export ZSH_SCRIPT_INFO=false
     done
@@ -194,19 +199,6 @@ fix_zsh_docker () {
     success "Done"
 }
 
-config_font() {
-    #clear screen to delimint install information and important information
-    clear
-    #this need do manually, so asking for that
-    info "Default shell now will change to zsh."
-    error "IMPORTANT:"
-    info "You must enable fonts in your terminal"
-    info "See here: https://github.com/romkatv/powerlevel10k#fonts <---
-    
-    "
-    sleep 5
-}
-
 change_shell () {
     #changing default shell
     warn "Changing default shell"
@@ -331,7 +323,6 @@ main () {
     install_plugins
     install_powerlevel
     fix_zsh_docker
-    config_font
     change_shell
     linux_2023
     drop_proxy_config_git
