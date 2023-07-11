@@ -50,7 +50,6 @@ EOF
 mount_image () {
     #mount img file to loop and get loop path
     export DISK=$(losetup -P -f --show vhd.img)
-    echo -e "USING $DISK <-----------------"
 }
 
 exit_trap () {
@@ -70,9 +69,13 @@ format_image () {
     mkfs.fat -F 32 "$DISK"p1
     #formatting efi partition
     mkfs.fat -F 32 "$DISK"p2
+    #creating root pv
     pvcreate "$DISK"p3
+    #creating root vg
     vgcreate arch "$DISK"p3
+    #creating root lv
     lvcreate -l 100%FREE arch -n root
+    #formatting root lv
     mkfs.ext4 /dev/arch/root
 }
 
@@ -91,10 +94,13 @@ pacstrap_base () {
 mount_boot () {
     #mount boot partition
     mount "$DISK"p2 "$MOUNT_PATH"/boot
+    #creating dir for efi
     mkdir -p "$MOUNT_PATH"/boot/efi
+    #mount efi partition
     mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
-    # partition tree finished. generating fstab
+    #if we not remove swap from host machine he will appear in arch fstab
     swapoff -a
+    #partition tree finished. generating fstab
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
 
@@ -139,7 +145,20 @@ chroot_arch () {
 
     language_config () {
         #set default language
-        echo -e 'LANG=en_US.UTF-8,\nLANGUAGE=en_US.UTF-8,\nLC_ALL=en_US.UTF-8' > /etc/locale.conf
+        echo -e 'LANG=en_US.UTF-8
+LANGUAGE=en_US.UTF-8
+LC_ADDRESS=en_US.UTF-8
+LC_COLLATE=en_US.UTF-8
+LC_CTYPE=en_US.UTF-8
+LC_IDENTIFICATION=en_US.UTF-8
+LC_MEASUREMENT=en_US.UTF-8
+LC_MESSAGES=en_US.UTF-8
+LC_MONETARY=en_US.UTF-8
+LC_NAME=en_US.UTF-8
+LC_NUMERIC=en_US.UTF-8
+LC_PAPER=en_US.UTF-8
+LC_TELEPHONE=en_US.UTF-8
+LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     hostname_config () {
@@ -175,6 +194,7 @@ chroot_arch () {
     }
 
     apps_install () {
+        #installing needed packages
         su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
@@ -230,6 +250,9 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
     
 
     postinstall_config () {
+        #for now we have large initramfs and strange-installed-grub. 
+        #in this block we generate initrd image with autodetect hook, reinstall grub and fixing sudo permissions
+        #after that remove this helper script
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
             echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             echo generationg initrd image...
@@ -275,6 +298,7 @@ EOF
 }
 
 unmounting_all () {
+    #unmount all mounts 
     umount "$MOUNT_PATH"/boot/efi 
     umount "$MOUNT_PATH"/boot
     umount "$MOUNT_PATH"
