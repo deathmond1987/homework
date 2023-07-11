@@ -2,28 +2,30 @@ set -xe
 
 #path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
-#for testing. enshure that first loop device is free to mount img there
-losetup --detach-all
 
 prepare_dependecies () {
     #installing dependencies
     #arch-install-scripts - pacman and his dependencies
     #e2fsprogs - for making fs in image
     #dosfstools - for making fat32 fs in image
-    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core
+    #qemu-kvm-core - for run builded image in qemu-kvm
+    #edk2-ovmf - uefi bios for run image in qemu with uefi
+    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf
 }
 
 pacman_init () {
-    #initialize keys and load archlinux keys
+    #initialize keyring and load archlinux keys
     pacman-key --init
     pacman-key --populate archlinux
 }
 
 create_image () {
-    #create image
+    #creating empty image 
     dd if=/dev/zero of=./vhd.img bs=1M count=10000
-    #in img wa add gpt table and 2 partitions "boot" and "root"
-    #in EOF answers for fdisk
+    #creating in image gpt table and 3 partitions
+    #first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
+    #second one - "boot" partition. we will mount it to /boot later with filesystem fat32
+    #third one - "root" partition. we will mount it to / later with lvm and ext4 partition
     fdisk ./vhd.img << EOF
 g
 n
@@ -51,11 +53,14 @@ EOF
 }
 
 mount_image () {
-    #mount img file to loop and get loop path
+    #mount img file to loop to interact with created partitions 
+    #they will be available in /dev/loop_loop-number_partition-number
+    #like /dev/loop0p1 or /dev/loop20p3
     export DISK=$(losetup -P -f --show vhd.img)
 }
 
 exit_trap () {
+    #if script fail - we need to umnount all mounts to clear host machine
     on_exit () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
@@ -131,6 +136,7 @@ chroot_arch () {
         pacman -S --noconfirm linux linux-firmware
     }
 
+    #we can not use systemd to configure locales, time and so on cause we are in chroot environment
     time_config () {
         #config localtime
         ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
@@ -232,7 +238,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     grub_install () {
-        #installin grub. extra config needed because we dont have efivars
+        #installin grub. extra config needed because we dont have efivars in container
         mkdir -p /boot/efi
         grub-install \
             --target=x86_64-efi \
@@ -273,7 +279,7 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
             sudo reboot" > /home/kosh/postinstall.sh
-            chmod 777 /home/kosh/postinstall.sh
+            chmod 755 /home/kosh/postinstall.sh
     }
 
     main () {
