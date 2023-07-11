@@ -241,7 +241,7 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
             echo done
-            sed -i '1d' /home/kosh/postinstall.sh
+            sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh" > /home/kosh/postinstall.sh
             chmod 777 /home/kosh/postinstall.sh
     }
@@ -273,6 +273,13 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
 EOF
 }
 
+unmounting_all () {
+    umount "$MOUNT_PATH"/boot/efi 
+    umount "$MOUNT_PATH"/boot
+    umount "$MOUNT_PATH"
+    losetup -d "$DISK" 
+}
+
 run_in_qemu () {
     qemu-system-x86_64 \
         -enable-kvm \
@@ -294,6 +301,7 @@ main () {
     pacstrap_base
     mount_boot
     chroot_arch
+    unmounting_all
     run_in_qemu
 }
 
