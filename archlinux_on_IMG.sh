@@ -1,7 +1,7 @@
 set -xe
 # POC
 # fully working arch linux builded from RHEL-like command line on RAW IMAGE with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
-
+. /os-release
 #path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
 
@@ -13,6 +13,10 @@ prepare_dependecies () {
     #qemu-kvm-core - for run builded image in qemu-kvm
     #edk2-ovmf - uefi bios for run image in qemu with uefi
     dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf
+}
+
+prepare_dependecies_arch () {
+    pacman -S lvm2 dosfstools
 }
 
 pacman_init () {
@@ -99,6 +103,14 @@ mount_root () {
 pacstrap_base () {
     #installing base arch files and devel apps
     pacstrap "$MOUNT_PATH" base base-devel
+}
+
+pacstrap_base_arch () {
+    #in arch package fakeroot in ignoring. temporary remove from ignoring
+    sed -i "i/IgnorePkg   = fakeroot/IgnorePkg   =/g" /etc/pacman.conf
+    #installing base arch files and devel apps
+    pacstrap "$MOUNT_PATH" base base-devel
+    sed -i "i/IgnorePkg   =/IgnorePkg   = fakeroot/g" /etc/pacman.conf
 }
 
 mount_boot () {
@@ -333,18 +345,35 @@ run_in_qemu () {
 }
 
 main () {
-    prepare_dependecies
-    pacman_init
-    create_image
-    mount_image
-    exit_trap
-    format_image
-    mount_root
-    pacstrap_base
-    mount_boot
-    chroot_arch
-    unmounting_all
-    run_in_qemu
+    case "$ID" in 
+         fedora) prepare_dependecies
+                  pacman_init
+                  create_image
+                  mount_image
+                  exit_trap
+                  format_image
+                  mount_root
+                  pacstrap_base
+                  mount_boot
+                  chroot_arch
+                  unmounting_all
+                  run_in_qemu
+                  ;;
+
+        arch)    prepare_dependecies_arch
+                  pacman_init
+                  create_image
+                  mount_image
+                  exit_trap
+                  format_image
+                  mount_root
+                  pacstrap_base_arch
+                  mount_boot
+                  chroot_arch
+                  unmounting_all
+                  run_in_qemu
+                  ;;
+    esac
 }
 
 main
