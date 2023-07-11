@@ -56,7 +56,9 @@ mount_image () {
 exit_trap () {
     on_exit () {
         umount "$MOUNT_PATH"/boot || true
+        umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
+        vgreduce arch /dev/"$DISK"p3 || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
