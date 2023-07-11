@@ -58,7 +58,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        vgreduce arch /dev/"$DISK"p3 || true
+        vgreduce arch "$DISK"p3 || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
@@ -91,7 +91,7 @@ pacstrap_base () {
 mount_boot () {
     #mount boot partition
     mount "$DISK"p2 "$MOUNT_PATH"/boot
-    mkdir -p /boot/efi
+    mkdir -p "$MOUNT_PATH"/boot/efi
     mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
     # partition tree finished. generating fstab
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
