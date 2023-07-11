@@ -299,7 +299,8 @@ EOF
 }
 
 unmounting_all () {
-    #unmount all mounts 
+    #unmount all mounts
+    #we need this to stop grub in vm dropping in grub-shell due first run
     umount "$MOUNT_PATH"/boot/efi 
     umount "$MOUNT_PATH"/boot
     umount "$MOUNT_PATH"
