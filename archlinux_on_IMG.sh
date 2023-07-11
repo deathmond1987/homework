@@ -18,7 +18,7 @@ pacman_init () {
 
 create_image () {
     #create image
-    dd if=/dev/zero of=./vhd.img bs=1M count=40000
+    dd if=/dev/zero of=./vhd.img bs=1M count=10000
     #in img wa add gpt table and 2 partitions "boot" and "root"
     #in EOF answers for fdisk
     fdisk ./vhd.img << EOF
@@ -26,16 +26,23 @@ g
 n
 1
 2048
-+1G
++50M
 t
 1
 n
 2
-2099200
-81917951
+104448
++1G
 t
 2
 20
+n
+3
+2201600
+20477951
+t
+3
+44
 w
 EOF
 }
@@ -57,17 +64,20 @@ trap "on_exit" EXIT
 }
 
 format_image () {
-    #formatting root partition
-    mkfs.ext4 "$DISK"p2
     #formatting boot partition
     mkfs.fat -F 32 "$DISK"p1
+    #formatting efi partition
+    mkfs.fat -F 32 "$DISK"p2
+    pvcreate "$DISK"p3
+    vgcreate arch "$DISK"3
+    lvcreate -l 100%FREE arch -n root
 }
 
 mount_root () {
     #create mount dirs
     mkdir -p "$MOUNT_PATH"
     #mount formatted root disk to /
-    mount "$DISK"p2 "$MOUNT_PATH"
+    mount /dev/arch/root "$MOUNT_PATH"
 }
 
 pacstrap_base () {
@@ -77,7 +87,9 @@ pacstrap_base () {
 
 mount_boot () {
     #mount boot partition
-    mount "$DISK"p1 "$MOUNT_PATH"/boot
+    mount "$DISK"p2 "$MOUNT_PATH"/boot
+    mkdir -p /boot/efi
+    mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
     # partition tree finished. generating fstab
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
@@ -245,8 +257,8 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
         generate_init
         zsh_install
         systemd_units_enable
-        systemd_boot_install
-   #     grub_install
+   #     systemd_boot_install
+        grub_install
         postinstall_config
     }
 
