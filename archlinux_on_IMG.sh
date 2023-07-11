@@ -112,7 +112,7 @@ chroot_arch () {
 
     remove_autodetect_hook () {
         #to run arch in most any environment we need build init image with all we can add to it
-        sed -i 's/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
+        sed -i 's/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base lvm udev modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
     }
 
     kernel_install () {
