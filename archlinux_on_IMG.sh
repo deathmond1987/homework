@@ -1,7 +1,7 @@
 set -xe
 # POC
 # fully working arch linux builded from RHEL-like command line on RAW IMAGE with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
-. /os-release
+. /etc/os-release
 #path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
 
@@ -16,7 +16,7 @@ prepare_dependecies () {
 }
 
 prepare_dependecies_arch () {
-    pacman -S lvm2 dosfstools
+    pacman -S --needed lvm2 dosfstools
 }
 
 pacman_init () {
@@ -103,14 +103,6 @@ mount_root () {
 pacstrap_base () {
     #installing base arch files and devel apps
     pacstrap "$MOUNT_PATH" base base-devel
-}
-
-pacstrap_base_arch () {
-    #in arch package fakeroot in ignoring. temporary remove from ignoring
-    sed -i "i/IgnorePkg   = fakeroot/IgnorePkg   =/g" /etc/pacman.conf
-    #installing base arch files and devel apps
-    pacstrap "$MOUNT_PATH" base base-devel
-    sed -i "i/IgnorePkg   =/IgnorePkg   = fakeroot/g" /etc/pacman.conf
 }
 
 mount_boot () {
@@ -367,7 +359,6 @@ main () {
                   exit_trap
                   format_image
                   mount_root
-                  pacstrap_base_arch
                   mount_boot
                   chroot_arch
                   unmounting_all
