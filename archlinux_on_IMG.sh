@@ -199,6 +199,17 @@ chroot_arch () {
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
+    systemd_boot_install () {
+        bootctl install --esp-path=/boot/efi
+        ENTRIES=/boot/loader/entries
+        mkdir -p "$ENTRIES"
+        echo "title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /initramfs-linux.img
+options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$ENTRIES"/arch.conf
+    }
+    
+
     postinstall_config () {
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
             echo -e "sed -i 's/HOOKS=(base udev modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/g' /etc/mkinitcpio.conf
