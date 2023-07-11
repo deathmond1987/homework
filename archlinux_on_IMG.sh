@@ -336,6 +336,16 @@ run_in_qemu () {
         -drive if=none,id=drive0,file=./vhd.img
 }
 
+run_in_qemu_arch () {
+    qemu-system-x86_64 \
+        -enable-kvm \
+        -smp cores=4 \
+        -m 8G \
+        -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/x64/OVMF_CODE.fd \
+        -device nvme,drive=drive0,serial=badbeef \
+        -drive if=none,id=drive0,file=./vhd.img
+}
+
 main () {
     case "$ID" in 
          fedora) prepare_dependecies
@@ -362,7 +372,7 @@ main () {
                   mount_boot
                   chroot_arch
                   unmounting_all
-                  run_in_qemu
+                  run_in_qemu_arch
                   ;;
     esac
 }
