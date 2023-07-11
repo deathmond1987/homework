@@ -1,6 +1,6 @@
 set -xe
 # POC
-# fully working arch linux builded from command line on RAW IMAGE with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
+# fully working arch linux builded from RHEL-like command line on RAW IMAGE with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
 
 #path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
@@ -296,11 +296,13 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
         user_config
         git_install
         yay_install
+   #pkgbuild for modules currently broken in aur
    #     init_modules_install
         apps_install
         generate_init
         zsh_install
         systemd_units_enable
+   #not implemented
    #     systemd_boot_install
         grub_install
         postinstall_config
@@ -312,8 +314,8 @@ EOF
 }
 
 unmounting_all () {
-    #unmount all mounts
-    #we need this to stop grub in vm dropping in grub-shell due first run
+    # unmount all mounts
+    # we need this to stop grub in vm dropping in grub-shell due first run
     umount "$MOUNT_PATH"/boot/efi 
     umount "$MOUNT_PATH"/boot
     umount "$MOUNT_PATH"
