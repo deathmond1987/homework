@@ -245,7 +245,8 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
         generate_init
         zsh_install
         systemd_units_enable
-        grub_install
+        systemd_boot_install
+   #     grub_install
         postinstall_config
     }
 
