@@ -352,13 +352,13 @@ main () {
                   run_in_qemu
                   ;;
 
-        arch)    prepare_dependecies_arch
-                  pacman_init
+        arch)     prepare_dependecies_arch
                   create_image
                   mount_image
                   exit_trap
                   format_image
                   mount_root
+                  pacstrap_base
                   mount_boot
                   chroot_arch
                   unmounting_all
