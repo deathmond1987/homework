@@ -101,6 +101,7 @@ chroot_arch () {
     #go to arch
     sudo arch-chroot "$MOUNT_PATH" << EOF
 
+    set -e
     sudo_config () {
         sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
     }
