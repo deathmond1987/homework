@@ -1,4 +1,6 @@
 set -xe
+# POC
+# fully working arch linux builded from command line on RAW IMAGE with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
 
 #path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
