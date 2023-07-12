@@ -377,6 +377,10 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
             echo done
+            # fdisk resize
+            # pvresize /dev/sda3
+            # lvextend -l +100%FREE /dev/arch/root
+            # resize2fs /dev/arch/root
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
             sudo reboot" > /home/kosh/postinstall.sh
