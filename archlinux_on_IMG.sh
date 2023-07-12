@@ -111,10 +111,12 @@ pacstrap_base () {
 
 pacstrap_base_debian () {
     #installing base arch files and devel apps
-    wget -O pacstrap.sh https://raw.githubusercontent.com/archlinux/arch-install-scripts/master/pacstrap.in
-    chmod 755 ./pacstrap.sh
-    ./pacstrap.sh -K "$MOUNT_PATH" -S base base-devel
-    rm ./pacstrap.sh
+    cd "$MOUNT_PATH"
+    wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz 
+    tar xzf ./archlinux.tar.gz --numeric-owner
+    arch-chroot "$MOUNT_PATH" << EOF
+    pacman -S -noconfirm base base-devel
+EOF
 }
 
 mount_boot () {
@@ -132,7 +134,7 @@ mount_boot () {
 
 chroot_arch () {
     #go to arch
-    sudo arch-chroot "$MOUNT_PATH" << EOF
+    arch-chroot "$MOUNT_PATH" << EOF
 
     set -e
     sudo_config () {
