@@ -133,13 +133,20 @@ pacstrap_base_debian () {
     # we can wget pacstrap script from net or...
     # ...full bootstrap image... for example
     cd "$MOUNT_PATH"
+    #donwloading tar archive with bootstrap image to build dir
     wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz
+    #extracting archive in current dir with cut root dir
     tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
+    #chrooting to bootstrap root
     arch-chroot "$MOUNT_PATH" << EOF
+    #usually pacstrap script populating keys but we doing it manually
     pacman-key --init
     pacman-key --populate archlinux
+    #configuring mirrorlist
     sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
+    #installing root
     pacman -Syu --noconfirm base base-devel
+    #ckeaning up root dir. thereis tar archive, list installed packages in root and version file.
     rm -f /archlinux.tar.gz
     rm -f /pkglist.x86_64.txt
     rm -f /version
