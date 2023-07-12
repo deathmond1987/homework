@@ -63,7 +63,7 @@ prepare_dependecies_alpine () {
 }
 
 pacman_init () {
-    # initialize keyring and load archlinux keys
+    # initialize keyring and load archlinux keys for host pacman
     pacman-key --init
     pacman-key --populate archlinux
 }
