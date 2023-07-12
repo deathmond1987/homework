@@ -117,7 +117,7 @@ pacstrap_base_debian () {
     arch-chroot "$MOUNT_PATH" << EOF
     pacman-key --init
     pacman-key --populate archlinux
-    pacman -S --noconfirm base base-devel
+    pacman -Sy --noconfirm base base-devel
 EOF
     cd -
 }
