@@ -24,7 +24,7 @@ prepare_dependecies () {
     # dosfstools - for making fat32 fs in image
     # qemu-kvm-core - for run builded image in qemu-kvm
     # edk2-ovmf - uefi bios for run image in qemu with uefi
-    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf
+    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf -y
 }
 
 prepare_dependecies_arch () {
@@ -32,11 +32,13 @@ prepare_dependecies_arch () {
 }
 
 prepare_dependecies_debian () {
-    apt install arch-install-scripts e2fsprogs dosfstools qemu-utils qemu-system-x86 ovmf pacman-package-manager lvm2  -y
+    apt install arch-install-scripts e2fsprogs dosfstools qemu-utils qemu-system-x86 ovmf lvm2  -y
 }
 
 prepare_dependecies_alpine () {
-    apk add pacman arch-install-scripts
+    #busybox-losetup dont know about --show flag
+    #installing not busybox losetup version
+    apk add pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs
 }
 
 pacman_init () {
@@ -145,6 +147,28 @@ pacstrap_base_debian () {
 EOF
     cd -
 }
+
+pacstrap_base_alpine() {
+    #pacman in alpine has no configured repositories
+    echo "
+[core]
+SigLevel = Required DatabaseOptional
+Include = /etc/pacman.d/mirrorlist
+
+[community]
+SigLevel = Required DatabaseOptional
+Include = /etc/pacman.d/mirrorlist
+
+[extra]
+SigLevel = Required DatabaseOptional
+Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+    #...and no mirrorlist
+    wget -O /etc/pacman.d/mirrorlist https://archlinux.org/mirrorlist/all/http/
+    #configuring mirrors
+    sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
+    pacstrap -K "$MOUNT_PATH" base base-devel
+}
+
 
 mount_boot () {
     # mount boot partition
@@ -440,7 +464,7 @@ main () {
                   exit_trap
                   format_image
                   mount_root
-                  pacstrap_base
+                  pacstrap_base_alpine
                   mount_boot
                   chroot_arch
                   unmounting_all
