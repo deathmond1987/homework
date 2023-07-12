@@ -24,7 +24,7 @@ prepare_dependecies () {
     # dosfstools - for making fat32 fs in image
     # qemu-kvm-core - for run builded image in qemu-kvm
     # edk2-ovmf - uefi bios for run image in qemu with uefi
-    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf -y
+    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf lvm2 -y
 }
 
 prepare_dependecies_arch () {
@@ -37,8 +37,8 @@ prepare_dependecies_debian () {
 
 prepare_dependecies_alpine () {
     #busybox-losetup dont know about --show flag
-    #installing not busybox losetup version
-    apk add pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs
+    #installing losetup
+    apk add pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs qemu-system-x86_64
 }
 
 pacman_init () {
