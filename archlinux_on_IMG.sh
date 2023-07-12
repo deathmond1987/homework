@@ -12,8 +12,8 @@ script can do unknown effects on host if thereis already that lvm mountpoint!!!"
 }
 
 notify_debian () {
-    echo "in debian fdisk tolds me that alias 44 for filesystem is \"Linux /usr verity (x86-64)\"
-in fedora alias 44 - LVM filesystem. I don`t know what can be broken. At least it loading filesystem, anyway."
+    echo "in debian fdisk tolds me that alias 44 for filesystem is Linux /usr verity (x86-64)
+in fedora alias 44 - LVM filesystem. I dont know what can be broken. At least it loading filesystem, anyway."
     sleep 10
 }
 
