@@ -117,7 +117,12 @@ pacstrap_base_debian () {
     arch-chroot "$MOUNT_PATH" << EOF
     pacman-key --init
     pacman-key --populate archlinux
+    sed -i 's/#Server =/$arch/Server =/g' /etc/sudoers
     pacman -Sy --noconfirm base base-devel
+    rm -f /archlinux.tar.gz
+    rm -f /pkglist.x86_64.txt
+    rm -f /version
+
 EOF
     cd -
 }
