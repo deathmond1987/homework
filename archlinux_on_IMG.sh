@@ -111,7 +111,7 @@ pacstrap_base () {
 
 pacstrap_base_debian () {
     #installing base arch files and devel apps
-    wget -O https://raw.githubusercontent.com/archlinux/arch-install-scripts/master/pacstrap.in pacstrap.sh
+    wget -O pacstrap.sh https://raw.githubusercontent.com/archlinux/arch-install-scripts/master/pacstrap.in
     chmod 755 ./pacstrap.sh
     pacstrap -K "$MOUNT_PATH" -S base base-devel
     rm ./pacstrap.sh
