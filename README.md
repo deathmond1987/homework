@@ -1,6 +1,6 @@
 # homework
 
-archlinux_on_IMG.sh - creates RAW img with archlinux installed os. 
+archlinux_on_IMG.sh - creates RAW img with archlinux installed os from fedora, debian, alpine hosts. 
 Including uefi grub, root on lvm, oh-my-zsh 
 
 bootstrap_rocky.sh - helper to avoid routine work jobs. 
