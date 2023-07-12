@@ -150,17 +150,18 @@ EOF
 
 pacstrap_base_alpine() {
     #pacman in alpine has no configured repositories
+    #and it has no archlinux-keyring, so temporary disabling PGP check
     echo "
 [core]
-SigLevel = Required DatabaseOptional
+SigLevel = Never
 Include = /etc/pacman.d/mirrorlist
 
 [community]
-SigLevel = Required DatabaseOptional
+SigLevel = Never
 Include = /etc/pacman.d/mirrorlist
 
 [extra]
-SigLevel = Required DatabaseOptional
+SigLevel = Never
 Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
     #...and no mirrorlist
     wget -O /etc/pacman.d/mirrorlist https://archlinux.org/mirrorlist/all/http/
@@ -444,7 +445,6 @@ main () {
                   
           debian) notify_debian
                   prepare_dependecies_debian
-                  pacman_init
                   create_image
                   mount_image
                   exit_trap
