@@ -150,7 +150,7 @@ EOF
 
 pacstrap_base_alpine() {
     #pacman in alpine has no configured repositories
-    #and it has no archlinux-keyring, so temporary disabling PGP check
+    #and it has no archlinux-keyring in repo, so temporary disabling PGP check to install base packages before chroot
     echo "
 [core]
 SigLevel = Never
