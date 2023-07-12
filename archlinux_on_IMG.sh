@@ -5,6 +5,18 @@ set -xe
 # path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
 
+notify_arch () {
+    echo "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem
+script can do unknown effects on host if thereis already that lvm mountpoint!!!"
+    sleep 10
+}
+
+notify_debian () {
+    echo "in debian fdisk tolds me that alias 44 for filesystem is \"Linux /usr verity (x86-64)\"
+in fedora alias 44 - LVM filesystem. I don`t know what can be broken. At least it loading filesystem, anyway."
+    sleep 10
+}
+
 prepare_dependecies () {
     # installing dependencies
     # arch-install-scripts - pacman and his dependencies
@@ -388,7 +400,8 @@ main () {
                   run_in_qemu
                   ;;
 
-            arch) prepare_dependecies_arch
+            arch) notify_arch
+                  prepare_dependecies_arch
                   create_image
                   mount_image
                   exit_trap
@@ -400,7 +413,8 @@ main () {
                   unmounting_all
                   run_in_qemu_arch
                   ;;
-          debian) prepare_dependecies_debian
+          debian) notify_debian
+                  prepare_dependecies_debian
                   pacman_init
                   create_image
                   mount_image
