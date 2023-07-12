@@ -35,6 +35,10 @@ prepare_dependecies_debian () {
     apt install arch-install-scripts e2fsprogs dosfstools qemu-utils qemu-system-x86 ovmf pacman-package-manager lvm2  -y
 }
 
+prepare_dependecies_alpine () {
+    apk --version
+}
+
 pacman_init () {
     # initialize keyring and load archlinux keys
     pacman-key --init
@@ -429,7 +433,7 @@ main () {
                   run_in_qemu
                   ;;
                   
-          alpine) prepare_dependecies
+          alpine) prepare_dependecies_alpine
                   pacman_init
                   create_image
                   mount_image
