@@ -413,6 +413,7 @@ main () {
                   unmounting_all
                   run_in_qemu_arch
                   ;;
+                  
           debian) notify_debian
                   prepare_dependecies_debian
                   pacman_init
@@ -426,6 +427,21 @@ main () {
                   chroot_arch
                   unmounting_all
                   run_in_qemu
+                  ;;
+                  
+          alpine) prepare_dependecies
+                  pacman_init
+                  create_image
+                  mount_image
+                  exit_trap
+                  format_image
+                  mount_root
+                  pacstrap_base
+                  mount_boot
+                  chroot_arch
+                  unmounting_all
+                  run_in_qemu
+                  ;;
     esac
 }
 
