@@ -38,7 +38,11 @@ prepare_dependecies_debian () {
 prepare_dependecies_alpine () {
     #busybox-losetup dont know about --show flag
     #installing losetup
-    apk add pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs qemu-system-x86_64
+    #installing findmnt dependency for genfstab. not installing default
+    #20 min of my life gone before i understand that genfstab not generating PARTUUID because there is no lsblk in alpine. fuk...
+    #installing gawk because busybox-awk not working with this script
+    #installing grep
+    apk add pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs qemu-system-x86_64 findmnt gawk grep ovmf lsblk
 }
 
 pacman_init () {
