@@ -458,7 +458,6 @@ main () {
                   ;;
                   
           alpine) prepare_dependecies_alpine
-                  pacman_init
                   create_image
                   mount_image
                   exit_trap
