@@ -19,6 +19,10 @@ prepare_dependecies_arch () {
     pacman -S --needed lvm2 dosfstools
 }
 
+prepare_dependecies_debian () {
+    apt install arch-install-scripts e2fsprogs dosfstools qemu-utils qemu-system-x86 ovmf pacman-package-manager lvm2  -y
+}
+
 pacman_init () {
     #initialize keyring and load archlinux keys
     pacman-key --init
@@ -102,7 +106,15 @@ mount_root () {
 
 pacstrap_base () {
     #installing base arch files and devel apps
-    pacstrap "$MOUNT_PATH" base base-devel
+    pacstrap -K "$MOUNT_PATH" base base-devel
+}
+
+pacstrap_base_debian () {
+    #installing base arch files and devel apps
+    wget -O https://raw.githubusercontent.com/archlinux/arch-install-scripts/master/pacstrap.in pacstrap.sh
+    chmod 755 ./pacstrap.sh
+    pacstrap -K "$MOUNT_PATH" -S base base-devel
+    rm ./pacstrap.sh
 }
 
 mount_boot () {
@@ -348,7 +360,7 @@ run_in_qemu_arch () {
 
 main () {
     case "$ID" in 
-         fedora) prepare_dependecies
+          fedora) prepare_dependecies
                   pacman_init
                   create_image
                   mount_image
@@ -362,7 +374,7 @@ main () {
                   run_in_qemu
                   ;;
 
-        arch)     prepare_dependecies_arch
+            arch) prepare_dependecies_arch
                   create_image
                   mount_image
                   exit_trap
@@ -374,6 +386,18 @@ main () {
                   unmounting_all
                   run_in_qemu_arch
                   ;;
+          debian) prepare_dependecies_debian
+                  pacman_init
+                  create_image
+                  mount_image
+                  exit_trap
+                  format_image
+                  mount_root
+                  pacstrap_base_debian
+                  mount_boot
+                  chroot_arch
+                  unmounting_all
+                  run_in_qemu
     esac
 }
 
