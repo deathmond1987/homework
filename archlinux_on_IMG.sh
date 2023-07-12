@@ -36,7 +36,7 @@ prepare_dependecies_debian () {
 }
 
 prepare_dependecies_alpine () {
-    apk --version
+    apk add pacman arch-install-scripts
 }
 
 pacman_init () {
