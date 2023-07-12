@@ -112,13 +112,14 @@ pacstrap_base () {
 pacstrap_base_debian () {
     #installing base arch files and devel apps
     cd "$MOUNT_PATH"
-    wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz 
-    tar xzf ./archlinux.tar.gz --numeric-owner
+    wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz
+    tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
     arch-chroot "$MOUNT_PATH" << EOF
     pacman-key --init
     pacman-key --populate archlinux
     pacman -S -noconfirm base base-devel
 EOF
+    cd -
 }
 
 mount_boot () {
