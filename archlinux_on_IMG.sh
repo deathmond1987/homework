@@ -118,7 +118,7 @@ pacstrap_base_debian () {
     pacman-key --init
     pacman-key --populate archlinux
     sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
-    pacman -Sy --noconfirm base base-devel
+    pacman -Syu --noconfirm base base-devel
     rm -f /archlinux.tar.gz
     rm -f /pkglist.x86_64.txt
     rm -f /version
@@ -225,7 +225,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                       cd .. && \
                       rm -rf yay-bin && \
                       yay -Y --gendb && \
-                      yay -Syu --devel && \
+                      yes | yay -Syu --devel && \
                       yay -Y --devel --save && \
                       yay --editmenu --nodiffmenu --save"
     }
