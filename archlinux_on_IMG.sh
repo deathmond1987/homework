@@ -2,16 +2,16 @@ set -xe
 # POC
 # fully working arch linux builded from RHEL-like command line on RAW IMAGE with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
 . /etc/os-release
-#path where we build new arch linux system
+# path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
 
 prepare_dependecies () {
-    #installing dependencies
-    #arch-install-scripts - pacman and his dependencies
-    #e2fsprogs - for making fs in image
-    #dosfstools - for making fat32 fs in image
-    #qemu-kvm-core - for run builded image in qemu-kvm
-    #edk2-ovmf - uefi bios for run image in qemu with uefi
+    # installing dependencies
+    # arch-install-scripts - pacman and his dependencies
+    # e2fsprogs - for making fs in image
+    # dosfstools - for making fat32 fs in image
+    # qemu-kvm-core - for run builded image in qemu-kvm
+    # edk2-ovmf - uefi bios for run image in qemu with uefi
     dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf
 }
 
@@ -24,18 +24,18 @@ prepare_dependecies_debian () {
 }
 
 pacman_init () {
-    #initialize keyring and load archlinux keys
+    # initialize keyring and load archlinux keys
     pacman-key --init
     pacman-key --populate archlinux
 }
 
 create_image () {
-    #creating empty image 
+    # creating empty image 
     dd if=/dev/zero of=./vhd.img bs=1M count=10000
-    #creating in image gpt table and 3 partitions
-    #first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
-    #second one - "boot" partition. we will mount it to /boot later with filesystem fat32
-    #third one - "root" partition. we will mount it to / later with lvm and ext4 partition
+    # creating in image gpt table and 3 partitions
+    # first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
+    # second one - "boot" partition. we will mount it to /boot later with filesystem fat32
+    # third one - "root" partition. we will mount it to / later with lvm and ext4 partition
     fdisk ./vhd.img << EOF
 g
 n
@@ -63,19 +63,19 @@ EOF
 }
 
 mount_image () {
-    #mount img file to loop to interact with created partitions 
-    #they will be available in /dev/loop_loop-number_partition-number
-    #like /dev/loop0p1 or /dev/loop20p3
+    # mount img file to loop to interact with created partitions 
+    # they will be available in /dev/loop_loop-number_partition-number
+    # like /dev/loop0p1 or /dev/loop20p3
     export DISK=$(losetup -P -f --show vhd.img)
 }
 
 exit_trap () {
-    #if script fail - we need to umnount all mounts to clear host machine
+    # if script fail - we need to umnount all mounts to clear host machine
     on_exit () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        #vgremove arch || true
+        # vgremove arch || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
@@ -83,34 +83,37 @@ trap "on_exit" EXIT
 }
 
 format_image () {
-    #formatting boot partition
+    # formatting boot partition
     mkfs.fat -F 32 "$DISK"p1
-    #formatting efi partition
+    # formatting efi partition
     mkfs.fat -F 32 "$DISK"p2
-    #creating root pv
+    # creating root pv
     pvcreate "$DISK"p3
-    #creating root vg
+    # creating root vg
     vgcreate arch "$DISK"p3
-    #creating root lv
+    # creating root lv
     lvcreate -l 100%FREE arch -n root
-    #formatting root lv
+    # formatting root lv
     mkfs.ext4 /dev/arch/root
 }
 
 mount_root () {
-    #create mount dirs
+    # create mount dirs
     mkdir -p "$MOUNT_PATH"
-    #mount formatted root disk to /
+    # mount formatted root disk to /
     mount /dev/arch/root "$MOUNT_PATH"
 }
 
 pacstrap_base () {
-    #installing base arch files and devel apps
+    # installing base arch files and devel apps
     pacstrap -K "$MOUNT_PATH" base base-devel
 }
 
 pacstrap_base_debian () {
-    #installing base arch files and devel apps
+    # installing base arch files and devel apps
+    # in debian arch-install-scripts package thereis no pacstrap script, so...
+    # we can wget pacstrap script from net or...
+    # ...full bootstrap image... for example
     cd "$MOUNT_PATH"
     wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz
     tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
@@ -128,60 +131,61 @@ EOF
 }
 
 mount_boot () {
-    #mount boot partition
+    # mount boot partition
     mount "$DISK"p2 "$MOUNT_PATH"/boot
-    #creating dir for efi
+    # creating dir for efi
     mkdir -p "$MOUNT_PATH"/boot/efi
-    #mount efi partition
+    # mount efi partition
     mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
-    #if we not remove swap from host machine he will appear in arch fstab
+    # if we not remove swap from host machine he will appear in arch fstab
     swapoff -a
-    #partition tree finished. generating fstab
+    # partition tree finished. generating fstab
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
 
 chroot_arch () {
-    #go to arch
+    # go to arch
     arch-chroot "$MOUNT_PATH" << EOF
 
     set -e
     sudo_config () {
+        # temporary disabling ask password
         sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
     }
 
     mkinitcpio_install () {
-        #install kernel and firmware
+        # install kernel and firmware
         pacman -S --noconfirm mkinitcpio
     }
 
     remove_autodetect_hook () {
-        #to run arch in most any environment we need build init image with all we can add to it
+        # to run arch in most any environment we need build init image with all we can add to it
         sed -i 's/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
     }
 
     kernel_install () {
-        #installing kernel and firmware
+        # installing kernel and firmware
         pacman -S --noconfirm linux linux-firmware
     }
 
     #we can not use systemd to configure locales, time and so on cause we are in chroot environment
     time_config () {
-        #config localtime
+        # config localtime
         ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-        #config hardware clocks
+        # config hardware clocks
         hwclock --systohc
     }
 
     locale_config () {
-        #add locales
+        # add locales
         sed -i 's/#ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/g' /etc/locale.gen
         sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
-        #generating locale
+        # generating locale
         locale-gen
     }
 
     language_config () {
-        #set default language
+        # set default language
         echo -e 'LANG=en_US.UTF-8
 LANGUAGE=en_US.UTF-8
 LC_ADDRESS=en_US.UTF-8
@@ -199,26 +203,26 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     hostname_config () {
-        #set hostname
+        # set hostname
         echo 'home' > /etc/hostname
     }
 
     user_config () {
-        #create user and add it to wheel group
+        # create user and add it to wheel group
         useradd -m -G wheel -s /bin/bash kosh
-        #changing password
+        # changing password
         echo "root:qwe" |chpasswd
         echo "kosh:qwe" |chpasswd
         usermod -s /usr/bin/bash root
     }
 
     git_install () {
-        #adding git
+        # adding git
         pacman -S --noconfirm git
     }
 
     yay_install () {
-        #dropping root user bacause makepkg and yay not working from root user
+        # dropping root user bacause makepkg and yay not working from root user
         su - kosh -c "git clone https://aur.archlinux.org/yay-bin && \
                       cd yay-bin && \
                       yes | makepkg -si && \
@@ -231,14 +235,14 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     apps_install () {
-        #installing needed packages
+        # installing needed packages
         su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" \
                                           lvm2 docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit"
-        #админу локалхоста дозволено:)
+        # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
 
@@ -260,13 +264,13 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     systemd_units_enable () {
-        #enabling units
+        # enabling units
         systemctl enable docker
         systemctl enable sshd
     }
 
     grub_install () {
-        #installin grub. extra config needed because we dont have efivars in container
+        # installin grub. extra config needed because we dont have efivars in container
         mkdir -p /boot/efi
         grub-install \
             --target=x86_64-efi \
@@ -289,9 +293,9 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
     
 
     postinstall_config () {
-        #for now we have large initramfs and strange-installed-grub. 
-        #in this block we generate initrd image with autodetect hook, reinstall grub and fixing sudo permissions
-        #after that remove this helper script
+        # for now we have large initramfs and strange-installed-grub. 
+        # in this block we generate initrd image with autodetect hook, reinstall grub and fixing sudo permissions
+        # after that remove this helper script
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
             echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             echo generationg initrd image...
@@ -322,7 +326,7 @@ options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$EN
         user_config
         git_install
         yay_install
-   #pkgbuild for modules currently broken in aur
+   # pkgbuild for modules currently broken in aur
    #     init_modules_install
         apps_install
         generate_init
