@@ -350,15 +350,15 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
-    systemd_boot_install () {
-        bootctl install --esp-path=/boot/efi
-        ENTRIES=/boot/loader/entries
-        mkdir -p "$ENTRIES"
-        echo "title   Arch Linux
-linux   /vmlinuz-linux
-initrd  /initramfs-linux.img
-options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$ENTRIES"/arch.conf
-    }
+#    systemd_boot_install () {
+#        bootctl install --esp-path=/boot/efi
+#        ENTRIES=/boot/loader/entries
+#        mkdir -p "$ENTRIES"
+#        echo "title   Arch Linux
+#linux   /vmlinuz-linux
+#initrd  /initramfs-linux.img
+#options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$ENTRIES"/arch.conf
+#    }
     
 
     postinstall_config () {
