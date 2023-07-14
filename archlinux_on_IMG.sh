@@ -140,7 +140,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        lvremove /dev/arch/root || true
+        # lvremove /dev/arch/root || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
