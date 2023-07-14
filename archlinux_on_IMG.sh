@@ -381,7 +381,8 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     postinstall_config () {
         # for now we have large initramfs and strange-installed-grub. 
-        # in this block we generate initrd image with autodetect hook, reinstall grub and fixing sudo permissions
+        # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
+        # resizing partition / to full disk and creating swap
         # after that remove this helper script
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
             set -xe
