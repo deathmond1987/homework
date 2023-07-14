@@ -407,7 +407,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
             # fdisk resize
             echo adding swap-file...
-            dd if=/dev/zero of=/swapfile bs=1M count=\$(free -m | grep Mem| awk '{ print $2}') status=progress
+            dd if=/dev/zero of=/swapfile bs=1M count=\$(free -m | grep Mem| awk '{ print \$2}') status=progress
             chmod 0600 /swapfile
             mkswap -U clear /swapfile
             swapon /swapfile
@@ -415,7 +415,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             echo done
 
             # echo resize / partition to full disk...
-            # echo \", +\" | sfdisk \$(fdisk -l | grep "Linux")
+            # echo \", +\" | sfdisk \$(fdisk -l | grep \"Linux\")
             # pvresize /dev/sda3
             # lvextend -l +100%FREE /dev/arch/root
             # resize2fs /dev/arch/root
