@@ -393,6 +393,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # resizing partition / to full disk and creating swap
         # after that remove this helper script
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
+            #/usr/bin/env bash
             set -xe
             echo Finishing installation...
             echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
