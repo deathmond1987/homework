@@ -240,7 +240,7 @@ mount_boot () {
 
 chroot_arch () {
     # go to arch
-    arch-chroot "$MOUNT_PATH" #<< EOF
+    arch-chroot "$MOUNT_PATH" << EOF
 
     set -e
     sudo_config () {
