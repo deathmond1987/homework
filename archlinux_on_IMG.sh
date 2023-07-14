@@ -97,7 +97,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        lvremove /dev/arch/root || true
+        #lvremove /dev/arch/root || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
@@ -349,7 +349,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
         # resizing partition / to full disk and creating swap
         # after that remove this helper script
-        sed -i '1s|^|sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n|' /home/kosh/.zshrc
+        sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' /home/kosh/.zshrc
             
             echo -e "#/usr/bin/env bash
             set -xe
@@ -432,7 +432,7 @@ unmounting_all () {
     umount -l "$MOUNT_PATH"/boot/efi 
     umount -l "$MOUNT_PATH"/boot
     umount -l "$MOUNT_PATH"
-    lvremove -f --yes /dev/arch/root
+    #lvremove -f --yes /dev/arch/root
     losetup -d "$DISK" 
 }
 
