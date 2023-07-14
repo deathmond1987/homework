@@ -405,33 +405,12 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
             echo done
 
-            # fdisk resize
-            echo adding swap-file...
-            dd if=/dev/zero of=/swapfile bs=1M count=\$(free -m | grep Mem| awk '{ print \$2}') status=progress
-            chmod 0600 /swapfile
-            mkswap -U clear /swapfile
-            swapon /swapfile
-            echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
-            echo done
-
-            # echo resize / partition to full disk...
-            # echo \", +\" | sfdisk \$(fdisk -l | grep \"Linux\")
-            # pvresize /dev/sda3
-            # lvextend -l +100%FREE /dev/arch/root
-            # resize2fs /dev/arch/root
-            # echo done
-
-            echo remove postinstall script...
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
             echo done
-
-            echo changing sudoers...
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
-            echo done
-            sudo reboot
-            " > /home/kosh/postinstall.sh
+            sudo reboot" > /home/kosh/postinstall.sh
             chmod 755 /home/kosh/postinstall.sh
     }
 
@@ -457,11 +436,10 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
    #     systemd_boot_install
         grub_install
         postinstall_config
-    }
-
-    main
+}
 
 EOF
+
 }
 
 unmounting_all () {
@@ -553,5 +531,21 @@ main () {
                   ;;
     esac
 }
+
+#todo () {
+#todo
+#            dd if=/dev/zero of=/swapfile bs=1M count=
+#            chmod 0600 /swapfile
+#            mkswap -U clear /swapfile
+#            swapon /swapfile
+#            echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
+#            echo done
+#
+#            echo resize / partition to full disk...
+#            echo \", +\" | fdisk -N 3 /dev/sda
+#            pvresize /dev/sda3
+#            lvextend -l +100%FREE /dev/arch/root
+#            resize2fs /dev/arch/root
+#}
 
 main
