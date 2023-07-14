@@ -1,6 +1,6 @@
 set -xe
 
-# source distrib info 
+# source distrib info
 . /etc/os-release
 # path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
@@ -52,7 +52,7 @@ pacman_init () {
 }
 
 create_image () {
-    # creating empty image 
+    # creating empty image
     dd if=/dev/zero of=./vhd.img bs=1M count=10000
     # creating in image gpt table and 3 partitions
     # first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
@@ -85,7 +85,7 @@ EOF
 }
 
 mount_image () {
-    # mount img file to loop to interact with created partitions 
+    # mount img file to loop to interact with created partitions
     # they will be available in /dev/loop_loop-number_partition-number
     # like /dev/loop0p1 or /dev/loop20p3
     export DISK=$(losetup -P -f --show vhd.img)
@@ -97,7 +97,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        #lvremove /dev/arch/root || true
+        lvremove /dev/arch/root || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
@@ -342,51 +342,50 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 #initrd  /initramfs-linux.img
 #options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$ENTRIES"/arch.conf
 #    }
-    
 
     postinstall_config () {
-        # for now we have large initramfs and strange-installed-grub. 
+        # for now we have large initramfs and strange-installed-grub.
         # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
         # resizing partition / to full disk and creating swap
         # after that remove this helper script
-        sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' /home/kosh/.zshrc
-            
+        sed -i '1s|^|sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n|' /home/kosh/.zshrc
+
             echo -e "#/usr/bin/env bash
             set -xe
-            
+
             echo Finishing installation...
-            
+
             sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             echo generationg initrd image...
             # if this is real host (not virtual) thereis should be intel-ucode or amd-ucode install
             mkinitcpio -P
             echo done
-            
+
             echo re-installing grub...
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
             echo done
-            
+
             # fdisk resize
-            echo adding swap-file... 
+            echo adding swap-file...
             dd if=/dev/zero of=/swapfile bs=1M count=$(free -m | grep Mem| awk '{ print $2}') status=progress
             chmod 0600 /swapfile
             mkswap -U clear /swapfile
             swapon /swapfile
             echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
             echo done
-            
+
             echo resize / partition to full disk...
             echo \", +\" | sfdisk -N 3 /dev/sda
             pvresize /dev/sda3
             lvextend -l +100%FREE /dev/arch/root
             resize2fs /dev/arch/root
-            echo done 
-            
+            echo done
+
             echo remove postinstall script...
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
-            echo done 
-            
+            echo done
+
             echo changing sudoers...
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
@@ -429,11 +428,11 @@ unmounting_all () {
     # unmount all mounts
     # we need this to stop grub in vm dropping in grub-shell due first run
     sync
-    umount -l "$MOUNT_PATH"/boot/efi 
+    umount -l "$MOUNT_PATH"/boot/efi
     umount -l "$MOUNT_PATH"/boot
     umount -l "$MOUNT_PATH"
-    #lvremove -f --yes /dev/arch/root
-    losetup -d "$DISK" 
+    lvremove -f --yes /dev/arch/root
+    losetup -d "$DISK"
 }
 
 run_in_qemu () {
@@ -457,7 +456,7 @@ run_in_qemu_arch () {
 }
 
 main () {
-    case "$ID" in 
+    case "$ID" in
           fedora) prepare_dependecies
                   pacman_init
                   create_image
@@ -485,7 +484,7 @@ main () {
                   unmounting_all
                   run_in_qemu_arch
                   ;;
-                  
+
           debian) notify_debian
                   prepare_dependecies_debian
                   create_image
@@ -499,7 +498,7 @@ main () {
                   unmounting_all
                   run_in_qemu
                   ;;
-                  
+
           alpine) prepare_dependecies_alpine
                   create_image
                   mount_image
