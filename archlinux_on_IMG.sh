@@ -378,9 +378,15 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
             echo done
             # fdisk resize
-            # pvresize /dev/sda3
-            # lvextend -l +100%FREE /dev/arch/root
-            # resize2fs /dev/arch/root
+            dd if=/dev/zero of=/swapfile bs=1M count=$(free -m -h -t | grep Mem| awk '{ print $2}') status=progress
+            chmod 0600 /swapfile
+            mkswap -U clear /swapfile
+            swapon /swapfile
+            echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
+            echo \", +\" | sfdisk -N 3 /dev/sda
+            pvresize /dev/sda3
+            lvextend -l +100%FREE /dev/arch/root
+            resize2fs /dev/arch/root
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
             sudo reboot" > /home/kosh/postinstall.sh
