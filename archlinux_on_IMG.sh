@@ -409,7 +409,8 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             resize2fs /dev/arch/root
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
-            sudo reboot" > /home/kosh/postinstall.sh
+            # sudo reboot
+            " > /home/kosh/postinstall.sh
             chmod 755 /home/kosh/postinstall.sh
     }
 
