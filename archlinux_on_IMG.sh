@@ -240,7 +240,7 @@ mount_boot () {
 
 chroot_arch () {
     # go to arch
-    arch-chroot "$MOUNT_PATH" << EOF
+    arch-chroot "$MOUNT_PATH" #<< EOF
 
     set -e
     sudo_config () {
@@ -393,17 +393,23 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # resizing partition / to full disk and creating swap
         # after that remove this helper script
         sed -i '1s|^|sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n|' /home/kosh/.zshrc
-            #/usr/bin/env bash
+            
+            echo "#/usr/bin/env bash
             set -xe
+            
             echo Finishing installation...
+            
             echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
+            
             echo generationg initrd image...
             # if this is real host (not virtual) thereis should be intel-ucode or amd-ucode install
             mkinitcpio -P
             echo done
+            
             echo re-installing grub...
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
             echo done
+            
             # fdisk resize
             echo adding swap-file... 
             dd if=/dev/zero of=/swapfile bs=1M count=$(free -m | grep Mem| awk '{ print $2}') status=progress
@@ -412,16 +418,19 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             swapon /swapfile
             echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
             echo done
+            
             echo resize / partition to full disk...
             echo \", +\" | sfdisk -N 3 /dev/sda
             pvresize /dev/sda3
             lvextend -l +100%FREE /dev/arch/root
             resize2fs /dev/arch/root
             echo done 
+            
             echo remove postinstall script...
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
             echo done 
+            
             echo changing sudoers...
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
