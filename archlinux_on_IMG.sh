@@ -15,6 +15,24 @@
 # Поэтому для установки корневой системы мы выключаем временно проверку подписей пакетов, ставим и делаем chroot. Донастраиваем изнутри.
 # Так же в alpine изкоробки поломан genfstab так как некоторых стандартных приложений нет в дефолтной поставке alpine либо используются busybox варианты.
 
+# dnf подобные дистрибутивы можно ставить через sudo dnf  --installroot=/mnt/rocky group install core
+# создав /mnt/rocky/etc/yum.repos.d/rocky.conf файл с описанием репозитория:
+# [baseos]
+# name=Rocky Linux $releasever - BaseOS
+# mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever
+# #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/BaseOS/$basearch/os/
+# gpgcheck=1
+# enabled=1
+# countme=1
+# gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+# Для apt подобных debootstrap
+# debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
+
+
+
+
+
 set -xe
 
 # source distrib info 
