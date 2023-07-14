@@ -140,7 +140,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        # lvremove /dev/arch/root || true
+        lvremove /dev/arch/root || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
@@ -463,10 +463,10 @@ unmounting_all () {
     # unmount all mounts
     # we need this to stop grub in vm dropping in grub-shell due first run
     sync
-    lvremove /dev/arch/root
     umount -l "$MOUNT_PATH"/boot/efi 
     umount -l "$MOUNT_PATH"/boot
     umount -l "$MOUNT_PATH"
+    lvremove -f --yes /dev/arch/root
     losetup -d "$DISK" 
 }
 
