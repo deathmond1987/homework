@@ -390,7 +390,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # after that remove this helper script
         sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' /home/kosh/.zshrc
 
-            echo -e "#/usr/bin/env bash
+            echo -e "#!/usr/bin/env bash
             set -xe
 
             echo Finishing installation...
@@ -407,19 +407,19 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
             # fdisk resize
             echo adding swap-file...
-            dd if=/dev/zero of=/swapfile bs=1M count=$(free -m | grep Mem| awk '{ print $2}') status=progress
+            dd if=/dev/zero of=/swapfile bs=1M count=\$(free -m | grep Mem| awk '{ print $2}') status=progress
             chmod 0600 /swapfile
             mkswap -U clear /swapfile
             swapon /swapfile
             echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
             echo done
 
-            echo resize / partition to full disk...
-            echo \", +\" | sfdisk -N 3 /dev/sda
-            pvresize /dev/sda3
-            lvextend -l +100%FREE /dev/arch/root
-            resize2fs /dev/arch/root
-            echo done
+            # echo resize / partition to full disk...
+            # echo \", +\" | sfdisk \$(fdisk -l | grep "Linux")
+            # pvresize /dev/sda3
+            # lvextend -l +100%FREE /dev/arch/root
+            # resize2fs /dev/arch/root
+            # echo done
 
             echo remove postinstall script...
             sed -i '1d' /home/kosh/.zshrc
