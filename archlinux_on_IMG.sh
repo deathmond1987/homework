@@ -392,7 +392,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
         # resizing partition / to full disk and creating swap
         # after that remove this helper script
-        sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
+        sed -i '1s|^|sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n|' /home/kosh/.zshrc
             #/usr/bin/env bash
             set -xe
             echo Finishing installation...
