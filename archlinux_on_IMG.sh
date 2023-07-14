@@ -1,3 +1,43 @@
+# POC
+# fully working arch linux builded from RHEL-like command line on RAW IMAGE 
+# with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
+#
+# Полностью работоспособный arch linux установленный из rhel, debian и alpine дистрибутивов. 
+# Кофигурация включает в себя uefi grub агрузчик, корневой раздел на lvm в ext4, 
+#предустановленный oh-my-zsh и некоторые замены в системных приложениях .
+# 
+# в репозиториях fedora есть все для устновки arch в chroot: pacstrap, pacman,genfstab, 
+# arch-chroot (в пакете arch-install-scripts), archlinux-keyring - отдельно.
+# При помощи этого набора через pacstrap устанавливается в /mnt/arch новый корень с arch, 
+# происходит chroot туда и уже оттуда донастраивается.
+#
+# В дебиан тоже есть arch-install-scripts пакет, но в нем нет pacstrap.
+# то есть сходу нет простого инструмента сделать корневую систему arch в /mnt/arch.
+# Мы просто дергаем bootstrap архив с корневой системой арча и распаковвываем ее в /mnt/arch. 
+# А потом уже донастраиваем из окружение chroot.
+#
+# В alpine есть все скрипты для установки но нет archlinux-keyring 
+# https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/42040
+# Поэтому для установки корневой системы мы выключаем временно проверку подписей пакетов, 
+# ставим и делаем chroot. Донастраиваем изнутри.
+# Так же в alpine изкоробки поломан genfstab так как некоторых стандартных приложений 
+# нет в дефолтной поставке alpine либо используются busybox варианты.
+
+# dnf подобные дистрибутивы можно ставить через sudo dnf  --installroot=/mnt/rocky group install core
+# создав /mnt/rocky/etc/yum.repos.d/rocky.conf файл с описанием репозитория:
+# [baseos]
+# name=Rocky Linux $releasever - BaseOS
+# mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever
+# #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/BaseOS/$basearch/os/
+# gpgcheck=1
+# enabled=1
+# countme=1
+# gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+# Для apt подобных debootstrap
+# debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
+
+
 set -xe
 
 # source distrib info
