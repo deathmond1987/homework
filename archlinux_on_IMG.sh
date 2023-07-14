@@ -386,6 +386,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
             echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             echo generationg initrd image...
+            # if this is real host (not virtual) thereis should be intel-ucode or amd-ucode install
             mkinitcpio -P
             echo done
             echo re-installing grub...
