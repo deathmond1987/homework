@@ -384,6 +384,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # in this block we generate initrd image with autodetect hook, reinstall grub and fixing sudo permissions
         # after that remove this helper script
         sed -i '1s|^|sudo /home/kosh/postinstall.sh\n|' /home/kosh/.zshrc
+            set -xe
             echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             echo generationg initrd image...
             # if this is real host (not virtual) thereis should be intel-ucode or amd-ucode install
@@ -397,7 +398,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
             echo done
             # fdisk resize
-            dd if=/dev/zero of=/swapfile bs=1M count=$(free -m -h -t | grep Mem| awk '{ print $2}') status=progress
+            dd if=/dev/zero of=/swapfile bs=1M count=$(free -m | grep Mem| awk '{ print $2}') status=progress
             chmod 0600 /swapfile
             mkswap -U clear /swapfile
             swapon /swapfile
