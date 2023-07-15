@@ -1,26 +1,27 @@
+#!/usr/bin/env bash
 # POC
-# fully working arch linux builded from RHEL-like command line on RAW IMAGE 
+# fully working arch linux builded from RHEL-like command line on RAW IMAGE
 # with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
 #
-# Полностью работоспособный arch linux установленный из rhel, debian и alpine дистрибутивов. 
-# Кофигурация включает в себя uefi grub агрузчик, корневой раздел на lvm в ext4, 
+# Полностью работоспособный arch linux установленный из rhel, debian и alpine дистрибутивов.
+# Кофигурация включает в себя uefi grub агрузчик, корневой раздел на lvm в ext4,
 #предустановленный oh-my-zsh и некоторые замены в системных приложениях .
-# 
-# в репозиториях fedora есть все для устновки arch в chroot: pacstrap, pacman,genfstab, 
+#
+# в репозиториях fedora есть все для устновки arch в chroot: pacstrap, pacman,genfstab,
 # arch-chroot (в пакете arch-install-scripts), archlinux-keyring - отдельно.
-# При помощи этого набора через pacstrap устанавливается в /mnt/arch новый корень с arch, 
+# При помощи этого набора через pacstrap устанавливается в /mnt/arch новый корень с arch,
 # происходит chroot туда и уже оттуда донастраивается.
 #
 # В дебиан тоже есть arch-install-scripts пакет, но в нем нет pacstrap.
 # то есть сходу нет простого инструмента сделать корневую систему arch в /mnt/arch.
-# Мы просто дергаем bootstrap архив с корневой системой арча и распаковвываем ее в /mnt/arch. 
+# Мы просто дергаем bootstrap архив с корневой системой арча и распаковвываем ее в /mnt/arch.
 # А потом уже донастраиваем из окружение chroot.
 #
-# В alpine есть все скрипты для установки но нет archlinux-keyring 
+# В alpine есть все скрипты для установки но нет archlinux-keyring
 # https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/42040
-# Поэтому для установки корневой системы мы выключаем временно проверку подписей пакетов, 
+# Поэтому для установки корневой системы мы выключаем временно проверку подписей пакетов,
 # ставим и делаем chroot. Донастраиваем изнутри.
-# Так же в alpine изкоробки поломан genfstab так как некоторых стандартных приложений 
+# Так же в alpine изкоробки поломан genfstab так как некоторых стандартных приложений
 # нет в дефолтной поставке alpine либо используются busybox варианты.
 
 # dnf подобные дистрибутивы можно ставить через sudo dnf  --installroot=/mnt/rocky group install core
@@ -238,8 +239,7 @@ mount_boot () {
 chroot_arch () {
     # go to arch
     arch-chroot "$MOUNT_PATH" << EOF
-
-    set -e
+    set -ex
     sudo_config () {
         # temporary disabling ask password
         sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
@@ -373,16 +373,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
-#    systemd_boot_install () {
-#        bootctl install --esp-path=/boot/efi
-#        ENTRIES=/boot/loader/entries
-#        mkdir -p "$ENTRIES"
-#        echo "title   Arch Linux
-#linux   /vmlinuz-linux
-#initrd  /initramfs-linux.img
-#options root=\"$(blkid | grep $DISKp1 | awk '{ print $5 }')=Arch OS\" rw" > "$ENTRIES"/arch.conf
-#    }
-
     postinstall_config () {
         # for now we have large initramfs and strange-installed-grub.
         # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
@@ -390,24 +380,11 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # after that remove this helper script
         sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' /home/kosh/.zshrc
 
-            echo -e "#!/usr/bin/env bash
-            set -xe
-
-            echo Finishing installation...
-
-            sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
-            echo generationg initrd image...
-            # if this is real host (not virtual) thereis should be intel-ucode or amd-ucode install
+            echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             mkinitcpio -P
-            echo done
-
-            echo re-installing grub...
             grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-            echo done
-
             sed -i '1d' /home/kosh/.zshrc
             rm /home/kosh/postinstall.sh
-            echo done
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
             sudo reboot" > /home/kosh/postinstall.sh
@@ -432,11 +409,11 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         generate_init
         zsh_install
         systemd_units_enable
-   #not implemented
-   #     systemd_boot_install
         grub_install
         postinstall_config
+
 }
+main
 
 EOF
 
