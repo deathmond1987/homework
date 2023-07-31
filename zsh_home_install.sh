@@ -219,18 +219,42 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
     for apps in "${APPS[@]}"; do
         INSTALL=failed
         if command -v dnf > /dev/null ; then
-            dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
+            if command -v $apps > /dev/null ; then
+                success "$apps found. Nothing to do" && INSTALL=true
+            else
+                dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            fi
         elif command -v apt-get > /dev/null ; then
+            if command -v $apps > /dev/null ; then
+                success "$apps found. Nothing to do" && INSTALL=true
+            else
+                dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            fi
             apt-get install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         elif command -v pacman > /dev/null ; then
+            if command -v $apps > /dev/null ; then
+                success "$apps found. Nothing to do" && INSTALL=true
+            else
+                dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            fi
             echo y | LANG=C yay -S \
             --noprovides \
             --answerdiff None \
             --answerclean None \
             --mflags "--noconfirm" "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         elif command -v zypper > /dev/null ; then
+            if command -v $apps > /dev/null ; then
+                success "$apps found. Nothing to do" && INSTALL=true
+            else
+                dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            fi
             zypper install -y "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true 
         elif command -v apk > /dev/null ; then
+                        if command -v $apps > /dev/null ; then
+                success "$apps found. Nothing to do" && INSTALL=true
+            else
+                dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
+            fi
             apk add "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
         else
             error "Package manager not known"
