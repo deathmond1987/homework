@@ -421,10 +421,10 @@ postinstall_config () {
 
         echo resizing disk
         ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
-        ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $1 }' | head -1)
+        ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $2 }' | head -1)
         echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
         partprobe
-        pvresize "ROOT_PARTITION"
+        pvresize "$ROOT_PARTITION"
         lvextend -l +100%FREE /dev/arch/root
         resize2fs /dev/arch/root
 
