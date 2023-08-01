@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # POC
 # fully working arch linux builded from RHEL-like command line on RAW IMAGE
 # with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
@@ -239,6 +238,7 @@ mount_boot () {
 chroot_arch () {
     # go to arch
     arch-chroot "$MOUNT_PATH" << EOF
+    #!/usr/bin/env bash
     set -ex
     sudo_config () {
         # temporary disabling ask password
@@ -333,7 +333,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" \
-                                          lvm2 docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit"
+                                          lvm2 docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit parted"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
@@ -345,10 +345,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                           --answerclean None \
                                           --mflags \" --noconfirm\" \
                                           mkinitcpio-firmware"
-    }
-
-    generate_init () {
-        mkinitcpio -P
     }
 
     zsh_install () {
@@ -373,29 +369,10 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
-    postinstall_config () {
-        # for now we have large initramfs and strange-installed-grub.
-        # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
-        # resizing partition / to full disk and creating swap
-        # after that remove this helper script
-        sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' /home/kosh/.zshrc
-
-            echo -e "sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
-            mkinitcpio -P
-            grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-            sed -i '1d' /home/kosh/.zshrc
-            rm /home/kosh/postinstall.sh
-            sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
-            sudo reboot" > /home/kosh/postinstall.sh
-            chmod 755 /home/kosh/postinstall.sh
-    }
-
     main () {
         sudo_config
         mkinitcpio_install
         remove_autodetect_hook
-        kernel_install
         time_config
         locale_config
         language_config
@@ -406,17 +383,57 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
    # pkgbuild for modules currently broken in aur
    #     init_modules_install
         apps_install
-        generate_init
+        kernel_install
         zsh_install
         systemd_units_enable
         grub_install
-        postinstall_config
 
 }
+
 main
 
 EOF
 
+}
+
+postinstall_config () {
+    # for now we have large initramfs and strange-installed-grub.
+    # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
+    # resizing partition / to full disk and creating swap
+    # after that remove this helper script
+    sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' "$MOUNT_PATH"/home/kosh/.zshrc
+
+    cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
+#!/usr/bin/env bash
+        set -xv
+        sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
+        mkinitcpio -P
+        grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+        sed -i '1d' /home/kosh/.zshrc
+
+        memory=$(free -m | grep Mem | awk '{print $2}')
+        dd if=/dev/zero of=/swapfile bs=1M count=$memory
+        chmod 0600 /swapfile
+        mkswap -U clear /swapfile
+        swapon /swapfile
+        echo "/swapfile none swap defaults 0 0" >> /etc/fstab
+        echo done
+
+        echo resizing disk
+        ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
+        ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $1 }' | head -1)
+        echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
+        partprobe
+        pvresize "ROOT_PARTITION"
+        lvextend -l +100%FREE /dev/arch/root
+        resize2fs /dev/arch/root
+
+        rm /home/kosh/postinstall.sh
+        sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+        sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+        sudo reboot
+EOL
+        chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
 }
 
 unmounting_all () {
@@ -431,6 +448,7 @@ unmounting_all () {
 }
 
 run_in_qemu () {
+    qemu-img resize ./vhd.img 15G
     qemu-system-x86_64 \
         -enable-kvm \
         -smp cores=4 \
@@ -441,6 +459,7 @@ run_in_qemu () {
 }
 
 run_in_qemu_arch () {
+    qemu-img resize ./vhd.img 15G
     qemu-system-x86_64 \
         -enable-kvm \
         -smp cores=4 \
@@ -462,6 +481,7 @@ main () {
                   pacstrap_base
                   mount_boot
                   chroot_arch
+                  postinstall_config
                   unmounting_all
                   run_in_qemu
                   ;;
@@ -476,6 +496,7 @@ main () {
                   pacstrap_base
                   mount_boot
                   chroot_arch
+                  postinstall_config
                   unmounting_all
                   run_in_qemu_arch
                   ;;
@@ -490,6 +511,7 @@ main () {
                   pacstrap_base_debian
                   mount_boot
                   chroot_arch
+                  postinstall_config
                   unmounting_all
                   run_in_qemu
                   ;;
@@ -503,6 +525,7 @@ main () {
                   pacstrap_base_alpine
                   mount_boot
                   chroot_arch
+                  postinstall_config
                   unmounting_all
                   run_in_qemu
                   ;;
