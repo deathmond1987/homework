@@ -68,7 +68,7 @@ prepare_dependecies () {
 }
 
 prepare_dependecies_arch () {
-    pacman -S --needed lvm2 dosfstools arch-install-script
+    pacman -S --needed lvm2 dosfstools arch-install-scripts edk2-ovmf e2fsprogs
 }
 
 prepare_dependecies_debian () {
