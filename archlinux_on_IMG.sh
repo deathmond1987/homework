@@ -372,6 +372,16 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         grub-mkconfig -o /boot/grub/grub.cfg
     }
 
+    other_config () {
+    # enabling pacman from game
+    echo "
+ILoveCandy" >> /etc/pacman.conf
+    #enabling parallel downloads in pacman 
+    sed -i sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
+    #enabling colors in pacman output
+    sed -i '/Color/s/^#//g' /etc/pacman.conf
+    }
+
     main () {
         sudo_config
         mkinitcpio_install
@@ -390,7 +400,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         zsh_install
         systemd_units_enable
         grub_install
-
+        other_config
 }
 
 main
