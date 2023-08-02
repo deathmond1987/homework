@@ -401,38 +401,70 @@ postinstall_config () {
     # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
     # resizing partition / to full disk and creating swap
     # after that remove this helper script
-    sed -i '1s#^#sudo /home/kosh/postinstall.sh 2>&1 | tee /home/kosh/log.file\n#' "$MOUNT_PATH"/home/kosh/.zshrc
 
+    # adding this script to autoboot after first load arch linux
+    sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
+
+    # script body
     cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
 #!/usr/bin/env bash
-        set -xv
+        set -x
+        # adding autodetect hook to mkinicpio to generate default arch init image 
         sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
+        # creating initrd image
         mkinitcpio -P
+        
+        # reinstalling grub
         grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-        sed -i '1d' /home/kosh/.zshrc
-
+       
+        # check memory available
         memory=$(free -m | grep Mem | awk '{print $2}')
+        # creating swap file with sizy equal to memory 
         dd if=/dev/zero of=/swapfile bs=1M count=$memory
+        # changing swap file permissions
         chmod 0600 /swapfile
+        # formatting swap file
         mkswap -U clear /swapfile
+        # enabling swap
         swapon /swapfile
+        # adding swap file entry to fstab to automount
         echo "/swapfile none swap defaults 0 0" >> /etc/fstab
         echo done
 
+        # default disk size in this script 10G
+        # after install we want to use all disk space
         echo resizing disk
+        # searching name of partition with mounted root FS
         ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
+        # searching disk name with founded root partition
         ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $2 }' | head -1)
+        # adding all free disk space on founded disk to root FS partition
         echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
+        # reloading hard disk info
         partprobe
+        
+        # we have lvm on root partition. after resizing disk we need add new space to lvm
+        # extend physical volume to use all free space on partition
         pvresize "$ROOT_PARTITION"
+        # extend logical volume to use all free space from physical volume
         lvextend -l +100%FREE /dev/arch/root
+        # we have ext4 fs on lvm. resizing ext4 fs
         resize2fs /dev/arch/root
 
+        # removing helper script from autoload
+        sed -i '1d' /home/kosh/.zshrc
+        # removing helper script itself
         rm /home/kosh/postinstall.sh
+
+        # changing sudo rules to disable executing sudo without password
         sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+        # allow wheel group using sudo with password
         sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+        
+        # rebooting OS after reconfiguring
         sudo reboot
 EOL
+        # marking helper script executable
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
 }
 
@@ -531,21 +563,5 @@ main () {
                   ;;
     esac
 }
-
-#todo () {
-#todo
-#            dd if=/dev/zero of=/swapfile bs=1M count=
-#            chmod 0600 /swapfile
-#            mkswap -U clear /swapfile
-#            swapon /swapfile
-#            echo \"/swapfile none swap defaults 0 0\" >> /etc/fstab
-#            echo done
-#
-#            echo resize / partition to full disk...
-#            echo \", +\" | fdisk -N 3 /dev/sda
-#            pvresize /dev/sda3
-#            lvextend -l +100%FREE /dev/arch/root
-#            resize2fs /dev/arch/root
-#}
 
 main
