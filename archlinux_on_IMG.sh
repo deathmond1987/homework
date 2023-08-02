@@ -373,14 +373,18 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     other_config () {
-    # enabling pacman from game
-    echo "
+        # enabling pacman from game
+        echo "
 ILoveCandy" >> /etc/pacman.conf
-    #enabling parallel downloads in pacman 
-    sed -i sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
-    #enabling colors in pacman output
-    sed -i '/Color/s/^#//g' /etc/pacman.conf
-    }
+        #enabling parallel downloads in pacman 
+        sed -i sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
+        #enabling colors in pacman output
+        sed -i '/Color/s/^#//g' /etc/pacman.conf
+        #run mc to generate config
+        mc & pid="$(echo $?)" ; sleep 10; kill $pid
+        # changing default mc theme
+        echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
+        echo "MC_SKIN=gotar" >> /etc/bash.bashrc}
 
     main () {
         sudo_config
