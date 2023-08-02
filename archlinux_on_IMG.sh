@@ -68,7 +68,7 @@ prepare_dependecies () {
 }
 
 prepare_dependecies_arch () {
-    pacman -S --needed lvm2 dosfstools pacstrap
+    pacman -S --needed lvm2 dosfstools arch-install-script
 }
 
 prepare_dependecies_debian () {
