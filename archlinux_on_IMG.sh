@@ -68,7 +68,10 @@ prepare_dependecies () {
 }
 
 prepare_dependecies_arch () {
-    pacman -S --needed lvm2 dosfstools arch-install-scripts edk2-ovmf e2fsprogs qemu-base
+    pacman -S --needed lvm2 dosfstools arch-install-scripts edk2-ovmf e2fsprogs
+    if [ $(pacman -Qi qemu-desktop > /dev/null 2>&1) = "1" ]; then 
+        pacman -S qemu-base
+    fi
 }
 
 prepare_dependecies_debian () {
