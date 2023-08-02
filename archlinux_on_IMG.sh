@@ -383,8 +383,8 @@ ILoveCandy" >> /etc/pacman.conf
         #run mc to generate config
         mc & pid="$(echo $?)" ; sleep 10; kill $pid
         # changing default mc theme
-        echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
-        echo "MC_SKIN=gotar" >> /etc/bash.bashrc}
+        echo "MC_SKIN=gotar" >> /etc/profile
+}
 
     main () {
         sudo_config
