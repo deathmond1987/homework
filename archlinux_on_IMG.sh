@@ -268,12 +268,12 @@ mount_boot () {
 }
 
 chroot_arch () {
-    # tell the environment that this is install wor wsl
+    # tell the environment that this is install for wsl
     if [ "$WSL_INSTALL" = "true" ]; then
         echo "WSL_INSTALL=true" >> "$MOUNT_PATH"/etc/environment
     fi
     # go to arch    
- #   arch-chroot "$MOUNT_PATH" << EOF
+    arch-chroot "$MOUNT_PATH" << EOF
     #!/usr/bin/env bash
     set -ex
     sudo_config () {
