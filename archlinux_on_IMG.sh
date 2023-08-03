@@ -268,7 +268,11 @@ mount_boot () {
 }
 
 chroot_arch () {
-    # go to arch
+    # tell the environment that this is install wor wsl
+    if [ "WSL_INSTALL" = "true"]; then
+        echo "WSL_INSTALL=true" >> "$MOUNT_PATH"/etc/environment
+    fi
+    # go to arch    
     arch-chroot "$MOUNT_PATH" << EOF
     #!/usr/bin/env bash
     set -ex
@@ -435,24 +439,41 @@ ILoveCandy" >> /etc/pacman.conf
 }
 
     main () {
-        sudo_config
-        mkinitcpio_install
-        remove_autodetect_hook
-        time_config
-        locale_config
-        language_config
-        hostname_config
-        user_config
-        git_install
-        yay_install
-   # pkgbuild for modules currently broken in aur
-   #     init_modules_install
-        apps_install
-        kernel_install
-        zsh_install
-        systemd_units_enable
-        grub_install
-        other_config
+        if ! [ "WSL_INSTALL" = "true" ]; then
+            sudo_config
+            mkinitcpio_install
+            remove_autodetect_hook
+            time_config
+            locale_config
+            language_config
+            hostname_config
+            user_config
+            git_install
+            yay_install
+            # pkgbuild for modules currently broken in aur
+            #     init_modules_install
+            apps_install
+            kernel_install
+            zsh_install
+            systemd_units_enable
+            grub_install
+            other_config
+        else
+            sudo_config
+            time_config
+            locale_config
+            language_config
+            hostname_config
+            user_config
+            git_install
+            yay_install
+            # pkgbuild for modules currently broken in aur
+            #     init_modules_install
+            apps_install
+            zsh_install
+            systemd_units_enable
+            other_config
+        fi 
 }
 
 main
@@ -548,28 +569,39 @@ unmounting_all () {
 }
 
 run_in_qemu () {
-    qemu-img resize ./vhd.img 15G
-    qemu-system-x86_64 \
-        -enable-kvm \
-        -smp cores=4 \
-        -m 2G \
-        -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
-        -device nvme,drive=drive0,serial=badbeef \
-        -drive if=none,id=drive0,file=./vhd.img
+    if ! [ "$WSL_INSTALL" = "true" ]; then
+        qemu-img resize ./vhd.img 15G
+        qemu-system-x86_64 \
+            -enable-kvm \
+            -smp cores=4 \
+            -m 2G \
+            -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
+            -device nvme,drive=drive0,serial=badbeef \
+            -drive if=none,id=drive0,file=./vhd.img
+    else
+        true # CONVERT TO VHDX
+    fi
 }
 
 run_in_qemu_arch () {
-    qemu-img resize ./vhd.img 15G
-    qemu-system-x86_64 \
-        -enable-kvm \
-        -smp cores=4 \
-        -m 2G \
-        -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/x64/OVMF_CODE.fd \
-        -device nvme,drive=drive0,serial=badbeef \
-        -drive if=none,id=drive0,file=./vhd.img
+    if ! [ "$WSL_INSTALL" = "true" ]; then
+        qemu-img resize ./vhd.img 15G
+        qemu-system-x86_64 \
+            -enable-kvm \
+            -smp cores=4 \
+            -m 2G \
+            -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/x64/OVMF_CODE.fd \
+            -device nvme,drive=drive0,serial=badbeef \
+            -drive if=none,id=drive0,file=./vhd.img
+    else
+        true # CONVERT TO VHDX
+    fi
 }
 
 main () {
+    if [ "$1" = "--wsl" ]; then
+        export WSL_INSTALL=true
+    fi 
     case "$ID" in
           fedora) prepare_dependecies
                   pacman_init
@@ -632,4 +664,4 @@ main () {
     esac
 }
 
-main
+main "$@"
