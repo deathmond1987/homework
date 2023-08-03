@@ -64,18 +64,35 @@ prepare_dependecies () {
     # dosfstools - for making fat32 fs in image
     # qemu-kvm-core - for run builded image in qemu-kvm
     # edk2-ovmf - uefi bios for run image in qemu with uefi
-    dnf install arch-install-scripts e2fsprogs dosfstools qemu-kvm-core edk2-ovmf lvm2 -y
+    dnf install -y arch-install-scripts \
+                   e2fsprogs \
+                   dosfstools \
+                   qemu-kvm-core \
+                   edk2-ovmf \
+                   lvm2 
 }
 
 prepare_dependecies_arch () {
-    pacman -S --needed lvm2 dosfstools arch-install-scripts edk2-ovmf e2fsprogs
+    pacman -S --needed lvm2 \ 
+                       dosfstools \
+                       arch-install-scripts \
+                       edk2-ovmf \
+                       e2fsprogs
+    # on my arch laptop qemu-desktop is installed
+    # qemu-desktop and qemu-base conflicts
     if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then 
         pacman -S qemu-base
     fi
 }
 
 prepare_dependecies_debian () {
-    apt install arch-install-scripts e2fsprogs dosfstools qemu-utils qemu-system-x86 ovmf lvm2  -y
+    apt install -y arch-install-scripts \
+                   e2fsprogs \
+                   dosfstools \
+                   qemu-utils \
+                   qemu-system-x86 \
+                   ovmf \
+                   lvm2
 }
 
 prepare_dependecies_alpine () {
@@ -85,7 +102,18 @@ prepare_dependecies_alpine () {
     #20 min of my life gone before i understand that genfstab not generating PARTUUID because there is no lsblk in alpine. fuk...
     #installing gawk because busybox-awk not working with this script
     #installing grep
-    apk add pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs qemu-system-x86_64 findmnt gawk grep ovmf lsblk
+    apk add pacman \
+            arch-install-scripts \
+            losetup \
+            dosfstools \
+            lvm2 \
+            e2fsprogs \
+            qemu-system-x86_64 \
+            findmnt \
+            gawk \
+            grep \
+            ovmf \
+            lsblk
 }
 
 pacman_init () {
@@ -184,6 +212,7 @@ pacstrap_base_debian () {
     wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz
     #extracting archive in current dir with cut root dir
     tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
+    
     #chrooting to bootstrap root
     arch-chroot "$MOUNT_PATH" << EOF
     #usually pacstrap script populating keys but we doing it manually
@@ -267,8 +296,6 @@ chroot_arch () {
     time_config () {
         # config localtime
         ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-        # config hardware clocks
-        hwclock --systohc
     }
 
     locale_config () {
@@ -336,7 +363,21 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" \
-                                          lvm2 docker docker-compose dive mc wget curl openssh pigz docker-buildx grub efibootmgr polkit parted strace"
+                                                                      lvm2 \
+                                                                      docker \
+                                                                      docker-compose \
+                                                                      dive \
+                                                                      mc \
+                                                                      wget \
+                                                                      curl \
+                                                                      openssh \
+                                                                      pigz \
+                                                                      docker-buildx \
+                                                                      grub \
+                                                                      efibootmgr \
+                                                                      polkit \
+                                                                      parted \
+                                                                      strace"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
@@ -380,8 +421,6 @@ ILoveCandy" >> /etc/pacman.conf
         sed -i sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
         #enabling colors in pacman output
         sed -i '/Color/s/^#//g' /etc/pacman.conf
-        #run mc to generate config
-        mc & pid="$(echo $?)" ; sleep 10; kill $pid
         # changing default mc theme
         echo "MC_SKIN=gotar" >> /etc/profile
 }
@@ -433,7 +472,10 @@ postinstall_config () {
         
         # reinstalling grub
         grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-       
+        
+        # sync hardware date
+        hwclock --systohc
+
         # check memory available
         memory=$(free -m | grep Mem | awk '{print $2}')
         # creating swap file with sizy equal to memory 
