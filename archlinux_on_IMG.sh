@@ -362,26 +362,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     apps_install () {
         # installing needed packages
-        su - kosh -c "echo y | LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\" \
-                                                                      lvm2 \
-                                                                      docker \
-                                                                      docker-compose \
-                                                                      dive \
-                                                                      mc \
-                                                                      wget \
-                                                                      curl \
-                                                                      openssh \
-                                                                      pigz \
-                                                                      docker-buildx \
-                                                                      grub \
-                                                                      efibootmgr \
-                                                                      polkit \
-                                                                      parted \
-                                                                      strace"
       su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
@@ -403,6 +383,27 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" hstr-git"
+        
+        su - kosh -c "echo y | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\" \
+                                                                      lvm2 \
+                                                                      docker \
+                                                                      docker-compose \
+                                                                      dive \
+                                                                      mc \
+                                                                      wget \
+                                                                      curl \
+                                                                      openssh \
+                                                                      pigz \
+                                                                      docker-buildx \
+                                                                      grub \
+                                                                      efibootmgr \
+                                                                      polkit \
+                                                                      parted \
+                                                                      strace"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
