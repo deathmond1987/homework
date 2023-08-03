@@ -579,7 +579,8 @@ run_in_qemu () {
             -device nvme,drive=drive0,serial=badbeef \
             -drive if=none,id=drive0,file=./vhd.img
     else
-        true # CONVERT TO VHDX
+        qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
+        echo wsl image created
     fi
 }
 
@@ -594,7 +595,8 @@ run_in_qemu_arch () {
             -device nvme,drive=drive0,serial=badbeef \
             -drive if=none,id=drive0,file=./vhd.img
     else
-        true # CONVERT TO VHDX
+        qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
+        echo wsl image created
     fi
 }
 
