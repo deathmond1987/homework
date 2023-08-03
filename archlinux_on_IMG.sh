@@ -37,6 +37,23 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
+set -o noglob
+
+reset="\033[0m"
+
+red="\033[0;31m"
+green="\033[0;32m"
+white="\033[0;37m"
+tan="\033[0;33m"
+
+info() { printf "${white}➜ %s${reset}\n" "$@"
+}
+success() { printf "${green}✔ %s${reset}\n" "$@"
+}
+error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
+}
+warn() { printf "${tan}➜ %s${reset}\n" "$@"
+}
 
 set -xe
 
@@ -46,18 +63,19 @@ set -xe
 MOUNT_PATH=/mnt/arch
 
 notify_arch () {
-    echo "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem
+    warn "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem
 script can do unknown effects on host if thereis already that lvm mountpoint!!!"
     sleep 10
 }
 
 notify_debian () {
-    echo "in debian fdisk tolds me that alias 44 for filesystem is Linux /usr verity (x86-64)
+    warn "in debian fdisk tolds me that alias 44 for filesystem is Linux /usr verity (x86-64)
 in fedora alias 44 - LVM filesystem. I dont know what can be broken. At least it loading filesystem, anyway."
     sleep 10
 }
 
 prepare_dependecies () {
+    success "Installing dependencies for fedora..."
     # installing dependencies
     # arch-install-scripts - pacman and his dependencies
     # e2fsprogs - for making fs in image
@@ -73,6 +91,7 @@ prepare_dependecies () {
 }
 
 prepare_dependecies_arch () {
+    success "Installing dependencies for arch..."
     pacman -S --needed lvm2 \
                        dosfstools \
                        arch-install-scripts \
@@ -86,6 +105,7 @@ prepare_dependecies_arch () {
 }
 
 prepare_dependecies_debian () {
+    success "Installing dependencies for debian..."
     apt install -y arch-install-scripts \
                    e2fsprogs \
                    dosfstools \
@@ -96,6 +116,7 @@ prepare_dependecies_debian () {
 }
 
 prepare_dependecies_alpine () {
+    success "Installing dependencies for alpine..."
     #busybox-losetup dont know about --show flag
     #installing losetup
     #installing findmnt dependency for genfstab. not installing default
@@ -117,12 +138,14 @@ prepare_dependecies_alpine () {
 }
 
 pacman_init () {
+    success "Initializing pacman..."
     # initialize keyring and load archlinux keys for host pacman
     pacman-key --init
     pacman-key --populate archlinux
 }
 
 create_image () {
+    success "Creating image..."
     # creating empty image
     dd if=/dev/zero of=./vhd.img bs=1M count=10000
     # creating in image gpt table and 3 partitions
@@ -156,6 +179,7 @@ EOF
 }
 
 mount_image () {
+    success "Mounting image..."
     # mount img file to loop to interact with created partitions
     # they will be available in /dev/loop_loop-number_partition-number
     # like /dev/loop0p1 or /dev/loop20p3
@@ -176,6 +200,7 @@ trap "on_exit" EXIT
 }
 
 format_image () {
+    success "Fromatting image..."
     # formatting boot partition
     mkfs.fat -F 32 "$DISK"p1
     # formatting efi partition
@@ -191,6 +216,7 @@ format_image () {
 }
 
 mount_root () {
+    success "Mount root tree"
     # create mount dirs
     mkdir -p "$MOUNT_PATH"
     # mount formatted root disk to /
@@ -198,11 +224,13 @@ mount_root () {
 }
 
 pacstrap_base () {
+    success "Install base files..."
     # installing base arch files and devel apps
     pacstrap -K "$MOUNT_PATH" base base-devel
 }
 
 pacstrap_base_debian () {
+    success "Download bootstrap arch archive..."
     # installing base arch files and devel apps
     # in debian arch-install-scripts package thereis no pacstrap script, so...
     # we can wget pacstrap script from net or...
@@ -214,6 +242,7 @@ pacstrap_base_debian () {
     tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
 
     #chrooting to bootstrap root
+    success "Init pacman from Debian system..."
     arch-chroot "$MOUNT_PATH" << EOF
     #usually pacstrap script populating keys but we doing it manually
     pacman-key --init
@@ -232,6 +261,7 @@ EOF
 }
 
 pacstrap_base_alpine() {
+    success "Init pacman from Alpine system"
     #pacman in alpine has no configured repositories
     #and it has no archlinux-keyring in repo, so temporary disabling PGP check to install base packages before chroot
     echo "
@@ -255,6 +285,7 @@ Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
 
 
 mount_boot () {
+    success "Mounting partitions..."
     # mount boot partition
     mount "$DISK"p2 "$MOUNT_PATH"/boot
     # creating dir for efi
@@ -268,6 +299,7 @@ mount_boot () {
 }
 
 chroot_arch () {
+    success "Chrooting arch-linux..."
     # tell the environment that this is install for wsl
     if [ "$WSL_INSTALL" = "true" ]; then
         echo "WSL_INSTALL=true" >> "$MOUNT_PATH"/etc/environment
@@ -375,7 +407,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                                       dive \
                                                                       mc \
                                                                       wget \
-                                                                      curl \
                                                                       openssh \
                                                                       pigz \
                                                                       docker-buildx \
@@ -494,6 +525,7 @@ EOF
 }
 
 postinstall_config () {
+    success "Create postinstall script..."
     # for now we have large initramfs and strange-installed-grub.
     # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
     # resizing partition / to full disk and creating swap
@@ -569,6 +601,7 @@ EOL
 }
 
 unmounting_all () {
+    success "Unmount partitions..."
     # unmount all mounts
     # we need this to stop grub in vm dropping in grub-shell due first run
     sync
