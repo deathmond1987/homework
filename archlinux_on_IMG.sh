@@ -37,7 +37,7 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
-set -o noglob
+set -oe noglob
 
 reset="\033[0m"
 
@@ -54,8 +54,6 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 }
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
-
-set -xe
 
 # source distrib info
 . /etc/os-release
