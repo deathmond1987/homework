@@ -425,6 +425,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                            pacman-cleanup-hook \
                                                            find-the-command \
                                                            hstr-git \
+                                                           networkmanager \
                                                      --noconfirm"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
@@ -445,8 +446,9 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     systemd_units_enable () {
         # enabling units
-        systemctl enable docker
-        systemctl enable sshd
+        systemctl enable docker.service
+        systemctl enable sshd.service
+        systemctl enable NetworkManager.service
     }
 
     grub_install () {
