@@ -73,7 +73,7 @@ prepare_dependecies () {
 }
 
 prepare_dependecies_arch () {
-    pacman -S --needed lvm2 \ 
+    pacman -S --needed lvm2 \
                        dosfstools \
                        arch-install-scripts \
                        edk2-ovmf \
@@ -269,11 +269,11 @@ mount_boot () {
 
 chroot_arch () {
     # tell the environment that this is install wor wsl
-    if [ "WSL_INSTALL" = "true"]; then
+    if [ "$WSL_INSTALL" = "true" ]; then
         echo "WSL_INSTALL=true" >> "$MOUNT_PATH"/etc/environment
     fi
     # go to arch    
-    arch-chroot "$MOUNT_PATH" << EOF
+ #   arch-chroot "$MOUNT_PATH" << EOF
     #!/usr/bin/env bash
     set -ex
     sudo_config () {
@@ -439,7 +439,7 @@ ILoveCandy" >> /etc/pacman.conf
 }
 
     main () {
-        if ! [ "WSL_INSTALL" = "true" ]; then
+        if ! [ "$WSL_INSTALL" = "true" ]; then
             sudo_config
             mkinitcpio_install
             remove_autodetect_hook
@@ -664,4 +664,5 @@ main () {
     esac
 }
 
+main "$@"
 main "$@"
