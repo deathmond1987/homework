@@ -313,7 +313,7 @@ chroot_arch () {
     # go to arch
     arch-chroot "$MOUNT_PATH" << EOF
     #!/usr/bin/env bash
-    set -ex
+    set -e
     sudo_config () {
         # temporary disabling ask password
         sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
