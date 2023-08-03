@@ -382,6 +382,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                                       polkit \
                                                                       parted \
                                                                       strace \
+                                                                      pacman-contrib \
                                                                       pacman-cleanup-hook \
                                                                       find-the-command \
                                                                       hstr-git"
