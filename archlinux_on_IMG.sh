@@ -362,7 +362,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     apps_install () {
         # installing needed packages
-        su - kosh -c "echo -e 'y\ny' | LANG=C yay -S \
+        su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
@@ -381,11 +381,28 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                                       efibootmgr \
                                                                       polkit \
                                                                       parted \
-                                                                      strace \
-                                                                      pacman-contrib \
-                                                                      pacman-cleanup-hook \
-                                                                      find-the-command \
-                                                                      hstr-git"
+                                                                      strace"
+      su - kosh -c "echo y | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\" pacman-contrib"
+                                          
+      su - kosh -c "echo y | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\" pacman-cleanup-hook"
+      su - kosh -c "echo y | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\ find-the-command"
+      su - kosh -c "echo y | LANG=C yay -S \
+                                          --noprovides \
+                                          --answerdiff None \
+                                          --answerclean None \
+                                          --mflags \" --noconfirm\" hstr-git"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
