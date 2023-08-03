@@ -402,31 +402,29 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     apps_install () {
         # installing needed packages
-        echo sleep
-        sleep 10
         su - kosh -c "LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\" \
-                                                                      lvm2 \
-                                                                      docker \
-                                                                      docker-compose \
-                                                                      dive \
-                                                                      mc \
-                                                                      wget \
-                                                                      openssh \
-                                                                      pigz \
-                                                                      docker-buildx \
-                                                                      grub \
-                                                                      efibootmgr \
-                                                                      polkit \
-                                                                      parted \
-                                                                      strace \
-                                                                      pacman-contrib \
-                                                                      pacman-cleanup-hook \
-                                                                      find-the-command \
-                                                                      hstr-git \
+                                  --noprovides \
+                                  --answerdiff None \
+                                  --answerclean None \
+                                  --mflags \" --noconfirm\" \
+                                                           lvm2 \
+                                                           docker \
+                                                           docker-compose \
+                                                           dive \
+                                                           mc \
+                                                           wget \
+                                                           openssh \
+                                                           pigz \
+                                                           docker-buildx \
+                                                           grub \
+                                                           efibootmgr \
+                                                           polkit \
+                                                           parted \
+                                                           strace \
+                                                           pacman-contrib \
+                                                           pacman-cleanup-hook \
+                                                           find-the-command \
+                                                           hstr-git \
                                                      --noconfirm"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
