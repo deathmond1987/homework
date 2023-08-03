@@ -372,19 +372,19 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
-                                          --mflags \" --noconfirm\" pacman-cleanup-hook"
+                                          --mflags \" --noconfirm\" pacman-cleanup-hook --noconfirm"
       su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
-                                          --mflags \" --noconfirm\ find-the-command"
+                                          --mflags \" --noconfirm\ find-the-command --noconfirm"
       su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
-                                          --mflags \" --noconfirm\" hstr-git"
+                                          --mflags \" --noconfirm\" hstr-git --noconfirm"
         
-        su - kosh -c "echo y | LANG=C yay -S \
+      su - kosh -c "echo y | LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
