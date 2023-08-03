@@ -429,7 +429,7 @@ ILoveCandy" >> /etc/pacman.conf
         # changing default mc theme
         echo "MC_SKIN=gotar" >> /etc/profile
         echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
-        echo "alias history="hstr" >> /home/kosh/.zshrc
+        echo 'alias history="hstr"' >> /home/kosh/.zshrc
         
         # downloading tor fork for docker
         mkdir -p /opt/tor 
