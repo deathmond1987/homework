@@ -459,6 +459,13 @@ ILoveCandy" >> /etc/pacman.conf
             grub_install
             other_config
         else
+
+            # wsl is container so we need minimal install to work in wsl
+            # do not need: 
+            # mkinitcpio (cause thereis no kernel)
+            # kernel (cause container using wsl kernel)
+            # grub (cause thereis no bios or uefi)
+    
             sudo_config
             time_config
             locale_config
