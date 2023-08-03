@@ -477,6 +477,9 @@ ILoveCandy" >> /etc/pacman.conf
         # downloading tor fork for docker
         mkdir -p /opt/tor
         wget -O /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
+
+        # workaround slow mc start: disable subshell
+        echo 'alias mc="mc --nosubshell"' >> /home/kosh/.zshrc
 }
 
     main () {
