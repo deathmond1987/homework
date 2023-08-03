@@ -377,12 +377,10 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                                       efibootmgr \
                                                                       polkit \
                                                                       parted \
-                                                                      strace
-
-                                                                      pacman-cleanup-hook
-                                                                      find-the-command
-                                                                      hstr-git
-                                                                      "
+                                                                      strace \
+                                                                      pacman-cleanup-hook \
+                                                                      find-the-command \
+                                                                      hstr-git"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
