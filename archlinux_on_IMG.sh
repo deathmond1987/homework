@@ -69,7 +69,7 @@ prepare_dependecies () {
                    dosfstools \
                    qemu-kvm-core \
                    edk2-ovmf \
-                   lvm2 
+                   lvm2
 }
 
 prepare_dependecies_arch () {
@@ -80,7 +80,7 @@ prepare_dependecies_arch () {
                        e2fsprogs
     # on my arch laptop qemu-desktop is installed
     # qemu-desktop and qemu-base conflicts
-    if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then 
+    if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
         pacman -S qemu-base
     fi
 }
@@ -212,7 +212,7 @@ pacstrap_base_debian () {
     wget -O archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.gz
     #extracting archive in current dir with cut root dir
     tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
-    
+
     #chrooting to bootstrap root
     arch-chroot "$MOUNT_PATH" << EOF
     #usually pacstrap script populating keys but we doing it manually
@@ -272,7 +272,7 @@ chroot_arch () {
     if [ "$WSL_INSTALL" = "true" ]; then
         echo "WSL_INSTALL=true" >> "$MOUNT_PATH"/etc/environment
     fi
-    # go to arch    
+    # go to arch
     arch-chroot "$MOUNT_PATH" << EOF
     #!/usr/bin/env bash
     set -ex
@@ -362,29 +362,9 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     apps_install () {
         # installing needed packages
-      su - kosh -c "LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\" pacman-contrib"
-                                          
-      su - kosh -c "LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\" pacman-cleanup-hook --noconfirm"
-      su - kosh -c "LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\ find-the-command --noconfirm"
-      su - kosh -c "LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\" hstr-git --noconfirm"
-        
-      su - kosh -c "LANG=C yay -S \
+        echo sleep
+        sleep 10
+        su - kosh -c "LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
@@ -403,7 +383,12 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                                       efibootmgr \
                                                                       polkit \
                                                                       parted \
-                                                                      strace --noconfirm"
+                                                                      strace \
+                                                                      pacman-contrib \
+                                                                      pacman-cleanup-hook \
+                                                                      find-the-command \
+                                                                      hstr-git \
+                                                     --noconfirm"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
@@ -443,17 +428,17 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         # enabling pacman from game
         echo "
 ILoveCandy" >> /etc/pacman.conf
-        #enabling parallel downloads in pacman 
-        sed -i sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
+        #enabling parallel downloads in pacman
+        sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
         #enabling colors in pacman output
         sed -i '/Color/s/^#//g' /etc/pacman.conf
         # changing default mc theme
-        echo "MC_SKIN=gotar" >> /etc/profile
+        echo "export MC_SKIN=gotar" >> /etc/profile
         echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
         echo 'alias history="hstr"' >> /home/kosh/.zshrc
-        
+
         # downloading tor fork for docker
-        mkdir -p /opt/tor 
+        mkdir -p /opt/tor
         wget -O /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
 }
 
@@ -480,11 +465,11 @@ ILoveCandy" >> /etc/pacman.conf
         else
 
             # wsl is container so we need minimal install to work in wsl
-            # do not need: 
+            # do not need:
             # mkinitcpio (cause thereis no kernel)
             # kernel (cause container using wsl kernel)
             # grub (cause thereis no bios or uefi)
-    
+
             sudo_config
             time_config
             locale_config
@@ -499,7 +484,7 @@ ILoveCandy" >> /etc/pacman.conf
             zsh_install
             systemd_units_enable
             other_config
-        fi 
+        fi
 }
 
 main
@@ -521,20 +506,20 @@ postinstall_config () {
     cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
 #!/usr/bin/env bash
         set -x
-        # adding autodetect hook to mkinicpio to generate default arch init image 
+        # adding autodetect hook to mkinicpio to generate default arch init image
         sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
         # creating initrd image
         mkinitcpio -P
-        
+
         # reinstalling grub
         grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-        
+
         # sync hardware date
         hwclock --systohc
 
         # check memory available
         memory=$(free -m | grep Mem | awk '{print $2}')
-        # creating swap file with sizy equal to memory 
+        # creating swap file with sizy equal to memory
         dd if=/dev/zero of=/swapfile bs=1M count=$memory
         # changing swap file permissions
         chmod 0600 /swapfile
@@ -557,7 +542,7 @@ postinstall_config () {
         echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
         # reloading hard disk info
         partprobe
-        
+
         # we have lvm on root partition. after resizing disk we need add new space to lvm
         # extend physical volume to use all free space on partition
         pvresize "$ROOT_PARTITION"
@@ -575,7 +560,7 @@ postinstall_config () {
         sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
         # allow wheel group using sudo with password
         sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
-        
+
         # rebooting OS after reconfiguring
         sudo reboot
 EOL
@@ -629,7 +614,7 @@ run_in_qemu_arch () {
 main () {
     if [ "$1" = "--wsl" ]; then
         export WSL_INSTALL=true
-    fi 
+    fi
     case "$ID" in
           fedora) prepare_dependecies
                   pacman_init
