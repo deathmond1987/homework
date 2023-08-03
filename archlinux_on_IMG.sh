@@ -206,13 +206,17 @@ format_image () {
     # formatting efi partition
     mkfs.fat -F 32 "$DISK"p2
     # creating root pv
-    pvcreate "$DISK"p3
-    # creating root vg
-    vgcreate arch "$DISK"p3
-    # creating root lv
-    lvcreate -l 100%FREE arch -n root
-    # formatting root lv
-    mkfs.ext4 /dev/arch/root
+    if [ "$WSL_INSTALL" = "true" ]; then
+        mkfs.ext4 "$DISK"p3
+    else 
+        pvcreate "$DISK"p3
+        # creating root vg
+        vgcreate arch "$DISK"p3
+        # creating root lv
+        lvcreate -l 100%FREE arch -n root
+        # formatting root lv
+        mkfs.ext4 /dev/arch/root
+    fi
 }
 
 mount_root () {
@@ -220,7 +224,11 @@ mount_root () {
     # create mount dirs
     mkdir -p "$MOUNT_PATH"
     # mount formatted root disk to /
-    mount /dev/arch/root "$MOUNT_PATH"
+    if [ "$WSL_INSTALL" = "true" ]; then
+        mount "$DISK"p3 "$MOUNT_PATH"
+    else
+        mount /dev/arch/root "$MOUNT_PATH"
+    fi
 }
 
 pacstrap_base () {
