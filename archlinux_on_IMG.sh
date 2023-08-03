@@ -362,29 +362,29 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     apps_install () {
         # installing needed packages
-      su - kosh -c "echo y | LANG=C yay -S \
+      su - kosh -c "LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" pacman-contrib"
                                           
-      su - kosh -c "echo -e 'y/ny' | LANG=C yay -S \
+      su - kosh -c "LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" pacman-cleanup-hook --noconfirm"
-      su - kosh -c "echo y | LANG=C yay -S \
+      su - kosh -c "LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\ find-the-command --noconfirm"
-      su - kosh -c "echo y | LANG=C yay -S \
+      su - kosh -c "LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
                                           --mflags \" --noconfirm\" hstr-git --noconfirm"
         
-      su - kosh -c "echo y | LANG=C yay -S \
+      su - kosh -c "LANG=C yay -S \
                                           --noprovides \
                                           --answerdiff None \
                                           --answerclean None \
@@ -403,7 +403,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                                                       efibootmgr \
                                                                       polkit \
                                                                       parted \
-                                                                      strace"
+                                                                      strace --noconfirm"
         # админу локалхоста дозволено:)
         sudo usermod -aG docker kosh
     }
