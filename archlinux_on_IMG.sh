@@ -72,6 +72,9 @@ in fedora alias 44 - LVM filesystem. I dont know what can be broken. At least it
     sleep 10
 }
 
+############################################################################################
+############################### PREPARE HOST TO BUILD IMAGE ################################
+############################################################################################
 prepare_dependecies () {
     success "Installing dependencies for fedora..."
     # installing dependencies
@@ -304,6 +307,9 @@ mount_boot () {
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
 
+############################################################################################
+##################################### CHROOT ###############################################
+############################################################################################
 chroot_arch () {
     success "Chrooting arch-linux..."
     # tell the environment that this is install for wsl
