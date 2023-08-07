@@ -476,7 +476,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         sed -i '/Color/s/^#//g' /etc/pacman.conf
         
         # changing default mc theme
-        echo "export MC_SKIN=gotar" >> /etc/environment
+        echo "MC_SKIN=gotar" >> /etc/environment
         
         # enabling hstr alias
         echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
