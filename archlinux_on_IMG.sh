@@ -469,8 +469,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
     other_config () {
         # enabling pacman from game
-        # echo "
-        # ILoveCandy" >> /etc/pacman.conf
+        sed -i '/^\[options.*/a ILoveCandy' /etc/pacman.conf
         #enabling parallel downloads in pacman
         sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
         #enabling colors in pacman output
