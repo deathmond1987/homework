@@ -49,7 +49,7 @@ mkdir -p /opt/tor
 wget -O /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
 
 # workaround slow mc start. long time to create subshell for mc. we will load mc from bash
-echo 'alias mc="SHELL=/bin/bash /usr/bin/mc"' >> /home/kosh/.zshrc
+echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 
 # enabling units
 systemctl enable docker.service
