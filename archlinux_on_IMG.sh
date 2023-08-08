@@ -405,54 +405,20 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     apps_install () {
-        # installing needed packages
+        # installing needed packages to working properly
         su - kosh -c "LANG=C yay -S \
                                   --noprovides \
                                   --answerdiff None \
                                   --answerclean None \
                                   --mflags \" --noconfirm\" \
                                                            lvm2 \
-                                                           docker \
-                                                           docker-compose \
-                                                           dive \
-                                                           mc \
                                                            wget \
                                                            openssh \
-                                                           pigz \
-                                                           docker-buildx \
                                                            grub \
                                                            efibootmgr \
-                                                           polkit \
                                                            parted \
-                                                           strace \
-                                                           pacman-contrib \
-                                                           pacman-cleanup-hook \
-                                                           find-the-command \
-                                                           hstr-git \
                                                            networkmanager \
                                                      --noconfirm"
-        # админу локалхоста дозволено:)
-        sudo usermod -aG docker kosh
-    }
-
-    init_modules_install () {
-            su - kosh -c "yes | LANG=C yay -S \
-                                          --noprovides \
-                                          --answerdiff None \
-                                          --answerclean None \
-                                          --mflags \" --noconfirm\" \
-                                          mkinitcpio-firmware"
-    }
-
-    zsh_install () {
-        su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
-    }
-
-    systemd_units_enable () {
-        # enabling units
-        systemctl enable docker.service
-        systemctl enable sshd.service
-        systemctl enable NetworkManager.service
     }
 
     grub_install () {
@@ -483,12 +449,8 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             user_config
             git_install
             yay_install
-            # pkgbuild for modules currently broken in aur
-            #     init_modules_install
             apps_install
             kernel_install
-            zsh_install
-            systemd_units_enable
             grub_install
             other_config
         else
@@ -507,11 +469,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             user_config
             git_install
             yay_install
-            # pkgbuild for modules currently broken in aur
-            #     init_modules_install
             apps_install
-            zsh_install
-            systemd_units_enable
             other_config
         fi
 }
