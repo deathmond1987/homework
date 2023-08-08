@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 set -xe 
 
+
+# PACMAN CONF
 # enabling pacman from game
 sed -i '/^\[options.*/a ILoveCandy' /etc/pacman.conf
 # enabling parallel downloads in pacman
 sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
 # enabling colors in pacman output
 sed -i '/Color/s/^#//g' /etc/pacman.conf
+
+# MAKEPKG CONF
+# Optimizing build config
+sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -)/g' /etc/makepkg.conf
+# enabling ccache
+sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
 
 # installing packages 
 su - kosh -c "LANG=C yay -S \
@@ -31,9 +39,6 @@ su - kosh -c "LANG=C yay -S \
                                                     --noconfirm"
 # админу локалхоста дозволено:)
 usermod -aG docker kosh
-
-# enabling ccache
-sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
 
 # adding zsh
 su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
