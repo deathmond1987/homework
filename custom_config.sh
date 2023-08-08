@@ -49,6 +49,10 @@ echo "MC_SKIN=gotar" >> /etc/environment
 # enabling hstr alias
 echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
 echo 'alias history="hstr"' >> /home/kosh/.zshrc
+# workaround slow mc start. long time to create subshell for mc. we will load mc from bash
+echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
+# habit
+echo 'alias netstat=ss' >> /home/kosh/.zshrc
 
 # changing grub config
 sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
@@ -57,9 +61,6 @@ sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAU
 # downloading tor fork for docker
 mkdir -p /opt/tor
 wget -O /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
-
-# workaround slow mc start. long time to create subshell for mc. we will load mc from bash
-echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 
 # enabling units
 systemctl enable docker.service
