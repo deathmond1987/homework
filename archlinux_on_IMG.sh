@@ -195,7 +195,7 @@ exit_trap () {
         umount "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH" || true
-        lvremove --force --yes /dev/arch/root || true
+        # lvremove --force --yes /dev/arch/root || true
         losetup -d "$DISK" || true
         echo "trap finished"
     }
@@ -568,10 +568,10 @@ unmounting_all () {
     umount -l "$MOUNT_PATH"/boot/efi
     umount -l "$MOUNT_PATH"/boot
     umount -l "$MOUNT_PATH"
-    while ! lvremove --force --yes /dev/arch/root 2>&1 > /dev/null; do
-        echo lvm not unmount
-        sleep 5
-    done 
+    #while ! lvremove --force --yes /dev/arch/root 2>&1 > /dev/null; do
+    #    echo lvm not unmount
+    #    sleep 5
+    #done 
     losetup -d "$DISK"
 }
 
