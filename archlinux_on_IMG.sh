@@ -437,7 +437,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
     }
 
     other_config () {
-        wget -O - https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh | bash
+        wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh | bash
 }
 
     main () {
