@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -xe 
 
+# enabling pacman from game
+sed -i '/^\[options.*/a ILoveCandy' /etc/pacman.conf
+# enabling parallel downloads in pacman
+sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
+# enabling colors in pacman output
+sed -i '/Color/s/^#//g' /etc/pacman.conf
+
 # installing packages 
 su - kosh -c "LANG=C yay -S \
                          --noprovides \
@@ -25,13 +32,6 @@ usermod -aG docker kosh
 
 # adding zsh
 su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
-
-# enabling pacman from game
-sed -i '/^\[options.*/a ILoveCandy' /etc/pacman.conf
-# enabling parallel downloads in pacman
-sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
-# enabling colors in pacman output
-sed -i '/Color/s/^#//g' /etc/pacman.conf
         
 # changing default mc theme
 echo "MC_SKIN=gotar" >> /etc/environment
