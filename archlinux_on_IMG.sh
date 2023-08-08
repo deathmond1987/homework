@@ -93,7 +93,9 @@ prepare_dependecies () {
 
 prepare_dependecies_arch () {
     success "Installing dependencies for arch..."
-    pacman -S --needed lvm2 \
+    pacman -S --needed \
+              --noconfirm \
+                       lvm2 \
                        dosfstools \
                        arch-install-scripts \
                        edk2-ovmf \
@@ -101,7 +103,7 @@ prepare_dependecies_arch () {
     # on my arch laptop qemu-desktop is installed
     # qemu-desktop and qemu-base conflicts
     if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-        pacman -S qemu-base
+        pacman -S --needed --noconfirm qemu-base
     fi
 }
 
