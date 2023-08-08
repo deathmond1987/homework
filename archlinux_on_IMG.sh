@@ -568,7 +568,7 @@ unmounting_all () {
     umount -l "$MOUNT_PATH"/boot/efi
     umount -l "$MOUNT_PATH"/boot
     umount -l "$MOUNT_PATH"
-    sync
+    sleep 20
     lvremove --force --yes /dev/arch/root
     losetup -d "$DISK"
 }
