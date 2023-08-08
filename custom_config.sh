@@ -26,9 +26,14 @@ su - kosh -c "LANG=C yay -S \
                                                     pacman-cleanup-hook \
                                                     find-the-command \
                                                     hstr-git \
+                                                    ccache 
+                                                    qemu-base \
                                                     --noconfirm"
 # админу локалхоста дозволено:)
 usermod -aG docker kosh
+
+# enabling ccache
+sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
 
 # adding zsh
 su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
@@ -54,4 +59,3 @@ echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # enabling units
 systemctl enable docker.service
 systemctl enable sshd.service
-systemctl enable NetworkManager.service
