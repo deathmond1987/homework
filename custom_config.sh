@@ -34,7 +34,7 @@ su - kosh -c "LANG=C yay -S \
                                                     pacman-cleanup-hook \
                                                     find-the-command \
                                                     hstr-git \
-                                                    ccache 
+                                                    ccache \
                                                     qemu-base \
                                                     --noconfirm"
 # админу локалхоста дозволено:)
