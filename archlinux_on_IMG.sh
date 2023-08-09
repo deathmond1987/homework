@@ -723,7 +723,7 @@ run_in_qemu () {
 
 main () {
     if [ "$1" = "--wsl" ]; then
-        export WSL_INSTALL=true
+        WSL_INSTALL=true
     fi
 
     prepare_dependecies
@@ -739,6 +739,7 @@ main () {
     unmounting_all_and_wsl_copy
     run_in_qemu
 
+    unset WSL_INSTALL
 }
 
 main "$@"
