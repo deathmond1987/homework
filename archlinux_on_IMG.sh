@@ -600,8 +600,14 @@ unmounting_all_and_wsl_copy () {
     if [ "$WSL_INSTALL" = "true" ]; then
         tar -cf /archfs.tar -C /mnt/arch .
         success "ARCH root filsystem exported to /archfs.tar"
-        info "You need to export this file to WSL. Example:"
-        info "wsl --import Arch-linux D:\arch\ .\archfs.tar"
+        warn "You need to export this file to WSL. Example:"
+        warn "wsl --import Arch-linux D:\arch\ .\archfs.tar"
+        warn "Where: wsl - wsl command in windows"
+        warn "       --import Arch-linux - import wsl machine with name Arch-linux"
+        warn "       D:\arch - dir where will be placed image with filsesystem"
+        warn "       .\archfs.tar - path to generated tar archive with filesystem"
+        error "You must enable fonts in your terminal !"
+        info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
         umount "$MOUNT_PATH" || true
     else
         sync
