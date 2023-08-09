@@ -580,9 +580,14 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
             systemctl daemon-reload || true
             systemctl enable drop_cache.timer || true
             
-            # Alter user to kosh in wsl
-            # enable systemd in wsl
-            # alter default login dir in wsl
+            echo "[boot]
+systemd=true
+[user]
+default=kosh
+[automount]
+enabled = true
+options = \"metadata\"
+mountFsTab = true" > /etc/wsl.conf
                                                     
             # changing sudo rules to disable executing sudo without password
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
