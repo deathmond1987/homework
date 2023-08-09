@@ -79,7 +79,7 @@ prepare_dependecies () {
                        edk2-ovmf \
                        lvm2
     elif [ "$ID" = "arch" ]; then
-        if ! [ "$WSL_INSTALL" = "true" ]; then 
+        if ! [ "$WSL_INSTALL" = "true" ]; then
             warn "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem"
             warn "script can do unknown effects on host if thereis already that lvm mountpoint!!!"
             sleep 10
@@ -93,7 +93,7 @@ prepare_dependecies () {
         # on my arch laptop qemu-desktop is installed
         # qemu-desktop and qemu-base conflicts
         if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-            pacman -S --needed --noconfirm qemu-base
+            pacman -S --noconfirm qemu-base
         fi
     elif [ "$ID" = "debian" ]; then
         if ! [ "$WSL_INSTALL" = "true" ]; then
@@ -257,7 +257,7 @@ mount_root () {
 
 pacstrap_base () {
     # workaround to create wsl in debian way
-    if [ "$WSL_INSTALL" = "true" ] ; then 
+    if [ "$WSL_INSTALL" = "true" ] ; then
         ID=debian
     fi
     if [ "$ID" = "fedora" ] ; then
@@ -363,7 +363,7 @@ chroot_arch () {
 
         mkinitcpio_install () {
             # install kernel and firmware
-            pacman -S --noconfirm mkinitcpio
+            pacman -S --noconfirm --disable-download-timeout mkinitcpio
         }
 
         remove_autodetect_hook () {
@@ -373,7 +373,7 @@ chroot_arch () {
 
         kernel_install () {
             # installing kernel and firmware
-            pacman -S --noconfirm linux linux-firmware
+            pacman -S --noconfirm --disable-download-timeout linux linux-firmware
         }
 
         #we can not use systemd to configure locales, time and so on cause we are in chroot environment
@@ -424,7 +424,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         git_install () {
             # adding git
-            pacman -S --noconfirm git
+            pacman -S --noconfirm --disable-download-timeout git
         }
 
         yay_install () {
@@ -446,7 +446,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                                       --noprovides \
                                       --answerdiff None \
                                       --answerclean None \
-                                      --mflags \" --noconfirm\" \
+                                      --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" \
                                                                lvm2 \
                                                                wget \
                                                                openssh \
@@ -475,7 +475,15 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         }
 
         other_config () {
-            wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh | bash
+            wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
+            echo "[boot]
+systemd=true
+[user]
+default=kosh
+[automount]
+enabled = true
+options = \"metadata\"
+mountFsTab = true" > /etc/wsl.conf
     }
 
     main () {
@@ -538,13 +546,13 @@ postinstall_config () {
         ######################################################################################################
         ########################################### WSL ######################################################
         ######################################################################################################
-        
+
         if [ "$WSL_INSTALL" = "true" ]; then
             # removing helper script from autoload
             sed -i '1d' /home/kosh/.zshrc
             # removing helper script itself
             rm /home/kosh/postinstall.sh
-            
+
             # Removing packages from wsl instance
             su - kosh -c "LANG=C yay -Rscn --noconfirm\
                                                     lvm2 \
@@ -579,16 +587,7 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
             #We need true if systemd is not enabled in wsl by default to avoid script failing
             systemctl daemon-reload || true
             systemctl enable drop_cache.timer || true
-            
-            echo "[boot]
-systemd=true
-[user]
-default=kosh
-[automount]
-enabled = true
-options = \"metadata\"
-mountFsTab = true" > /etc/wsl.conf
-                                                    
+
             # changing sudo rules to disable executing sudo without password
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             # allow wheel group using sudo with password
@@ -611,7 +610,7 @@ mountFsTab = true" > /etc/wsl.conf
                    fi
                 fi
             fi
-            
+
             # adding autodetect hook to mkinicpio to generate default arch init image
             sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             # creating initrd image
