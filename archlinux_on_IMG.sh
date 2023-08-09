@@ -306,7 +306,7 @@ Include = /etc/pacman.d/mirrorlist
 
 [extra]
 SigLevel = Never
-Include = /etc/pacman.d/mirrorlist" >> "$MOUNT_PATH"/etc/pacman.conf
+Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
         #...and no mirrorlist
         mkdir -p /etc/pacman.d
         wget -O /etc/pacman.d/mirrorlist https://archlinux.org/mirrorlist/all/http/
