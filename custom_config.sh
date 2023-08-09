@@ -41,7 +41,7 @@ su - kosh -c "LANG=C yay -S \
 usermod -aG docker kosh
 
 # adding zsh
-su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh 1> /dev/null | bash"
+su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
         
 # changing default mc theme
 echo "MC_SKIN=gotar" >> /etc/environment
