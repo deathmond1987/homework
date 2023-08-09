@@ -534,7 +534,18 @@ postinstall_config () {
             sed -i '1d' /home/kosh/.zshrc
             # removing helper script itself
             rm /home/kosh/postinstall.sh
+            
+            # Removing packages from wsl instance
+            su - kosh -c "LANG=C yay -Rscn --noconfirm\
+                                                    lvm2 \
+                                                    grub \
+                                                    efibootmgr \
+                                                    parted"
 
+            # Alter user to kosh in wsl
+            # enable systemd in wsl
+            # alter default login dir in wsl
+                                                    
             # changing sudo rules to disable executing sudo without password
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             # allow wheel group using sudo with password
