@@ -599,7 +599,7 @@ mountFsTab = true" > /etc/wsl.conf
             ######################################### HOST #######################################################
             ######################################################################################################
             # if this real host and we have internet - we will install vendor blobs for processor
-            if timeout 6 curl --head --silent --output /dev/null https://hub.docker.com; then                                                                                                                  ✔  21s   16:43:05 
+            if timeout 6 curl --head --silent --output /dev/null https://hub.docker.com; then
                 if  systemd-detect-virt -q; then
                     vendor=$(lscpu | awk '/Vendor ID/{print $3}')
                     if [[ "$vendor" == "GenuineIntel" ]]; then
