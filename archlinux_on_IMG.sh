@@ -198,10 +198,18 @@ exit_trap () {
         if [ "$WSL_INSTALL" = "true" ]; then
             umount "$MOUNT_PATH" || true
         else
-            umount "$MOUNT_PATH"/boot || true
+            sync
+            sleep 5
+            fuser -km "$MOUNT_PATH"/boot/efi || true
             umount "$MOUNT_PATH"/boot/efi || true
+            sleep 1
+            fuser -km "$MOUNT_PATH"/boot || true
+            umount "$MOUNT_PATH"/boot || true
+            sleep 1
+            fuser -km "$MOUNT_PATH" || true
             umount "$MOUNT_PATH" || true
-            lvchange -an /dev/arch/root
+            sleep 5
+            lvchange -an /dev/arch/root || true
         fi
         losetup -d "$DISK" || true
         echo "trap finished"
