@@ -592,21 +592,18 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
             ######################################### HOST #######################################################
             ######################################################################################################
             # if this real host and we have internet - we will install vendor blobs for processor
-            CHECK_ONLINE_DOMAINS=('https://github.com' 'https://hub.docker.com')
-            for domain in "${CHECK_ONLINE_DOMAINS[@]}"; do
-                if timeout 6 curl --head --silent --output /dev/null ${domain}; then
-                    if ! systemd-detect-virt -q; then 
-                       vendor=$(lscpu | awk '/Vendor ID/{print $3}')
-                       if [[ "$vendor" == "GenuineIntel" ]]; then
-                           yay -S --noconfirm intel-ucode
-                       elif [[ "$vendor" == "AuthenticAMD" ]]; then
-                           yay -S --noconfirm amd-ucode
-                       else
-                           echo "cpu vendor: $vendor"
-                       fi
-                    fi
+            if timeout 6 curl --head --silent --output /dev/null https://hub.docker.com; then                                                                                                                  ✔  21s   16:43:05 
+                if  systemd-detect-virt -q; then
+                    vendor=$(lscpu | awk '/Vendor ID/{print $3}')
+                    if [[ "$vendor" == "GenuineIntel" ]]; then
+                        yay -S --noconfirm intel-ucode
+                    elif [[ "$vendor" == "AuthenticAMD" ]]; then
+                        yay -S --noconfirm amd-ucode
+                    else
+                        echo "cpu vendor: $vendor"
+                   fi
                 fi
-            done
+            fi
             
             # adding autodetect hook to mkinicpio to generate default arch init image
             sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
