@@ -93,7 +93,7 @@ prepare_dependecies () {
         # on my arch laptop qemu-desktop is installed
         # qemu-desktop and qemu-base conflicts
         if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-            pacman -S qemu-base
+            pacman -S --needed --noconfirm qemu-base
         fi
     elif [ "$ID" = "debian" ]; then
         if ! [ "$WSL_INSTALL" = "true" ]; then
