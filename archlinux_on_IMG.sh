@@ -79,10 +79,11 @@ prepare_dependecies () {
                        edk2-ovmf \
                        lvm2
     elif [ "$ID" = "arch" ]; then
-        warn "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem"
-        warn "script can do unknown effects on host if thereis already that lvm mountpoint!!!"
-        sleep 10
-
+        if ! [ "$WSL_INSTALL" = "true" ]; then 
+            warn "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem"
+            warn "script can do unknown effects on host if thereis already that lvm mountpoint!!!"
+            sleep 10
+        fi
         success "Installing dependencies for arch..."
         pacman -S --needed lvm2 \
                            dosfstools \
@@ -95,10 +96,11 @@ prepare_dependecies () {
             pacman -S qemu-base
         fi
     elif [ "$ID" = "debian" ]; then
-        warn "in debian fdisk tolds me that alias 44 for filesystem is Linux /usr verity (x86-64)"
-        warn "in fedora alias 44 - LVM filesystem. I dont know what can be broken. At least it loading filesystem, anyway."
-        sleep 10
-
+        if ! [ "$WSL_INSTALL" = "true" ]; then
+            warn "in debian fdisk tolds me that alias 44 for filesystem is Linux /usr verity (x86-64)"
+            warn "in fedora alias 44 - LVM filesystem. I dont know what can be broken. At least it loading filesystem, anyway."
+            sleep 10
+        fi
         success "Installing dependencies for debian..."
         apt install -y arch-install-scripts \
                        e2fsprogs \
@@ -231,6 +233,7 @@ format_image () {
         # creating root vg
         vgcreate arch "$DISK"p3
         # creating root lv
+        # fuck debian with custom lvm2 and udev
         lvcreate -l 100%FREE arch -n root
         # formatting root lv
         mkfs.ext4 /dev/arch/root
