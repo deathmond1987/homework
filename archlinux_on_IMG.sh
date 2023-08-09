@@ -542,6 +542,34 @@ postinstall_config () {
                                                     efibootmgr \
                                                     parted"
 
+            #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
+            echo -e "[Unit]
+Description=Periodically drop caches to save memory under WSL.
+Documentation=https://github.com/arkane-systems/wsl-drop-caches
+ConditionVirtualization=wsl
+Requires=drop_cache.timer
+
+[Service]
+Type=oneshot
+ExecStartPre=sync
+ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
+
+            echo -e "[Unit]
+Description=Periodically drop caches to save memory under WSL.
+Documentation=https://github.com/arkane-systems/wsl-drop-caches
+ConditionVirtualization=wsl
+PartOf=drop_cache.service
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=3min
+
+[Install]
+WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
+            #We need true if systemd is not enabled in wsl by default to avoid script failing
+            systemctl daemon-reload || true
+            systemctl enable drop_cache.timer || true
+            
             # Alter user to kosh in wsl
             # enable systemd in wsl
             # alter default login dir in wsl
