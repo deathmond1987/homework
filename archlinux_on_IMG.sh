@@ -234,6 +234,7 @@ format_image () {
         vgcreate arch "$DISK"p3
         # creating root lv
         # fuck debian with custom lvm2 and udev
+        error "If you wee error below - you should say: FUCK DEBIAN"
         lvcreate -l 100%FREE arch -n root
         # formatting root lv
         mkfs.ext4 /dev/arch/root
