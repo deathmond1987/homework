@@ -533,6 +533,10 @@ postinstall_config () {
     cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
 #!/usr/bin/env bash
         set -x
+        ######################################################################################################
+        ########################################### WSL ######################################################
+        ######################################################################################################
+        
         if [ "$WSL_INSTALL" = "true" ]; then
             # removing helper script from autoload
             sed -i '1d' /home/kosh/.zshrc
@@ -582,7 +586,28 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             # allow wheel group using sudo with password
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+
         else
+            ######################################################################################################
+            ######################################### HOST #######################################################
+            ######################################################################################################
+            # if this real host and we have internet - we will install vendor blobs for processor
+            CHECK_ONLINE_DOMAINS=('https://github.com' 'https://hub.docker.com')
+            for domain in "${CHECK_ONLINE_DOMAINS[@]}"; do
+                if timeout 6 curl --head --silent --output /dev/null ${domain}; then
+                    if ! systemd-detect-virt -q; then 
+                       vendor=$(lscpu | awk '/Vendor ID/{print $3}')
+                       if [[ "$vendor" == "GenuineIntel" ]]; then
+                           yay -S --noconfirm intel-ucode
+                       elif [[ "$vendor" == "AuthenticAMD" ]]; then
+                           yay -S --noconfirm amd-ucode
+                       else
+                           echo "cpu vendor: $vendor"
+                       fi
+                    fi
+                fi
+            done
+            
             # adding autodetect hook to mkinicpio to generate default arch init image
             sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
             # creating initrd image
