@@ -460,6 +460,17 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             systemctl enable NetworkManager
             systemctl enable ModemManager
             systemctl enable sshd
+            
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            systemctl disable systemd-networkd
+            # rm -f /etc/systemd/system/dbus-org.freedesktop.network1.service || :
+            # rm -f /etc/systemd/system/multi-user.target.wants/systemd-networkd.service || :
+            # rm -f /etc/systemd/system/sockets.target.wants/systemd-networkd.socket || :
+            # rm -f /etc/systemd/system/sysinit.target.wants/systemd-network-generator.service || :
+            # rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service || :
+            
+            
+            echo "!!!!!!!!!!!!!!!!!!!!!!!!!!"
         }
 
         grub_install () {
