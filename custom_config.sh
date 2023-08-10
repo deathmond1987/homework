@@ -38,12 +38,12 @@ OnUnitActiveSec=3min
 WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
 
     systemctl enable drop_cache.timer
-    systemctl disable systemd-networkd-wait-online
+    systemctl disable systemd-networkd-wait-online.service
 
-# not work in wsl with default user in wsl.conf
-echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
+    # not work in wsl with default user in wsl.conf
+    echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
 else
-# changing grub config
+    # changing grub config
     sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
     sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
 fi 
@@ -102,13 +102,9 @@ echo 'alias netstat="ss"' >> /home/kosh/.zshrc
         
 # downloading tor fork for docker
 mkdir -p /opt/tor
-wget -O /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
+wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
 
 # enabling units
 systemctl enable docker.service
 systemctl enable sshd.service
 
-# changing sudo rules to disable executing sudo without password
-sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-# allow wheel group using sudo with password
-sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
