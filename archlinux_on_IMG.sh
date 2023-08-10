@@ -537,66 +537,66 @@ postinstall_config () {
             set -x
             . /etc/environment
             if ! [ "$WSL_INSTALL" = "true" ]; then
-            ######################################################################################################
-            ######################################### HOST #######################################################
-            ######################################################################################################
-            # if this real host and we have internet - we will install vendor blobs for processor
-            if timeout 6 curl --head --silent --output /dev/null https://hub.docker.com; then
-                if  systemd-detect-virt -q; then
-                    vendor=$(lscpu | awk '/Vendor ID/{print $3}')
-                    if [[ "$vendor" == "GenuineIntel" ]]; then
-                        yay -S --noconfirm intel-ucode
-                    elif [[ "$vendor" == "AuthenticAMD" ]]; then
-                        yay -S --noconfirm amd-ucode
-                    else
-                        echo "cpu vendor: $vendor"
-                   fi
+                ######################################################################################################
+                ######################################### HOST #######################################################
+                ######################################################################################################
+                # if this real host and we have internet - we will install vendor blobs for processor
+                if timeout 6 curl --head --silent --output /dev/null https://hub.docker.com; then
+                    if  systemd-detect-virt -q; then
+                        vendor=$(lscpu | awk '/Vendor ID/{print $3}')
+                        if [[ "$vendor" == "GenuineIntel" ]]; then
+                            yay -S --noconfirm intel-ucode
+                        elif [[ "$vendor" == "AuthenticAMD" ]]; then
+                            yay -S --noconfirm amd-ucode
+                        else
+                            echo "cpu vendor: $vendor"
+                        fi
+                    fi
                 fi
-            fi
 
-            # adding autodetect hook to mkinicpio to generate default arch init image
-            sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
-            # creating initrd image
-            mkinitcpio -P
+                # adding autodetect hook to mkinicpio to generate default arch init image
+                sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
+                # creating initrd image
+                mkinitcpio -P
 
-            # reinstalling grub
-            grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-            grub-mkconfig -o /boot/grub/grub.cfg
+                # reinstalling grub
+                grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+                grub-mkconfig -o /boot/grub/grub.cfg
 
-            # check memory available
-            memory=$(free -m | grep Mem | awk '{print $2}')
-            # creating swap file with size equal to memory
-            dd if=/dev/zero of=/swapfile bs=1M count=$memory
-            # changing swap file permissions
-            chmod 0600 /swapfile
-            # formatting swap file
-            mkswap -U clear /swapfile
-            # enabling swap
-            swapon /swapfile
-            # adding swap file entry to fstab to automount
-            echo "/swapfile none swap defaults 0 0" >> /etc/fstab
-            echo done
+                # check memory available
+                memory=$(free -m | grep Mem | awk '{print $2}')
+                # creating swap file with size equal to memory
+                dd if=/dev/zero of=/swapfile bs=1M count=$memory
+                # changing swap file permissions
+                chmod 0600 /swapfile
+                # formatting swap file
+                mkswap -U clear /swapfile
+                # enabling swap
+                swapon /swapfile
+                # adding swap file entry to fstab to automount
+                echo "/swapfile none swap defaults 0 0" >> /etc/fstab
+                echo done
 
-            # default disk size in this script 10G
-            # after install we want to use all disk space
-            echo resizing disk
-            # searching name of partition with mounted root FS
-            ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
-            # searching disk name with founded root partition
-            ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $2 }' | head -1)
-            # adding all free disk space on founded disk to root FS partition
-            echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
-            # reloading hard disk info
-            partprobe
+                # default disk size in this script 10G
+                # after install we want to use all disk space
+                echo resizing disk
+                # searching name of partition with mounted root FS
+                ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
+                # searching disk name with founded root partition
+                ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $2 }' | head -1)
+                # adding all free disk space on founded disk to root FS partition
+                echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
+                # reloading hard disk info
+                partprobe
 
-            # we have lvm on root partition. after resizing disk we need add new space to lvm
-            # extend physical volume to use all free space on partition
-            pvresize "$ROOT_PARTITION"
-            # extend logical volume to use all free space from physical volume
-            lvextend -l +100%FREE /dev/arch/root
-            # we have ext4 fs on lvm. resizing ext4 fs
-            resize2fs /dev/arch/root
-        fi 
+                # we have lvm on root partition. after resizing disk we need add new space to lvm
+                # extend physical volume to use all free space on partition
+                pvresize "$ROOT_PARTITION"
+                # extend logical volume to use all free space from physical volume
+                lvextend -l +100%FREE /dev/arch/root
+                # we have ext4 fs on lvm. resizing ext4 fs
+                resize2fs /dev/arch/root
+            fi 
             # removing helper script from autoload
             sed -i '1d' /home/kosh/.zshrc
             # removing helper script itself
@@ -607,8 +607,10 @@ postinstall_config () {
             # allow wheel group using sudo with password
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 
-            # rebooting OS after reconfiguring
-            sudo reboot    
+            if ! [ "$WSL_INSTALL" = "true"]; then
+                # rebooting OS after reconfiguring
+                sudo reboot    
+            fi
 EOL
         # marking helper script executable
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
