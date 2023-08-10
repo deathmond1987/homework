@@ -258,7 +258,7 @@ pacstrap_base () {
     if [ "$WSL_INSTALL" = "true" ] ; then
         ID=debian
     fi
-    if [ "$ID" = "fedora" ] ; then
+    if [ "$ID" = "fedora" ] || [ "$ID" = "arch" ]; then
         success "Initializing pacman..."
         # initialize keyring and load archlinux keys for host pacman
         pacman-key --init
