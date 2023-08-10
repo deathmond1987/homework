@@ -633,13 +633,10 @@ unmounting_all_and_wsl_copy () {
     else
         sync
         sleep 5
-        fuser -km "$MOUNT_PATH"/boot/efi || true
         umount "$MOUNT_PATH"/boot/efi || true
         sleep 1
-        fuser -km "$MOUNT_PATH"/boot || true
         umount "$MOUNT_PATH"/boot || true
         sleep 1
-        fuser -km "$MOUNT_PATH" || true
         umount "$MOUNT_PATH" || true
         sleep 5
         lvchange -an /dev/arch/root || true
@@ -684,6 +681,7 @@ main () {
     unmounting_all_and_wsl_copy
     run_in_qemu
 
+    trap '' EXIT
     unset WSL_INSTALL
 }
 
