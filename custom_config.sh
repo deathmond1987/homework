@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -xe 
 
+. /etc/environment
 if [ "$WSL_INSTALL" = "true" ]; then
     success "configuring wsl..."
     echo "[boot]
