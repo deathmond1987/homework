@@ -542,8 +542,8 @@ postinstall_config () {
                 ######################################################################################################
                 # if this real host and we have internet - we will install vendor blobs for processor
                 if timeout 6 curl --head --silent --output /dev/null https://hub.docker.com; then
-                    if  systemd-detect-virt -q; then
-                        vendor=$(lscpu | awk '/Vendor ID/{print $3}')
+                    if ! systemd-detect-virt -q; then
+                        vendor=$(lscpu | awk '/Vendor ID/{print $3}'| head -1)
                         if [[ "$vendor" == "GenuineIntel" ]]; then
                             yay -S --noconfirm intel-ucode
                         elif [[ "$vendor" == "AuthenticAMD" ]]; then
