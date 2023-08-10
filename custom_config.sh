@@ -38,7 +38,8 @@ OnUnitActiveSec=3min
 WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
 
     systemctl enable drop_cache.timer
-    systemctl disable systemd-networkd-wait-online.service
+    rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
+    rm -f /usr/lib/systemd/system/systemd-firstboot.service
 
     # not work in wsl with default user in wsl.conf
     echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
