@@ -41,7 +41,7 @@ WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
     systemctl disable systemd-networkd-wait-online
 
 # not work in wsl with default user in wsl.conf
-echo "MC_SKIN=gotar" >> /home/kosh/.zshcr
+echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
 else
 # changing grub config
     sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
