@@ -98,7 +98,7 @@ echo 'alias history="hstr"' >> /home/kosh/.zshrc
 # workaround slow mc start. long time to create subshell for mc. we will load mc from bash
 echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # habit
-echo 'alias netstat=ss' >> /home/kosh/.zshrc
+echo 'alias netstat="ss"' >> /home/kosh/.zshrc
         
 # downloading tor fork for docker
 mkdir -p /opt/tor
