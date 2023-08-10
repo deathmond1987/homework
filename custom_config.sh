@@ -42,6 +42,7 @@ WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
 
     # not work in wsl with default user in wsl.conf
     echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
+    echo "" > /etc/fstab
 else
     # changing grub config
     sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
