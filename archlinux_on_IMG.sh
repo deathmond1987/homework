@@ -200,15 +200,13 @@ exit_trap () {
         if [ "$WSL_INSTALL" = "true" ]; then
             umount "$MOUNT_PATH" || true
         else
+            # hmm. I can not use fuser to force unmount. This chashing wsl2
             sync
             sleep 5
-            fuser -km "$MOUNT_PATH"/boot/efi || true
             umount "$MOUNT_PATH"/boot/efi || true
             sleep 1
-            fuser -km "$MOUNT_PATH"/boot || true
             umount "$MOUNT_PATH"/boot || true
             sleep 1
-            fuser -km "$MOUNT_PATH" || true
             umount "$MOUNT_PATH" || true
             sleep 5
             lvchange -an /dev/arch/root || true
@@ -464,7 +462,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         }
 
         grub_install () {
-            # installin grub. extra config needed because we dont have efivars in container
+            # installing grub. extra config needed because we dont have efivars in container
             mkdir -p /boot/efi
             grub-install \
                 --target=x86_64-efi \
@@ -476,6 +474,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         }
 
         other_config () {
+            # my personal config
             wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
     }
 
