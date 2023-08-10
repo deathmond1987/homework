@@ -40,9 +40,6 @@ WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
     systemctl enable drop_cache.timer
     rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
     rm -f /usr/lib/systemd/system/systemd-firstboot.service
-
-    # not work in wsl with default user in wsl.conf
-    echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
     echo "" > /etc/fstab
 else
     # changing grub config
@@ -101,6 +98,8 @@ echo 'alias history="hstr"' >> /home/kosh/.zshrc
 echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # habit
 echo 'alias netstat="ss"' >> /home/kosh/.zshrc
+# not work in wsl with default user in wsl.conf
+echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
         
 # downloading tor fork for docker
 mkdir -p /opt/tor
