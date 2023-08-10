@@ -476,14 +476,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         other_config () {
             wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
-            echo "[boot]
-systemd=true
-[user]
-default=kosh
-[automount]
-enabled = true
-options = \"metadata\"
-mountFsTab = true" > /etc/wsl.conf
     }
 
     main () {
@@ -530,38 +522,18 @@ EOF
 }
 
 postinstall_config () {
-    success "Create postinstall script..."
-    # for now we have large initramfs and strange-installed-grub.
-    # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
-    # resizing partition / to full disk and creating swap
-    # after that remove this helper script
-
-    # adding this script to autoboot after first load arch linux
-    sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
-
-    # script body
-    cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
-#!/usr/bin/env bash
-        set -x
-        ######################################################################################################
-        ########################################### WSL ######################################################
-        ######################################################################################################
-
-        if [ "$WSL_INSTALL" = "true" ]; then
-            # removing helper script from autoload
-            sed -i '1d' /home/kosh/.zshrc
-            # removing helper script itself
-            rm /home/kosh/postinstall.sh
-
-            # Removing packages from wsl instance
-            su - kosh -c "LANG=C yay -Rscn --noconfirm\
-                                                    lvm2 \
-                                                    grub \
-                                                    efibootmgr \
-                                                    parted"
-
-            #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
-            echo -e "[Unit]
+    if [ "$WSL_INSTALL" = "true" ]; then
+        success "configuring wsl..."
+        echo "[boot]
+systemd=true
+[user]
+default=kosh
+[automount]
+enabled = true
+options = \"metadata\"
+mountFsTab = true" > "$MOUNT_PATH"/etc/wsl.conf
+        #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
+        echo -e "[Unit]
 Description=Periodically drop caches to save memory under WSL.
 Documentation=https://github.com/arkane-systems/wsl-drop-caches
 ConditionVirtualization=wsl
@@ -570,9 +542,9 @@ Requires=drop_cache.timer
 [Service]
 Type=oneshot
 ExecStartPre=sync
-ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
+ExecStart=echo 3 > /proc/sys/vm/drop_caches" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.service
 
-            echo -e "[Unit]
+        echo -e "[Unit]
 Description=Periodically drop caches to save memory under WSL.
 Documentation=https://github.com/arkane-systems/wsl-drop-caches
 ConditionVirtualization=wsl
@@ -583,17 +555,30 @@ OnBootSec=3min
 OnUnitActiveSec=3min
 
 [Install]
-WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
-            #We need true if systemd is not enabled in wsl by default to avoid script failing
-            systemctl daemon-reload || true
-            systemctl enable drop_cache.timer || true
+WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
+        #We need true if systemd is not enabled in wsl by default to avoid script failing
 
-            # changing sudo rules to disable executing sudo without password
-            sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-            # allow wheel group using sudo with password
-            sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+        arch-chroot << EOF 
+systemctl enable drop_cache.timer || true
+EOF
+        # changing sudo rules to disable executing sudo without password
+        sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' "$MOUNT_PATH"/etc/sudoers
+        # allow wheel group using sudo with password
+        sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' "$MOUNT_PATH"/etc/sudoers 
+    else
+        success "Create postinstall script..."
+        # for now we have large initramfs and strange-installed-grub.
+        # in this block we generate initrd image with autodetect hook, reinstall grub, fixing sudo permissions,
+        # resizing partition / to full disk and creating swap
+        # after that remove this helper script
 
-        else
+        # adding this script to autoboot after first load arch linux
+        sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
+
+        # script body
+        cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
+            #!/usr/bin/env bash
+            set -x
             ######################################################################################################
             ######################################### HOST #######################################################
             ######################################################################################################
@@ -666,11 +651,10 @@ WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
 
             # rebooting OS after reconfiguring
             sudo reboot
-        fi
 EOL
         # marking helper script executable
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
-
+    fi
 }
 
 unmounting_all_and_wsl_copy () {
