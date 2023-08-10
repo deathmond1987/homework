@@ -535,6 +535,7 @@ postinstall_config () {
         cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
             #!/usr/bin/env bash
             set -x
+            if ! [ "$WSL_INSTALL" = "true" ]; then
             ######################################################################################################
             ######################################### HOST #######################################################
             ######################################################################################################
@@ -607,6 +608,7 @@ postinstall_config () {
 
             # rebooting OS after reconfiguring
             sudo reboot
+            fi     
 EOL
         # marking helper script executable
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
