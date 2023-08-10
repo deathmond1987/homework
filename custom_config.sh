@@ -39,7 +39,14 @@ WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
 
     systemctl enable drop_cache.timer
     systemctl disable systemd-networkd-wait-online
-fi
+
+# not work in wsl with default user in wsl.conf
+echo "MC_SKIN=gotar" >> /home/kosh/.zshcr
+else
+# changing grub config
+    sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
+    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
+fi 
 
 # PACMAN CONF
 # enabling pacman from game
@@ -84,8 +91,6 @@ su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homewor
         
 # changing default mc theme
 echo "MC_SKIN=gotar" >> /etc/environment
-# not work in wsl with default user in wsl.conf
-echo "MC_SKIN=gotar" >> /home/kosh/.zshcr
 
 # enabling hstr alias
 echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
@@ -94,10 +99,6 @@ echo 'alias history="hstr"' >> /home/kosh/.zshrc
 echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # habit
 echo 'alias netstat=ss' >> /home/kosh/.zshrc
-
-# changing grub config
-sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
         
 # downloading tor fork for docker
 mkdir -p /opt/tor
