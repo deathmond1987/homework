@@ -534,7 +534,7 @@ postinstall_config () {
         # script body
         cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
             #!/usr/bin/env bash
-            set -x
+            set -xe
             . /etc/environment
             if ! [ "$WSL_INSTALL" = "true" ]; then
                 ######################################################################################################
@@ -607,7 +607,7 @@ postinstall_config () {
             # allow wheel group using sudo with password
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 
-            if ! [ "$WSL_INSTALL" = "true"]; then
+            if ! [ "$WSL_INSTALL" = "true" ]; then
                 # rebooting OS after reconfiguring
                 sudo reboot    
             fi
