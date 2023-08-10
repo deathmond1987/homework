@@ -3,7 +3,7 @@ set -xe
 
 . /etc/environment
 if [ "$WSL_INSTALL" = "true" ]; then
-    success "configuring wsl..."
+    echo "Configuring wsl..."
     echo "[boot]
 systemd=true
 [user]
