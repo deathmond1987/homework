@@ -596,7 +596,7 @@ postinstall_config () {
             lvextend -l +100%FREE /dev/arch/root
             # we have ext4 fs on lvm. resizing ext4 fs
             resize2fs /dev/arch/root
-
+        fi 
             # removing helper script from autoload
             sed -i '1d' /home/kosh/.zshrc
             # removing helper script itself
@@ -608,8 +608,7 @@ postinstall_config () {
             sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 
             # rebooting OS after reconfiguring
-            sudo reboot
-            fi     
+            sudo reboot    
 EOL
         # marking helper script executable
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
