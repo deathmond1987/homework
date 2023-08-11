@@ -654,12 +654,19 @@ run_in_qemu () {
         #success "wsl image created !!!"
         true
     else
+        if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
+            OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
+        elif [ "$ID" = "arch" ]; then
+            OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
+        else
+            echo "Unknow OS"
+        fi    
         qemu-img resize ./vhd.img 15G
         qemu-system-x86_64 \
             -enable-kvm \
             -smp cores=4 \
             -m 2G \
-            -drive if=pflash,format=raw,readonly=on,file="$(find /usr/share -name OVMF_CODE.fd | head -n 1)" \
+            -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
             -device nvme,drive=drive0,serial=badbeef \
             -drive if=none,id=drive0,file=./vhd.img
     fi
