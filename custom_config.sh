@@ -42,9 +42,10 @@ WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
     rm -f /usr/lib/systemd/system/systemd-firstboot.service
     echo "" > /etc/fstab
 else
+    true
     # changing grub config
-    sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
-    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
+    # sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
+    # sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
 fi 
 
 # PACMAN CONF
