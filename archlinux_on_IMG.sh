@@ -68,12 +68,12 @@ options_handler () {
         case "$1" in
             --wsl|-w) WSL_INSTALL=true
                 ;;
-            --default|-d) WITH_CONFIG=false
+            --clear|-c) WITH_CONFIG=false
                 ;;
             *) echo -e "Unknown option: $1\n"
                echo -e "Options:"
                echo -e "--wsl - create tar archive for wsl"
-               echo -e "--default - create clean image"
+               echo -e "--clear - create clean image"
                exit 1
         esac
         shift
