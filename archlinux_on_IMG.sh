@@ -409,6 +409,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         hostname_config () {
             # set hostname
             echo 'home' > /etc/hostname
+            echo '127.0.0.1 home' >> /etc/hosts
         }
 
         user_config () {
