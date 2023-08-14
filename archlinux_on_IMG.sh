@@ -477,7 +477,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         other_config () {
             # my personal config
             wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
-            pkill gpg-agent
     }
 
     main () {
@@ -633,8 +632,10 @@ unmounting_all_and_wsl_copy () {
         warn "       .\archfs.tar - path to generated tar archive with filesystem"
         error "You must enable fonts in your terminal !"
         info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
+        arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
         umount "$MOUNT_PATH" || true
     else
+        arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
         sync
         sleep 5
         #fuser killer may kill wsl...
