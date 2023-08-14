@@ -638,19 +638,14 @@ unmounting_all_and_wsl_copy () {
         pkill -en gpg-agent
         umount "$MOUNT_PATH" || true
     else
-        pkill -en gpg-agent
+        pkill -en gpg-agent || true
         sync
-        sleep 5
         #fuser killer may kill wsl...
         umount -l "$MOUNT_PATH"/boot/efi || true
-        sleep 1
         umount -l "$MOUNT_PATH"/boot || true
-        sleep 1
         umount -l "$MOUNT_PATH" || true
-        sleep 5
         lvchange -an /dev/arch/root || true
     fi
-    sleep 1
     losetup -d "$DISK" || true
     echo "Done"
     trap '' EXIT
@@ -669,7 +664,7 @@ run_in_qemu () {
         else
             echo "Unknown OS"
         fi    
-        qemu-img resize ./vhd.img 15G
+        qemu-img resize -f raw ./vhd.img 15G
         qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
         success "VHDX image for HYPER-V created"
         warn "$(ls -l | grep vhd.vhdx)"
