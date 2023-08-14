@@ -199,11 +199,11 @@ exit_trap () {
     on_exit () {
         if [ "$WSL_INSTALL" = "true" ]; then
             error "trap start"
-            arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
+            pkill -en gpg-agent || true
             umount "$MOUNT_PATH" || true
         else
             # hmm. I can not use fuser to force unmount. This chashing wsl2
-            arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
+            pkill -en gpg-agent || true
             sync
             sleep 5
             umount "$MOUNT_PATH"/boot/efi || true
@@ -635,10 +635,10 @@ unmounting_all_and_wsl_copy () {
         warn "       .\archfs.tar - path to generated tar archive with filesystem"
         error "You must enable fonts in your terminal !"
         info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
-        arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
+        pkill -en gpg-agent
         umount "$MOUNT_PATH" || true
     else
-        arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
+        pkill -en gpg-agent
         sync
         sleep 5
         #fuser killer may kill wsl...
