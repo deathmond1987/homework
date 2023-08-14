@@ -636,7 +636,11 @@ postinstall_config () {
                 resize2fs /dev/arch/root
             fi 
             # removing helper script from autoload
-            sed -i '1d' /home/kosh/.zshrc
+            if [ "$WITH_CONFIG" = true ]; then
+                sed -i '1d' /home/kosh/.zshrc
+            else
+                sed -i '1d' /home/kosh/.bashrc
+            fi
             # removing helper script itself
             rm /home/kosh/postinstall.sh
 
