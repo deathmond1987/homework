@@ -306,7 +306,7 @@ pacstrap_base () {
         tar xzf ./archlinux.tar.gz --numeric-owner --strip-components=1
         #chrooting to bootstrap root
         success "Init pacman from base image system..."
-        arch-chroot "$MOUNT_PATH" <<-EOF
+        arch-chroot "$MOUNT_PATH" <<-EOF 2>&1 /dev/null
             #usually pacstrap script populating keys but we doing it manually
             pacman-key --init
             pacman-key --populate archlinux
