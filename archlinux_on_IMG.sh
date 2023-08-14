@@ -197,8 +197,8 @@ mount_image () {
 exit_trap () {
     # if script fail - we need to umnount all mounts to clear host machine
     on_exit () {
+        error "trap start"
         if [ "$WSL_INSTALL" = "true" ]; then
-            error "trap start"
             pkill -en gpg-agent || true
             umount "$MOUNT_PATH" || true
         else
