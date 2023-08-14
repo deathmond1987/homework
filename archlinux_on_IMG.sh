@@ -198,6 +198,7 @@ exit_trap () {
     # if script fail - we need to umnount all mounts to clear host machine
     on_exit () {
         if [ "$WSL_INSTALL" = "true" ]; then
+            error "trap start"
             arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
             umount "$MOUNT_PATH" || true
         else
@@ -214,7 +215,7 @@ exit_trap () {
             lvchange -an /dev/arch/root || true
         fi
         losetup -d "$DISK" || true
-        echo "trap finished"
+        error "trap finished"
     }
 trap "on_exit" EXIT
 }
