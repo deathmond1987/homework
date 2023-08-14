@@ -198,9 +198,11 @@ exit_trap () {
     # if script fail - we need to umnount all mounts to clear host machine
     on_exit () {
         if [ "$WSL_INSTALL" = "true" ]; then
+            arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
             umount "$MOUNT_PATH" || true
         else
             # hmm. I can not use fuser to force unmount. This chashing wsl2
+            arch-chroot "$MOUNT_PATH" pkill -en gpg-agent
             sync
             sleep 5
             umount "$MOUNT_PATH"/boot/efi || true
