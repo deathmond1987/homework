@@ -653,6 +653,7 @@ unmounting_all_and_wsl_copy () {
     sleep 1
     losetup -d "$DISK" || true
     echo "Done"
+    trap '' EXIT
 }
 
 run_in_qemu () {
@@ -704,8 +705,6 @@ main () {
     postinstall_config
     unmounting_all_and_wsl_copy
     run_in_qemu
-
-    trap '' EXIT
     unset WSL_INSTALL
 }
 
