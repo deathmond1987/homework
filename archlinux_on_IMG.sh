@@ -635,11 +635,11 @@ unmounting_all_and_wsl_copy () {
     else
         sync
         sleep 5
-        umount "$MOUNT_PATH"/boot/efi || true
+        umount -l "$MOUNT_PATH"/boot/efi || true
         sleep 1
-        umount "$MOUNT_PATH"/boot || true
+        umount -l "$MOUNT_PATH"/boot || true
         sleep 1
-        umount "$MOUNT_PATH" || true
+        umount -l "$MOUNT_PATH" || true
         sleep 5
         lvchange -an /dev/arch/root || true
     fi
