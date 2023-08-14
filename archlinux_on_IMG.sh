@@ -477,6 +477,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         other_config () {
             # my personal config
             wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
+            pkill gpg-agent
     }
 
     main () {
@@ -636,6 +637,7 @@ unmounting_all_and_wsl_copy () {
     else
         sync
         sleep 5
+        #fuser killer may kill wsl...
         umount -l "$MOUNT_PATH"/boot/efi || true
         sleep 1
         umount -l "$MOUNT_PATH"/boot || true
@@ -660,7 +662,7 @@ run_in_qemu () {
         elif [ "$ID" = "arch" ]; then
             OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
         else
-            echo "Unknow OS"
+            echo "Unknown OS"
         fi    
         qemu-img resize ./vhd.img 15G
         qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
@@ -669,9 +671,7 @@ run_in_qemu () {
         qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
         success "VMDK image for VMWARE created"
         warn "$(ls -l | grep vhd.vhdx)"
-
-        if  [ "`tty`" = "not a tty" ]; then
-            qemu-system-x86_64 \
+        qemu-system-x86_64 \
                                  -enable-kvm \
                                  -smp cores=4 \
                                  -m 2G \
@@ -680,26 +680,6 @@ run_in_qemu () {
                                  -drive if=none,id=drive0,file=./vhd.img &
                                  success "Done"
                                  exit 0 
-        else 
-            read_answer () {
-                read -rp "Execute image in qemu? (y/n): " answer
-                case "$answer" in 
-                    y|yes) qemu-system-x86_64 \
-                                         -enable-kvm \
-                                         -smp cores=4 \
-                                         -m 2G \
-                                         -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
-                                         -device nvme,drive=drive0,serial=badbeef \
-                                         -drive if=none,id=drive0,file=./vhd.img
-                    ;;
-                    n|no) success "Done"
-                    ;;
-                    *) echo "Incorrect option"
-                       read_answer
-                    ;;
-                esac
-            }
-        fi
     fi
 }
 
