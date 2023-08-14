@@ -37,7 +37,7 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
-set -oe noglob
+set -oxe noglob
 
 reset="\033[0m"
 
@@ -59,6 +59,28 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 . /etc/os-release
 # path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
+
+options_handler () {
+    WSL_INSTALL=false
+    WITH_CONFIG=true
+
+    while [ "$1" != "" ]; do
+        case "$1" in
+            --wsl|-w) WSL_INSTALL=true
+                ;;
+            --default|-d) WITH_CONFIG=false
+                ;;
+            *) echo -e "Unknown option: $1\n"
+               echo -e "Options:"
+               echo -e "--wsl - create tar archive for wsl"
+               echo -e "--default - create clean image"
+               exit 1
+        esac
+        shift
+    done
+}
+
+
 
 ############################################################################################
 ############################### PREPARE HOST TO BUILD IMAGE ################################
@@ -85,7 +107,8 @@ prepare_dependecies () {
             sleep 10
         fi
         success "Installing dependencies for arch..."
-        pacman -S --needed lvm2 \
+        pacman -S --needed --disable-download-timeout \
+                           lvm2 \
                            dosfstools \
                            arch-install-scripts \
                            edk2-ovmf \
@@ -93,7 +116,7 @@ prepare_dependecies () {
         # on my arch laptop qemu-desktop is installed
         # qemu-desktop and qemu-base conflicts
         if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-            pacman -S --noconfirm qemu-base
+            pacman -S --needed --noconfirm --disable-download-timeout qemu-base
         fi
     elif [ "$ID" = "debian" ]; then
         if ! [ "$WSL_INSTALL" = "true" ]; then
@@ -290,7 +313,7 @@ pacstrap_base () {
             #configuring mirrorlist
             sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
             #installing root
-            pacman -Syu --noconfirm base base-devel
+            pacman -Syu --needed --noconfirm --disable-download-timeout base base-devel
             #ckeaning up root dir. thereis tar archive, list installed packages in root and version file.
             rm -f /archlinux.tar.gz
             rm -f /pkglist.x86_64.txt
@@ -350,9 +373,10 @@ mount_boot () {
 chroot_arch () {
     success "Chrooting arch-linux..."
     # tell the environment that this is install for wsl
-    if [ "$WSL_INSTALL" = "true" ]; then
-        echo "WSL_INSTALL=true" >> "$MOUNT_PATH"/etc/environment
-    fi
+    echo "WSL_INSTALL=$WSL_INSTALL" >> "$MOUNT_PATH"/etc/environment
+    # tell the environment about unnessesary config
+    echo "WITH_CONFIG=$WITH_CONFIG" >> "$MOUNT_PATH"/etc/environment
+
     # go to arch
     arch-chroot "$MOUNT_PATH" <<-EOF
         #!/usr/bin/env bash
@@ -364,7 +388,7 @@ chroot_arch () {
 
         mkinitcpio_install () {
             # install kernel and firmware
-            pacman -S --noconfirm --disable-download-timeout mkinitcpio
+            pacman -S --needed --noconfirm --disable-download-timeout mkinitcpio
         }
 
         remove_autodetect_hook () {
@@ -374,7 +398,7 @@ chroot_arch () {
 
         kernel_install () {
             # installing kernel and firmware
-            pacman -S --noconfirm --disable-download-timeout linux linux-firmware
+            pacman -S --needed --noconfirm --disable-download-timeout linux linux-firmware
         }
 
         #we can not use systemd to configure locales, time and so on cause we are in chroot environment
@@ -426,7 +450,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         git_install () {
             # adding git
-            pacman -S --noconfirm --disable-download-timeout git
+            pacman -S --needed --noconfirm --disable-download-timeout git
         }
 
         yay_install () {
@@ -479,7 +503,9 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         other_config () {
             # my personal config
-            wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
+            if [ "$WITH_CONFIG" = "true" ]; then
+                wget -O - "https://raw.githubusercontent.com/deathmond1987/homework/main/custom_config.sh" | bash
+            fi
     }
 
     main () {
@@ -533,8 +559,11 @@ postinstall_config () {
         # after that remove this helper script
 
         # adding this script to autoboot after first load arch linux
-        sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
-
+        if [ "$WITH_CONFIG" = "true" ]; then
+            sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
+        else 
+            sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.bashrc
+        fi 
         # script body
         cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
             #!/usr/bin/env bash
@@ -555,6 +584,11 @@ postinstall_config () {
                         else
                             echo "cpu vendor: $vendor"
                         fi
+                    fi
+                    if [ "$WITH_CONFIG" = true ]; then
+                            cd /opt/tor
+                            docker-compose up -d
+                            cd -
                     fi
                 fi
 
@@ -579,7 +613,7 @@ postinstall_config () {
                 swapon /swapfile
                 # adding swap file entry to fstab to automount
                 echo "/swapfile none swap defaults 0 0" >> /etc/fstab
-                echo done
+                echo "done"
 
                 # default disk size in this script 10G
                 # after install we want to use all disk space
@@ -635,8 +669,8 @@ unmounting_all_and_wsl_copy () {
         warn "       .\archfs.tar - path to generated tar archive with filesystem"
         error "You must enable fonts in your terminal !"
         info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
-        pkill -en gpg-agent
-        umount "$MOUNT_PATH" || true
+        pkill -en gpg-agent || true
+        umount -l "$MOUNT_PATH" || true
     else
         pkill -en gpg-agent || true
         sync
@@ -667,10 +701,10 @@ run_in_qemu () {
         qemu-img resize -f raw ./vhd.img 15G
         qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
         success "VHDX image for HYPER-V created"
-        warn "$(ls -l | grep vhd.vhdx)"
+        warn "$(ls -l ./vhd.vhdx)"
         qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
         success "VMDK image for VMWARE created"
-        warn "$(ls -l | grep vhd.vhdx)"
+        warn "$(ls -l ./vhd.vhdx)"
         qemu-system-x86_64 \
                                  -enable-kvm \
                                  -smp cores=4 \
@@ -684,10 +718,7 @@ run_in_qemu () {
 }
 
 main () {
-    if [ "$1" = "--wsl" ]; then
-        WSL_INSTALL=true
-    fi
-
+    options_handler "$@"
     prepare_dependecies
     create_image
     mount_image
