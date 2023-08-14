@@ -670,7 +670,7 @@ run_in_qemu () {
         success "VMDK image for VMWARE created"
         warn "$(ls -l | grep vhd.vhdx)"
 
-        if  [ "`tty`" != "not a tty" ]; then
+        if  [ "`tty`" = "not a tty" ]; then
             qemu-system-x86_64 \
                                  -enable-kvm \
                                  -smp cores=4 \
