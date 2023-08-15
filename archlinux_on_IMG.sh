@@ -759,6 +759,8 @@ export_image_hyperv () {
     qemu-img resize -f raw ./vhd.img 15G
     qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
     success "VHDX image for HYPER-V created"
+    info "Arch Linux does not have official support of UEFI Secure shell"
+    info "You need to disable UEFI Secure in HYPER-V"
     warn "$(ls -l $PWD./vhd.vhdx)"
 }
 
@@ -766,6 +768,8 @@ export_image_wmware () {
     qemu-img resize -f raw ./vhd.img 15G
     qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
     success "VMDK image for VMWARE created"
+    info "VMWARE Workstation create VM without UEFI"
+    info "You need enable UEFI for VM manually after create VM"
     warn "$(ls -l $PWD/vhd.vhdx)"
 }
 
