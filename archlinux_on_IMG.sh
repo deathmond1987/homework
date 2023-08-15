@@ -61,6 +61,7 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 MOUNT_PATH=/mnt/arch
 
 options_handler () {
+    # declare variables for operate with options
     WSL_INSTALL=false
     WITH_CONFIG=true
     NSPAWN_CHECK=false
@@ -68,6 +69,7 @@ options_handler () {
     VMWARE_EXPORT=false
     HYPERV_EXPORT=false
 
+    # help message
     options_message () {
         info " Usage: script_name.sh --wsl --clean --nspawn ( Create wsl rootfs with clean arch linux and check it in systemd-nspawn )"
         info "        script_name.sh --qemu --vmware ( Create uefi raw image with customizations, execute image in qemu and export image for vmware workstation)"
@@ -80,6 +82,7 @@ options_handler () {
         info " --hyperv - gen image for HYPER-V. ( Not working with --wsl key )"
     }
 
+    # catch arguments from command line
     while [ "$1" != "" ]; do
         case "$1" in
             --wsl|-w) WSL_INSTALL=true
@@ -106,6 +109,7 @@ options_handler () {
         shift
     done
 
+    # catch mutually exclusive options
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
         error "We cannot check WSL image in QEMU. Abort"
         exit 1
