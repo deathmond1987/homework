@@ -90,7 +90,7 @@ options_handler () {
                 ;;
             --vmware|-v) VMWARE_EXPORT=true
                 ;;
-            --hyperv|-h) HYPERV_EXPORT=true
+            --hyperv|-y) HYPERV_EXPORT=true
                 ;;
             --help|-h) options_message
                 ;;
