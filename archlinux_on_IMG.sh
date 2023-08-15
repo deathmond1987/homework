@@ -352,7 +352,7 @@ pacstrap_base () {
             rm -f /pkglist.x86_64.txt
             rm -f /version
 EOF
-            cd -
+        cd -
 
     elif [ "$ID" = "alpine" ]; then
         success "Init pacman from Alpine system"
