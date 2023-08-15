@@ -63,8 +63,10 @@ MOUNT_PATH=/mnt/arch
 options_handler () {
     WSL_INSTALL=false
     WITH_CONFIG=true
-    NSPAWN_CHECK=true
+    NSPAWN_CHECK=false
     QEMU_CHECK=false
+    VMWARE_EXPORT=false
+    HYPERV_EXPORT=false
     
     while [ "$1" != "" ]; do
         case "$1" in
@@ -75,6 +77,10 @@ options_handler () {
             --nspawn|-n) NSPAWN_CHECK=true
                 ;;
             --qemu|-q) QEMU_CHECK=true
+                ;;
+            --vmware|-v) VMWARE_EXPORT=true
+                ;;
+            -hyperv|-h) HYPERV_EXPORT=true
                 ;;
             *) info " Unknown option: $1\n"
                info " Options:"
@@ -90,6 +96,18 @@ options_handler () {
 
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
         error "We cannot check WSL image in QEMU. Abort"
+        exit 1
+    fi
+        if [ "$WSL_INSTALL" = "true" ] && [ "$VMWARE_EXPORT" = "true" ]; then
+        error "We cannot check WSL image in VWWARE. Abort"
+        exit 1
+    fi
+    if [ "$WSL_INSTALL" = "true" ] && [ "$HYPERV_CHECK" = "true" ]; then
+        error "We cannot check WSL image in HYPERV. Abort"
+        exit 1
+    fi
+    if [ "$NSPAWN_CHECK" = "true" ] && [ "$ID" = "true" ]; then
+        error "Alpine Linux does not have systemd nspawn. Abort"
         exit 1
     fi
 }
@@ -111,8 +129,6 @@ prepare_dependecies () {
         dnf install -y arch-install-scripts \
                        e2fsprogs \
                        dosfstools \
-                       qemu-kvm-core \
-                       edk2-ovmf \
                        lvm2
     elif [ "$ID" = "arch" ]; then
         success "Installing dependencies for arch..."
@@ -660,7 +676,7 @@ EOL
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
 }
 
-wsl_export_and_unmount () {
+export_wsl () {
     # unmount all mounts
     # we need this to stop grub in vm dropping in grub-shell due first run
     success "Taring rootfs and unmount partitions..."
@@ -674,6 +690,9 @@ wsl_export_and_unmount () {
     warn "       .\archfs.tar - path to generated tar archive with filesystem"
     error "You must enable fonts in your terminal !"
     info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
+}
+
+unmount_wsl () {
     pkill -en gpg-agent || true
     umount -l "$MOUNT_PATH" || true
     losetup -d "$DISK" || true
@@ -681,8 +700,7 @@ wsl_export_and_unmount () {
     trap '' EXIT
 }
 
-
-unmounting_all_image () {
+unmount_images () {
     pkill -en gpg-agent || true
     sync
     #fuser killer may kill wsl...
@@ -695,7 +713,7 @@ unmounting_all_image () {
     trap '' EXIT
 }
 
-run_in_qemu () {
+qemu_install () {
     if [ "$ID" = "fedora" ]; then
             dnf install -y qemu-kvm-core \
                            edk2-ovmf          
@@ -716,6 +734,23 @@ run_in_qemu () {
     else
         exit 1
     fi
+}
+
+export_image_hyperv () {
+    qemu-img resize -f raw ./vhd.img 15G
+    qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
+    success "VHDX image for HYPER-V created"
+    warn "$(ls -l ./vhd.vhdx)"
+}
+
+export_image_wmware () {
+    qemu-img resize -f raw ./vhd.img 15G
+    qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
+    success "VMDK image for VMWARE created"
+    warn "$(ls -l ./vhd.vhdx)"
+}
+
+run_in_qemu () {
     if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
         OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
     elif [ "$ID" = "arch" ]; then
@@ -723,13 +758,6 @@ run_in_qemu () {
     else
         echo "Unknown OS"
     fi    
-    qemu-img resize -f raw ./vhd.img 15G
-    qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
-    success "VHDX image for HYPER-V created"
-    warn "$(ls -l ./vhd.vhdx)"
-    qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
-    success "VMDK image for VMWARE created"
-    warn "$(ls -l ./vhd.vhdx)"
     qemu-system-x86_64 \
                              -enable-kvm \
                              -smp cores=4 \
@@ -739,6 +767,33 @@ run_in_qemu () {
                              -drive if=none,id=drive0,file=./vhd.img &
                              success "Done"
                              exit 0
+}
+
+nspawn_install () {
+   if [ "$ID" = "fedora" ]; then
+       true               
+   elif [ "$ID" = "arch" ]; then
+       true
+   elif [ "$ID" = "debian" ]; then
+       apt install -y systemd-container
+   elif [ "$ID" = "alpine" ]; then
+       exit 1     
+   else
+       exit 1
+   fi
+}
+
+nspawn_exec_wsl () {
+    mkdir -p /tmp/nspawn-arch
+    FILE_PATH=$(PWD)
+    cd /tmp/nspawn-arch
+    tar -xf "$FILE_PATH"/vhd.img --numeric-owner
+    systemd-nspawn -B -d /tmp/nspawn-arch
+    
+}
+
+nspawn_exec_image () {
+    systemd-nspawn -B -i ./vhd.img
 }
 
 main () {
@@ -755,9 +810,13 @@ main () {
         mount_boot
         chroot_arch
         postinstall_config
-        wsl_export_and_unmount
-        
-    fi 
+        export_wsl
+        unmount_wsl
+        if [ "$NSPAWN_CHECK" = "true" ]; then
+            nspawn_install
+            nspawn_exec_wsl
+        fi
+    else
         prepare_dependecies
         create_image
         mount_image
@@ -771,11 +830,30 @@ main () {
         fstab_gen
         chroot_arch
         postinstall_config
-        unmounting_all_image
+        unmount_images
         if [ "$QEMU_CHECK" = "true" ]; then
+            qemu_install
             run_in_qemu
         fi
+        if [ "$VMWARE_EXPORT" = "true" ]; then
+            qemu_install
+            export_image_wmware
+        fi
+        if [ "$HYPERV_EXPORT" = "true" ]; then
+            qemu_install
+            export_image_hyperv
+        fi
+        if [ "$NSPAWN_CHECK" = "true" ]; then
+            nspawn_install
+            nspawn_exec_image
+        fi
+    fi
     unset WSL_INSTALL
+    unset WITH_CONFIG
+    unset NSPAWN_CHECK
+    unset QEMU_CHECK
+    unset VMWARE_EXPORT
+    unset HYPERV_EXPORT
 }
 
 main "$@"
