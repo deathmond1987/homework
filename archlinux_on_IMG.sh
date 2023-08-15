@@ -81,24 +81,25 @@ options_handler () {
     while [ "$1" != "" ]; do
         case "$1" in
             --wsl|-w) WSL_INSTALL=true
-                ;;
-            --clear|-c) WITH_CONFIG=false
-                ;;
-            --nspawn|-n) NSPAWN_CHECK=true
-                ;;
-            --qemu|-q) QEMU_CHECK=true
-                ;;
-            --vmware|-v) VMWARE_EXPORT=true
-                ;;
-            --hyperv|-y) HYPERV_EXPORT=true
-                ;;
-            --help|-h) options_message
-                ;;
-            *) error "Unknown option: $1"
-               echo ""
-               options_message
-               exit 1
-               ;;
+                   ;;
+          --clear|-c) WITH_CONFIG=false
+                   ;;
+         --nspawn|-n) NSPAWN_CHECK=true
+                   ;;
+           --qemu|-q) QEMU_CHECK=true
+                   ;;
+         --vmware|-v) VMWARE_EXPORT=true
+                   ;;
+         --hyperv|-y) HYPERV_EXPORT=true
+                   ;;
+           --help|-h) options_message
+                      exit 0
+                   ;;
+                   *) error "Unknown option: $1"
+                      echo ""
+                      options_message
+                      exit 1
+                  ;;
         esac
         shift
     done
