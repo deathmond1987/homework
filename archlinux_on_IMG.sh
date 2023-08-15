@@ -308,6 +308,7 @@ mount_root () {
 
 pacstrap_base () {
     if [ "$WSL_INSTALL" = "true" ]; then
+        OLD_ID=$ID
         ID=debian
     fi
     if [ "$ID" = "fedora" ] || [ "$ID" = "arch" ]; then
@@ -373,6 +374,7 @@ Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
     else
         exit 1
     fi
+    ID=$OLD_ID
 }
 
 mount_boot () {
