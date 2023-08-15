@@ -699,7 +699,7 @@ export_wsl () {
     # we need this to stop grub in vm dropping in grub-shell due first run
     success "Taring rootfs and unmount partitions..."
     tar -cf ./archfs.tar -C /mnt/arch .
-    warn "$(ls -l $PWD./vhd.vhdx)"
+    warn "$(ls -l $PWD/vhd.vhdx)"
     success "ARCH root filesystem exported to $PWD/archfs.tar"
     warn "You need to export this file to WSL. Example:"
     warn "wsl --import Arch-linux D:\arch\ .\archfs.tar"
