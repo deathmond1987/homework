@@ -102,7 +102,7 @@ options_handler () {
         error "We cannot check WSL image in VWWARE. Abort"
         exit 1
     fi
-    if [ "$WSL_INSTALL" = "true" ] && [ "$HYPERV_CHECK" = "true" ]; then
+    if [ "$WSL_INSTALL" = "true" ] && [ "$HYPERV_EXPORT" = "true" ]; then
         error "We cannot check WSL image in HYPERV. Abort"
         exit 1
     fi
