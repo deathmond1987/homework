@@ -67,7 +67,17 @@ options_handler () {
     QEMU_CHECK=false
     VMWARE_EXPORT=false
     HYPERV_EXPORT=false
-    
+
+    options_message () {
+        info " Options:"
+        info " --wsl - create tar archive for wsl"
+        info " --clear - create clean Arch Linux image"
+        info " --nspawn - check created image in nspawn container"
+        info " --qemu - check created image in qemu. (Not working with --wsl key)"
+        info " --vmware - gen image for VMWARE. (Not working with --wsl key )"
+        info " --hyperv - gen image for HYPER-V. (Not working with --wsl key)"
+    }
+
     while [ "$1" != "" ]; do
         case "$1" in
             --wsl|-w) WSL_INSTALL=true
@@ -82,19 +92,13 @@ options_handler () {
                 ;;
             --hyperv|-h) HYPERV_EXPORT=true
                 ;;
-            --help|-h|*) echo ""
-                         info " Options:"
-                         info " --wsl - create tar archive for wsl"
-                         info " --clear - create clean Arch Linux image"
-                         info " --nspawn - check created image in nspawn container"
-                         info " --qemu - check created image in qemu. (Not working with --wsl key)"
-                         info " --vmware - gen image for VMWARE. (Not working with --wsl key )"
-                         info " --hyperv - gen image for HYPER-V. (Not working with --wsl key)"
-                         if [ "$1" != "--help" ] || [ "$1" != "-h" ]; then
-                             error " Unknown option: $1"
-                             exit 1
-                         fi
+            --help|-h|) options_message
                 ;;
+            *) error "Unknown option: $1"
+               echo ""
+               options_message
+               exit 1
+               ;;
         esac
         shift
     done
