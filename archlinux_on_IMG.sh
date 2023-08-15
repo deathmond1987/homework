@@ -80,7 +80,7 @@ options_handler () {
                 ;;
             --vmware|-v) VMWARE_EXPORT=true
                 ;;
-            -hyperv|-h) HYPERV_EXPORT=true
+            --hyperv|-h) HYPERV_EXPORT=true
                 ;;
             *) info " Unknown option: $1\n"
                info " Options:"
