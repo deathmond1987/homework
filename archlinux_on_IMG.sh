@@ -76,12 +76,12 @@ options_handler () {
                 ;;
             --qemu|-q) QEMU_CHECK=true
                 ;;
-            *) echo -e "Unknown option: $1\n"
-               echo -e "Options:"
-               echo -e "--wsl - create tar archive for wsl"
-               echo -e "--clear - create clean image"
-               echo -e "--nspawn - check created image in nspawn container"
-               echo -e "--qemu - check created image in qemu"
+            *) info " Unknown option: $1\n"
+               info " Options:"
+               info " --wsl - create tar archive for wsl"
+               info " --clear - create clean image"
+               info " --nspawn - check created image in nspawn container"
+               info " --qemu - check created image in qemu"
                exit 1
                 ;;
         esac
@@ -89,7 +89,7 @@ options_handler () {
     done
 
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
-        echo -e "We cannot check WSL image in QEMU. Abort"
+        error "We cannot check WSL image in QEMU. Abort"
         exit 1
     fi
 }
