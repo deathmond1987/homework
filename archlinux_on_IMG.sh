@@ -83,8 +83,9 @@ options_handler () {
             --hyperv|-h) HYPERV_EXPORT=true
                 ;;
             --help|-h|*) if [ "$1" != "--help"] || [ "$1" != "-h" ]; then
-                             error " Unknown option: $1\n"
+                             error " Unknown option: $1"
                          fi
+                         echo ""
                          info " Options:"
                          info " --wsl - create tar archive for wsl"
                          info " --clear - create clean Arch Linux image"
