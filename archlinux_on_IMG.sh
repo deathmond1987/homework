@@ -37,7 +37,7 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
-set -oe noglob
+set -oxe noglob
 
 reset="\033[0m"
 
@@ -86,10 +86,11 @@ options_handler () {
                 ;;
         esac
         shift
+    done
+
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
         echo -e "We cannot check WSL image in QEMU. Abort"
     fi
-    done
 }
 
 
