@@ -92,7 +92,7 @@ options_handler () {
                 ;;
             --hyperv|-h) HYPERV_EXPORT=true
                 ;;
-            --help|-h|) options_message
+            --help|-h) options_message
                 ;;
             *) error "Unknown option: $1"
                echo ""
