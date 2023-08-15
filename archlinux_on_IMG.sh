@@ -812,7 +812,7 @@ nspawn_exec_wsl () {
     mkdir -p "$TEST_DIR"
     cd "$TEST_DIR"
     tar -xf "$FILE_PATH"/archfs.tar --numeric-owner
-    exec bash -i 'systemd-nspawn -b -D "$TEST_DIR"'
+    exec bash -i "systemd-nspawn -b -D $TEST_DIR"
     rm -rf "$TEST_DIR"
     unset TEST_DIR
 }
