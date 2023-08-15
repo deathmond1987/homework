@@ -90,7 +90,7 @@ options_handler () {
                          info " --qemu - check created image in qemu. (Not working with --wsl key)"
                          info " --vmware - gen image for VMWARE. (Not working with --wsl key )"
                          info " --hyperv - gen image for HYPER-V. (Not working with --wsl key)"
-                         if [ "$1" != "--help"] || [ "$1" != "-h" ]; then
+                         if [ "$1" != "--help" ] || [ "$1" != "-h" ]; then
                              error " Unknown option: $1"
                              exit 1
                          fi
