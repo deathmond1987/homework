@@ -69,6 +69,8 @@ options_handler () {
     HYPERV_EXPORT=false
 
     options_message () {
+        info " Usage: script_name.sh --wsl --clean --nspawn ( Create wsl rootfs with clean arch linux and check it in systemd-nspawn )"
+        info "        script_name.sh --qemu --vmware ( Create uefi raw image with customizations, execute image in qemu and export image for vmware workstation)"
         info " Options:"
         info " --wsl - create tar archive for wsl."
         info " --clean - create clean Arch Linux image."
