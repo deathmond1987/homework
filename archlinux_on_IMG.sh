@@ -70,12 +70,12 @@ options_handler () {
 
     options_message () {
         info " Options:"
-        info " --wsl - create tar archive for wsl"
-        info " --clear - create clean Arch Linux image"
-        info " --nspawn - check created image in nspawn container"
-        info " --qemu - check created image in qemu. (Not working with --wsl key)"
-        info " --vmware - gen image for VMWARE. (Not working with --wsl key )"
-        info " --hyperv - gen image for HYPER-V. (Not working with --wsl key)"
+        info " --wsl - create tar archive for wsl."
+        info " --clear - create clean Arch Linux image."
+        info " --nspawn - check created image in nspawn container. ( Not working in Alpine Linux )"
+        info " --qemu - check created image in qemu. ( Not working with --wsl key )"
+        info " --vmware - gen image for VMWARE. ( Not working with --wsl key )"
+        info " --hyperv - gen image for HYPER-V. ( Not working with --wsl key )"
     }
 
     while [ "$1" != "" ]; do
@@ -693,6 +693,7 @@ export_wsl () {
     # we need this to stop grub in vm dropping in grub-shell due first run
     success "Taring rootfs and unmount partitions..."
     tar -cf ./archfs.tar -C /mnt/arch .
+    warn "$(ls -l $PWD./vhd.vhdx)"
     success "ARCH root filesystem exported to $PWD/archfs.tar"
     warn "You need to export this file to WSL. Example:"
     warn "wsl --import Arch-linux D:\arch\ .\archfs.tar"
