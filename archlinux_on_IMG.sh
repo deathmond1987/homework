@@ -817,7 +817,6 @@ main () {
         mkdir_root
         mount_root_wsl
         pacstrap_base
-        mount_boot
         chroot_arch
         postinstall_config
         export_wsl
