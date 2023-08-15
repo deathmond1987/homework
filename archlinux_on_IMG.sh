@@ -71,7 +71,7 @@ options_handler () {
     options_message () {
         info " Options:"
         info " --wsl - create tar archive for wsl."
-        info " --clear - create clean Arch Linux image."
+        info " --clean - create clean Arch Linux image."
         info " --nspawn - check created image in nspawn container. ( Not working in Alpine Linux )"
         info " --qemu - check created image in qemu. ( Not working with --wsl key )"
         info " --vmware - gen image for VMWARE. ( Not working with --wsl key )"
@@ -82,7 +82,7 @@ options_handler () {
         case "$1" in
             --wsl|-w) WSL_INSTALL=true
                    ;;
-          --clear|-c) WITH_CONFIG=false
+          --clean|-c) WITH_CONFIG=false
                    ;;
          --nspawn|-n) NSPAWN_CHECK=true
                    ;;
