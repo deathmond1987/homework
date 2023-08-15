@@ -800,11 +800,10 @@ nspawn_install () {
 
 nspawn_exec_wsl () {
     mkdir -p /tmp/nspawn-arch
-    FILE_PATH=$(PWD)
+    FILE_PATH=$PWD
     cd /tmp/nspawn-arch
     tar -xf "$FILE_PATH"/vhd.img --numeric-owner
     systemd-nspawn -B -d /tmp/nspawn-arch
-    
 }
 
 nspawn_exec_image () {
