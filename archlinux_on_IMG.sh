@@ -811,11 +811,11 @@ nspawn_exec_wsl () {
     mkdir -p /tmp/nspawn-arch
     cd /tmp/nspawn-arch
     tar -xf "$FILE_PATH"/archfs.tar --numeric-owner
-    systemd-nspawn -B -d /tmp/nspawn-arch
+    systemd-nspawn -b -D /tmp/nspawn-arch
 }
 
 nspawn_exec_image () {
-    systemd-nspawn -B -i ./vhd.img
+    systemd-nspawn -b -i ./vhd.img
 }
 
 main () {
