@@ -4,7 +4,7 @@
 #
 # Полностью работоспособный arch linux установленный из rhel, debian и alpine дистрибутивов.
 # Кофигурация включает в себя uefi grub агрузчик, корневой раздел на lvm в ext4,
-#предустановленный oh-my-zsh и некоторые замены в системных приложениях .
+# предустановленный oh-my-zsh и некоторые замены в системных приложениях .
 #
 # в репозиториях fedora есть все для устновки arch в chroot: pacstrap, pacman,genfstab,
 # arch-chroot (в пакете arch-install-scripts), archlinux-keyring - отдельно.
@@ -63,20 +63,32 @@ MOUNT_PATH=/mnt/arch
 options_handler () {
     WSL_INSTALL=false
     WITH_CONFIG=true
-
+    NSPAWN_CHECK=true
+    QEMU_CHECK=false
+    
     while [ "$1" != "" ]; do
         case "$1" in
-            --wsl|-w) WSL_INSTALL=true
+            --wsl|-w) WSL_INSTALL=true; ID=debian
                 ;;
             --clear|-c) WITH_CONFIG=false
+                ;;
+            --nspawn|-n) NSPAWN_CHECK=true
+                ;;
+            --qemu|-q) QEMU_CHECK=true
                 ;;
             *) echo -e "Unknown option: $1\n"
                echo -e "Options:"
                echo -e "--wsl - create tar archive for wsl"
                echo -e "--clear - create clean image"
+               echo -e "--nspawn - check created image in nspawn container"
+               echo -e "--qemu - check created image in qemu"
                exit 1
+                ;;
         esac
         shift
+    if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
+        echo -e "We cannot check WSL image in QEMU. Abort"
+    fi
     done
 }
 
@@ -101,36 +113,17 @@ prepare_dependecies () {
                        edk2-ovmf \
                        lvm2
     elif [ "$ID" = "arch" ]; then
-        if ! [ "$WSL_INSTALL" = "true" ]; then
-            warn "in arch linux i create lvm mountpoint as /dev/arch/root for root filesystem"
-            warn "script can do unknown effects on host if thereis already that lvm mountpoint!!!"
-            sleep 10
-        fi
         success "Installing dependencies for arch..."
         pacman -S --needed --disable-download-timeout \
                            lvm2 \
                            dosfstools \
                            arch-install-scripts \
-                           edk2-ovmf \
                            e2fsprogs
-        # on my arch laptop qemu-desktop is installed
-        # qemu-desktop and qemu-base conflicts
-        if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-            pacman -S --needed --noconfirm --disable-download-timeout qemu-base
-        fi
     elif [ "$ID" = "debian" ]; then
-        if ! [ "$WSL_INSTALL" = "true" ]; then
-            warn "in debian fdisk tolds me that alias 44 for filesystem is Linux /usr verity (x86-64)"
-            warn "in fedora alias 44 - LVM filesystem. I dont know what can be broken. At least it loading filesystem, anyway."
-            sleep 10
-        fi
         success "Installing dependencies for debian..."
         apt install -y arch-install-scripts \
                        e2fsprogs \
                        dosfstools \
-                       qemu-utils \
-                       qemu-system-x86 \
-                       ovmf \
                        lvm2
     elif [ "$ID" = "alpine" ]; then
         success "Installing dependencies for alpine..."
@@ -146,66 +139,65 @@ prepare_dependecies () {
                 dosfstools \
                 lvm2 \
                 e2fsprogs \
-                qemu-system-x86_64 \
-                qemu-img \
                 findmnt \
                 gawk \
                 grep \
-                ovmf \
                 lsblk
     else
+        error "This script not working in: $ID"
         exit 1
     fi
 }
 
+create_image_wsl () {
+    success "Creating image for wsl..."
+    # creating empty image
+    dd if=/dev/zero of=./vhd.img bs=1M count=10000
+    success "Creating image for wsl..."
+    fdisk ./vhd.img <<-EOF
+        g
+        n
+        1
+        2048
+        20477951
+        t
+        23
+        w
+EOF
+}
+    
 create_image () {
     success "Creating image..."
     # creating empty image
     dd if=/dev/zero of=./vhd.img bs=1M count=10000
-
-    if [ "$WSL_INSTALL" = "true" ]; then
-        success "Creating image for wsl..."
-        fdisk ./vhd.img <<-EOF
-            g
-            n
-            1
-            2048
-            20477951
-            t
-            23
-            w
+    # creating in image gpt table and 3 partitions
+    # first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
+    # second one - "boot" partition. we will mount it to /boot later with filesystem fat32
+    # third one - "root" partition. we will mount it to / later with lvm and ext4 partition
+    fdisk ./vhd.img <<-EOF
+        g
+        n
+        1
+        2048
+        +50M
+        t
+        1
+        n
+        2
+        104448
+        +1G
+        t
+        2
+        20
+        n
+        3
+        2201600
+        20477951
+        t
+        3
+        44
+        w
 EOF
-
-    else
-        # creating in image gpt table and 3 partitions
-        # first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
-        # second one - "boot" partition. we will mount it to /boot later with filesystem fat32
-        # third one - "root" partition. we will mount it to / later with lvm and ext4 partition
-        fdisk ./vhd.img <<-EOF
-            g
-            n
-            1
-            2048
-            +50M
-            t
-            1
-            n
-            2
-            104448
-            +1G
-            t
-            2
-            20
-            n
-            3
-            2201600
-            20477951
-            t
-            3
-            44
-            w
-EOF
-    fi
 }
 
 mount_image () {
@@ -217,73 +209,76 @@ mount_image () {
     export DISK=$(losetup -P -f --show vhd.img)
 }
 
-exit_trap () {
+exit_trap_wsl () {
     # if script fail - we need to umnount all mounts to clear host machine
+    # hmm. I can not use fuser to force unmount. This chashing wsl2
     on_exit () {
         error "trap start"
-        if [ "$WSL_INSTALL" = "true" ]; then
-            pkill -en gpg-agent || true
-            umount "$MOUNT_PATH" || true
-        else
-            # hmm. I can not use fuser to force unmount. This chashing wsl2
-            pkill -en gpg-agent || true
-            sync
-            sleep 5
-            umount "$MOUNT_PATH"/boot/efi || true
-            sleep 1
-            umount "$MOUNT_PATH"/boot || true
-            sleep 1
-            umount "$MOUNT_PATH" || true
-            sleep 5
-            lvchange -an /dev/arch/root || true
-        fi
+        pkill -en gpg-agent || true
+        umount "$MOUNT_PATH" || true
         losetup -d "$DISK" || true
         error "trap finished"
     }
-trap "on_exit" EXIT
+    trap "on_exit" EXIT
+}
+
+exit_trap () {
+    # if script fail - we need to umnount all mounts to clear host machine
+    on_exit () {
+        pkill -en gpg-agent || true
+        sync
+        umount "$MOUNT_PATH"/boot/efi || true
+        umount "$MOUNT_PATH"/boot || true
+        umount "$MOUNT_PATH" || true
+        lvchange -an /dev/arch/root || true
+        losetup -d "$DISK" || true
+        error "trap finished"
+    }
+    trap "on_exit" EXIT
+}
+
+format_image_wsl () {
+    success "Formatting partition..."
+    mkfs.ext4 "$DISK"p1
 }
 
 format_image () {
-    if [ "$WSL_INSTALL" = "true" ]; then
-        mkfs.ext4 "$DISK"p1
-    else
-        success "Formatting image..."
-        # formatting boot partition
-        mkfs.fat -F 32 "$DISK"p1
-        # formatting efi partition
-        mkfs.fat -F 32 "$DISK"p2
-        # creating root pv
-        pvcreate "$DISK"p3
-        # creating root vg
-        vgcreate arch "$DISK"p3
-        # creating root lv
-        # fuck debian with custom lvm2 and udev
-        if [ "$ID" = "debian" ]; then
-            error "If you wee error below - you should blame Debian"
-        fi
-        lvcreate -l 100%FREE arch -n root
-        # formatting root lv
-        mkfs.ext4 /dev/arch/root
+    success "Formatting partitions..."
+    # formatting boot partition
+    mkfs.fat -F 32 "$DISK"p1
+    # formatting efi partition
+    mkfs.fat -F 32 "$DISK"p2
+    # creating root pv
+    pvcreate "$DISK"p3
+    # creating root vg
+    vgcreate arch "$DISK"p3
+    # creating root lv
+    # fuck debian with custom lvm2 and udev
+    if [ "$ID" = "debian" ]; then
+        error "If you wee error below - you should blame Debian"
     fi
+    lvcreate -l 100%FREE arch -n root
+    # formatting root lv
+    mkfs.ext4 /dev/arch/root
 }
 
-mount_root () {
+mkdir_root () {
     success "Mount root tree"
     # create mount dirs
     mkdir -p "$MOUNT_PATH"
+}
+
+mount_root_wsl () {
     # mount formatted root disk to /
-    if [ "$WSL_INSTALL" = "true" ]; then
         mount "$DISK"p1 "$MOUNT_PATH"
-    else
-        mount /dev/arch/root "$MOUNT_PATH"
-    fi
+}
+
+mount_root () {
+    # mount formatted lvm disk to /
+    mount /dev/arch/root "$MOUNT_PATH"
 }
 
 pacstrap_base () {
-    # workaround to create wsl in debian way
-    if [ "$WSL_INSTALL" = "true" ] ; then
-        ID=debian
-    fi
     if [ "$ID" = "fedora" ] || [ "$ID" = "arch" ]; then
         success "Initializing pacman..."
         # initialize keyring and load archlinux keys for host pacman
@@ -350,19 +345,21 @@ Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
 }
 
 mount_boot () {
-    if [ "$WSL_INSTALL" = "true" ]; then
-        true
-    else
-        success "Mounting partitions..."
-        # mount boot partition
-        mount "$DISK"p2 "$MOUNT_PATH"/boot
-        # creating dir for efi
-        mkdir -p "$MOUNT_PATH"/boot/efi
-        # mount efi partition
-        mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
-    fi
+    success "Mounting partitions..."
+    # mount boot partition
+    mount "$DISK"p2 "$MOUNT_PATH"/boot
+    # creating dir for efi
+    mkdir -p "$MOUNT_PATH"/boot/efi
+    # mount efi partition
+    mount "$DISK"p1 "$MOUNT_PATH"/boot/efi
+}
+
+disable_swap () {
     # if we not remove swap from host machine he will appear in arch fstab
     swapoff -a
+}
+
+fstab_gen () {
     # partition tree finished. generating fstab
     genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
 }
@@ -658,83 +655,121 @@ EOL
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
 }
 
-unmounting_all_and_wsl_copy () {
-    success "Unmount partitions..."
+wsl_export_and_unmount () {
     # unmount all mounts
     # we need this to stop grub in vm dropping in grub-shell due first run
-    if [ "$WSL_INSTALL" = "true" ]; then
-        tar -cf /archfs.tar -C /mnt/arch .
-        success "ARCH root filsystem exported to /archfs.tar"
-        warn "You need to export this file to WSL. Example:"
-        warn "wsl --import Arch-linux D:\arch\ .\archfs.tar"
-        warn "Where: wsl - wsl command in windows"
-        warn "       --import Arch-linux - import wsl machine with name Arch-linux"
-        warn "       D:\arch - dir where will be placed image with filsesystem"
-        warn "       .\archfs.tar - path to generated tar archive with filesystem"
-        error "You must enable fonts in your terminal !"
-        info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
-        pkill -en gpg-agent || true
-        umount -l "$MOUNT_PATH" || true
-    else
-        pkill -en gpg-agent || true
-        sync
-        #fuser killer may kill wsl...
-        umount -l "$MOUNT_PATH"/boot/efi || true
-        umount -l "$MOUNT_PATH"/boot || true
-        umount -l "$MOUNT_PATH" || true
-        lvchange -an /dev/arch/root || true
-    fi
+    success "Taring rootfs and unmount partitions..."
+    tar -cf ./archfs.tar -C /mnt/arch .
+    success "ARCH root filesystem exported to $PWD/archfs.tar"
+    warn "You need to export this file to WSL. Example:"
+    warn "wsl --import Arch-linux D:\arch\ .\archfs.tar"
+    warn "Where: wsl - wsl command in windows"
+    warn "       --import Arch-linux - import wsl machine with name Arch-linux"
+    warn "       D:\arch - dir where will be placed image with filsesystem"
+    warn "       .\archfs.tar - path to generated tar archive with filesystem"
+    error "You must enable fonts in your terminal !"
+    info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
+    pkill -en gpg-agent || true
+    umount -l "$MOUNT_PATH" || true
+    losetup -d "$DISK" || true
+    echo "Done"
+    trap '' EXIT
+}
+
+
+unmounting_all_image () {
+    pkill -en gpg-agent || true
+    sync
+    #fuser killer may kill wsl...
+    umount -l "$MOUNT_PATH"/boot/efi || true
+    umount -l "$MOUNT_PATH"/boot || true
+    umount -l "$MOUNT_PATH" || true
+    lvchange -an /dev/arch/root || true
     losetup -d "$DISK" || true
     echo "Done"
     trap '' EXIT
 }
 
 run_in_qemu () {
-    if  [ "$WSL_INSTALL" = "true" ]; then
-        #qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
-        #success "wsl image created !!!"
-        true
+    if [ "$ID" = "fedora" ]; then
+            dnf install -y qemu-kvm-core \
+                           edk2-ovmf          
+    elif [ "$ID" = "arch" ]; then
+            pacman -S --needed --disable-download-timeout \
+                edk2-ovmf
+            if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
+                pacman -S --needed --noconfirm --disable-download-timeout qemu-base
+            fi 
+    elif [ "$ID" = "debian" ]; then
+            apt install -y qemu-utils \
+                       qemu-system-x86 \
+                       ovmf
+    elif [ "$ID" = "alpine" ]; then
+        apk add qemu-system-x86_64 \
+                qemu-img \
+                ovmf
     else
-        if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
-            OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
-        elif [ "$ID" = "arch" ]; then
-            OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
-        else
-            echo "Unknown OS"
-        fi    
-        qemu-img resize -f raw ./vhd.img 15G
-        qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
-        success "VHDX image for HYPER-V created"
-        warn "$(ls -l ./vhd.vhdx)"
-        qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
-        success "VMDK image for VMWARE created"
-        warn "$(ls -l ./vhd.vhdx)"
-        qemu-system-x86_64 \
-                                 -enable-kvm \
-                                 -smp cores=4 \
-                                 -m 2G \
-                                 -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
-                                 -device nvme,drive=drive0,serial=badbeef \
-                                 -drive if=none,id=drive0,file=./vhd.img &
-                                 success "Done"
-                                 exit 0 
+        exit 1
     fi
+    if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
+        OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
+    elif [ "$ID" = "arch" ]; then
+        OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
+    else
+        echo "Unknown OS"
+    fi    
+    qemu-img resize -f raw ./vhd.img 15G
+    qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
+    success "VHDX image for HYPER-V created"
+    warn "$(ls -l ./vhd.vhdx)"
+    qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
+    success "VMDK image for VMWARE created"
+    warn "$(ls -l ./vhd.vhdx)"
+    qemu-system-x86_64 \
+                             -enable-kvm \
+                             -smp cores=4 \
+                             -m 2G \
+                             -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
+                             -device nvme,drive=drive0,serial=badbeef \
+                             -drive if=none,id=drive0,file=./vhd.img &
+                             success "Done"
+                             exit 0
 }
 
 main () {
     options_handler "$@"
-    prepare_dependecies
-    create_image
-    mount_image
-    exit_trap
-    format_image
-    mount_root
-    pacstrap_base
-    mount_boot
-    chroot_arch
-    postinstall_config
-    unmounting_all_and_wsl_copy
-    run_in_qemu
+    if [ "$WSL_INSTALL" = "true" ]; then
+        prepare_dependecies
+        create_image_wsl
+        mount_image
+        exit_trap_wsl
+        format_image_wsl
+        mkdir_root
+        mount_root_wsl
+        pacstrap_base
+        mount_boot
+        chroot_arch
+        postinstall_config
+        wsl_export_and_unmount
+        
+    fi 
+        prepare_dependecies
+        create_image
+        mount_image
+        exit_trap
+        format_image
+        mkdir_root
+        mount_root
+        pacstrap_base
+        mount_boot
+        disable_swap
+        fstab_den
+        chroot_arch
+        postinstall_config
+        unmounting_all_image
+        if [ "$QEMU_CHECK" = "true" ]; then
+            run_in_qemu
+        fi
     unset WSL_INSTALL
 }
 
