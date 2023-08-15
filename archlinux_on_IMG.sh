@@ -752,14 +752,14 @@ export_image_hyperv () {
     qemu-img resize -f raw ./vhd.img 15G
     qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
     success "VHDX image for HYPER-V created"
-    warn "$(ls -l ./vhd.vhdx)"
+    warn "$(ls -l $PWD./vhd.vhdx)"
 }
 
 export_image_wmware () {
     qemu-img resize -f raw ./vhd.img 15G
     qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
     success "VMDK image for VMWARE created"
-    warn "$(ls -l ./vhd.vhdx)"
+    warn "$(ls -l $PWD/vhd.vhdx)"
 }
 
 run_in_qemu () {
