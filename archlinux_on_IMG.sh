@@ -768,7 +768,7 @@ main () {
         pacstrap_base
         mount_boot
         disable_swap
-        fstab_den
+        fstab_gen
         chroot_arch
         postinstall_config
         unmounting_all_image
