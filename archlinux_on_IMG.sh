@@ -760,7 +760,7 @@ export_image_hyperv () {
     qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
     success "VHDX image for HYPER-V created"
     info "Arch Linux does not have official support of UEFI Secure shell"
-    info "You need to disable UEFI Secure in HYPER-V"
+    info "You needKO to disable UEFI Secure in HYPER-V"
     warn "$(ls -l $PWD./vhd.vhdx)"
 }
 
@@ -808,20 +808,17 @@ nspawn_install () {
 
 nspawn_exec_wsl () {
     FILE_PATH=$PWD
-    mkdir -p /tmp/nspawn-arch
-    cd /tmp/nspawn-arch
+    TEST_DIR=/tmp/nspawn-arch
+    mkdir -p "$TEST_DIR"
+    cd "$TEST_DIR"
     tar -xf "$FILE_PATH"/archfs.tar --numeric-owner
-    systemd-nspawn -b -D /tmp/nspawn-arch <<-EOF
-       kosh
-       qwe
-EOF
+    exec systemd-nspawn -b -D "$TEST_DIR"
+    rm -rf "$TEST_DIR"
+    unset TEST_DIR
 }
 
 nspawn_exec_image () {
-    systemd-nspawn -b -i ./vhd.img <<-EOF
-        kosh
-        qwe
-EOF
+    exec systemd-nspawn -b -i ./vhd.img
 }
 
 main () {
