@@ -808,7 +808,7 @@ nspawn_install () {
 
 nspawn_exec_wsl () {
     FILE_PATH=$PWD
-    TEST_DIR=/tmp/nspawn-arch
+    export TEST_DIR=/tmp/nspawn-arch
     mkdir -p "$TEST_DIR"
     cd "$TEST_DIR"
     tar -xf "$FILE_PATH"/archfs.tar --numeric-owner
