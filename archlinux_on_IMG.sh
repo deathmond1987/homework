@@ -90,6 +90,7 @@ options_handler () {
 
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
         echo -e "We cannot check WSL image in QEMU. Abort"
+        exit 1
     fi
 }
 
