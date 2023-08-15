@@ -82,10 +82,7 @@ options_handler () {
                 ;;
             --hyperv|-h) HYPERV_EXPORT=true
                 ;;
-            --help|-h|*) if [ "$1" != "--help"] || [ "$1" != "-h" ]; then
-                             error " Unknown option: $1"
-                         fi
-                         echo ""
+            --help|-h|*) echo ""
                          info " Options:"
                          info " --wsl - create tar archive for wsl"
                          info " --clear - create clean Arch Linux image"
@@ -93,7 +90,10 @@ options_handler () {
                          info " --qemu - check created image in qemu. (Not working with --wsl key)"
                          info " --vmware - gen image for VMWARE. (Not working with --wsl key )"
                          info " --hyperv - gen image for HYPER-V. (Not working with --wsl key)"
-                         exit 1
+                         if [ "$1" != "--help"] || [ "$1" != "-h" ]; then
+                             error " Unknown option: $1"
+                             exit 1
+                         fi
                 ;;
         esac
         shift
