@@ -68,7 +68,7 @@ options_handler () {
     
     while [ "$1" != "" ]; do
         case "$1" in
-            --wsl|-w) WSL_INSTALL=true; ID=debian
+            --wsl|-w) WSL_INSTALL=true
                 ;;
             --clear|-c) WITH_CONFIG=false
                 ;;
@@ -279,6 +279,9 @@ mount_root () {
 }
 
 pacstrap_base () {
+    if [ "$WSL_INSTALL" = "true" ]; then
+        ID=debian
+    fi
     if [ "$ID" = "fedora" ] || [ "$ID" = "arch" ]; then
         success "Initializing pacman..."
         # initialize keyring and load archlinux keys for host pacman
