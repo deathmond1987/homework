@@ -788,8 +788,7 @@ run_in_qemu () {
                              -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
                              -device nvme,drive=drive0,serial=badbeef \
                              -drive if=none,id=drive0,file=./vhd.img &
-                             success "Done"
-                             exit 0
+                             success "Done. if qemu installed in headless mode you should try to connect by vnc client to 127.0.0.1"
 }
 
 nspawn_install () {
