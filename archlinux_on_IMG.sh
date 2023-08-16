@@ -313,8 +313,8 @@ mount_root () {
 }
 
 pacstrap_base () {
+    OLD_ID=$ID
     if [ "$WSL_INSTALL" = "true" ]; then
-        OLD_ID=$ID
         ID=debian
     fi
     if [ "$ID" = "fedora" ] || [ "$ID" = "arch" ]; then
