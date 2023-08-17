@@ -867,7 +867,6 @@ main () {
             export_image_hyperv
         fi
         if [ "$QEMU_CHECK" = "true" ]; then
-            check_qemu_already_run
             qemu_install
             run_in_qemu
         fi
