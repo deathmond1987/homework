@@ -760,7 +760,7 @@ export_image_hyperv () {
     qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
     success "VHDX image for HYPER-V created"
     info "Arch Linux does not have official support of UEFI Secure shell"
-    info "You needKO to disable UEFI Secure in HYPER-V"
+    info "You need to disable UEFI Secure in HYPER-V"
     warn "$(ls -l $PWD/vhd.vhdx)"
 }
 
