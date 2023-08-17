@@ -761,7 +761,7 @@ export_image_hyperv () {
     success "VHDX image for HYPER-V created"
     info "Arch Linux does not have official support of UEFI Secure shell"
     info "You needKO to disable UEFI Secure in HYPER-V"
-    warn "$(ls -l $PWD./vhd.vhdx)"
+    warn "$(ls -l $PWD/vhd.vhdx)"
 }
 
 export_image_wmware () {
