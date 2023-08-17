@@ -756,7 +756,7 @@ qemu_install () {
 }
 
 export_image_hyperv () {
-    qemu-img resize -f raw ./vhd.img 15G
+    qemu-img resize -f raw ./vhd.img 11G
     qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
     success "VHDX image for HYPER-V created"
     info "Arch Linux does not have official support of UEFI Secure shell"
@@ -765,7 +765,7 @@ export_image_hyperv () {
 }
 
 export_image_wmware () {
-    qemu-img resize -f raw ./vhd.img 15G
+    qemu-img resize -f raw ./vhd.img 11G
     qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
     success "VMDK image for VMWARE created"
     info "VMWARE Workstation create VM without UEFI"
@@ -781,13 +781,14 @@ run_in_qemu () {
     else
         echo "Unknown OS"
     fi    
+    cp ./vhd.img ./vhd-test-qemu.img
     qemu-system-x86_64 \
                              -enable-kvm \
                              -smp cores=4 \
                              -m 2G \
                              -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
                              -device nvme,drive=drive0,serial=badbeef \
-                             -drive if=none,id=drive0,file=./vhd.img &
+                             -drive if=none,id=drive0,file=./vhd-test-qemu.img &
                              success "Done. if qemu installed in headless mode you should try to connect by vnc client to 127.0.0.1"
 }
 
