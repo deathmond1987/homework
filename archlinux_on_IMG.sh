@@ -783,7 +783,7 @@ run_in_qemu () {
     fi    
     if ps -aux | grep -v grep | grep file=./vhd-test-qemu.img ; then
         warn "test image already used. killing process..."
-        pkill $(ps -aux | grep -v grep | grep file=./vhd-test-qemu.img | awk '{print $2}')
+        kill $(ps -aux | grep -v grep | grep file=./vhd-test-qemu.img | awk '{print $2}')
     fi
     cp ./vhd.img ./vhd-test-qemu.img
     qemu-system-x86_64 \
