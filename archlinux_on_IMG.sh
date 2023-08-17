@@ -812,8 +812,11 @@ nspawn_exec_wsl () {
     mkdir -p "$TEST_DIR"
     cd "$TEST_DIR"
     tar -xf "$FILE_PATH"/archfs.tar --numeric-owner
-    exec bash -i -c "systemd-nspawn -b -D $TEST_DIR"
-    rm -rf "$TEST_DIR"
+    #exec bash -i -c "systemd-nspawn -b -D $TEST_DIR"
+    warn "Ready to start nspawn. You need manually run in your terminal:"
+    success "sudo systemd-nspawn -b -D $TEST_DIR"
+    
+    #rm -rf "$TEST_DIR"
     unset TEST_DIR
 }
 
