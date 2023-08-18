@@ -862,16 +862,16 @@ main () {
         chroot_arch
         postinstall_config
         unmount_images
-        if [ "$VMWARE_EXPORT" = "true" ]; then
+        if [ "$VMWARE_EXPORT" = "true" ] || [ "$HYPERV_EXPORT" = "true" ] || [ "$NSPAWN_CHECK" = "true" ]; then
             qemu_install
+        fi
+        if [ "$VMWARE_EXPORT" = "true" ]; then
             export_image_wmware
         fi
         if [ "$HYPERV_EXPORT" = "true" ]; then
-            qemu_install
             export_image_hyperv
         fi
         if [ "$QEMU_CHECK" = "true" ]; then
-            qemu_install
             run_in_qemu
         fi
         if [ "$NSPAWN_CHECK" = "true" ]; then
