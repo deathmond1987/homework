@@ -37,7 +37,7 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
-set -oxe noglob
+set -oe noglob
 
 reset="\033[0m"
 
@@ -76,7 +76,7 @@ options_handler () {
         info " Options:"
         info " --wsl - create tar archive for wsl."
         info " --clean - create clean Arch Linux image."
-        info " --nspawn - check created image in nspawn container. ( Not working in Alpine Linux )"
+  #      info " --nspawn - check created image in nspawn container. ( Not working in Alpine Linux )"
         info " --qemu - check created image in qemu. ( Not working with --wsl key )"
         info " --vmware - gen image for VMWARE. ( Not working with --wsl key )"
         info " --hyperv - gen image for HYPER-V. ( Not working with --wsl key )"
@@ -89,8 +89,8 @@ options_handler () {
                    ;;
           --clean|-c) WITH_CONFIG=false
                    ;;
-         --nspawn|-n) NSPAWN_CHECK=true
-                   ;;
+#         --nspawn|-n) NSPAWN_CHECK=true
+#                   ;;
            --qemu|-q) QEMU_CHECK=true
                    ;;
          --vmware|-v) VMWARE_EXPORT=true
