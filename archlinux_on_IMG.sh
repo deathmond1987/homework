@@ -148,7 +148,7 @@ prepare_dependecies () {
                        lvm2
     elif [ "$ID" = "arch" ]; then
         success "Installing dependencies for arch..."
-        pacman -S --needed --disable-download-timeout \
+        pacman -S --needed --disable-download-timeout --noconfirm \
                            lvm2 \
                            dosfstools \
                            arch-install-scripts \
