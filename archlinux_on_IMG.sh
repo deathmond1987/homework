@@ -658,22 +658,19 @@ postinstall_config () {
                 ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
                 # searching disk name with founded root partition
                 ROOT_DISK=$(lsblk -n -o NAME,PKNAME -f "$ROOT_PARTITION" | awk '{ print $2 }' | head -1)
-                OLD_END=$(fdisk -l /dev/$ROOT_DISK | grep p3 | awk '{print $3}')
                 # adding all free disk space on founded disk to root FS partition
                 echo ", +" | sfdisk -N 3 /dev/"$ROOT_DISK" --force
                 # reloading hard disk info
                 partprobe
-                NEW_END=$(fdisk -l /dev/$ROOT_DISK | grep p3 | awk '{print $3}')
 
-                if [ "$OLD_END" != "$NEW_END" ]; then
-                    # we have lvm on root partition. after resizing disk we need add new space to lvm
-                    # extend physical volume to use all free space on partition
-                    pvresize "$ROOT_PARTITION"
-                    # extend logical volume to use all free space from physical volume
-                    lvextend -l +100%FREE /dev/arch/root
-                    # we have ext4 fs on lvm. resizing ext4 fs
-                    resize2fs /dev/arch/root
-                fi
+                # we have lvm on root partition. after resizing disk we need add new space to lvm
+                # extend physical volume to use all free space on partition
+                pvresize "$ROOT_PARTITION"
+                # extend logical volume to use all free space from physical volume
+                lvextend -l +100%FREE /dev/arch/root || true
+                # we have ext4 fs on lvm. resizing ext4 fs
+                resize2fs /dev/arch/root || true
+
             fi 
             # removing helper script from autoload
             if [ "$WITH_CONFIG" = true ]; then
