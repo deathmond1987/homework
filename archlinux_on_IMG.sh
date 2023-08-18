@@ -673,7 +673,7 @@ postinstall_config () {
 
             fi 
             # removing helper script from autoload
-            if [ "$WITH_CONFIG" = true ]; then
+            if [ "$WITH_CONFIG" = "true" ]; then
                 sed -i '1d' /home/kosh/.zshrc
             else
                 sed -i '1d' /home/kosh/.bashrc
