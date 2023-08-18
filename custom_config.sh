@@ -42,10 +42,10 @@ WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
     rm -f /usr/lib/systemd/system/systemd-firstboot.service
     echo "" > /etc/fstab
 else
-    true
+    
     # changing grub config
     # sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
-    # sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
+    sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
 fi 
 
 # PACMAN CONF
@@ -79,7 +79,6 @@ su - kosh -c "LANG=C yay -S \
                                                     pacman-contrib \
                                                     pacman-cleanup-hook \
                                                     find-the-command \
-                                                    hstr-git \
                                                     ccache \
                                                     qemu-base \
                                                     --noconfirm"
@@ -94,7 +93,6 @@ echo "MC_SKIN=gotar" >> /etc/environment
 
 # enabling hstr alias
 echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
-echo 'alias history="hstr"' >> /home/kosh/.zshrc
 # workaround slow mc start. long time to create subshell for mc. we will load mc from bash
 echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # habit
