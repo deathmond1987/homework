@@ -701,13 +701,15 @@ export_wsl () {
     success "Taring rootfs and unmount partitions..."
     tar -cf ./archfs.tar -C /mnt/arch .
     success "ARCH root filesystem exported to $PWD/archfs.tar"
+    echo ""
     warn "$(ls -l $PWD/archfs.tar)"
+    echo ""
     warn "You need to export this file to WSL. Example:"
-    warn "wsl --import Arch-linux D:\arch\ .\archfs.tar"
+    warn "wsl --import Arch-linux D:\arch\ D:\archfs.tar"
     warn "Where: wsl - wsl command in windows"
     warn "       --import Arch-linux - import wsl machine with name Arch-linux"
     warn "       D:\arch - dir where will be placed image with filsesystem"
-    warn "       .\archfs.tar - path to generated tar archive with filesystem"
+    warn "       D:\archfs.tar - path to generated tar archive with filesystem"
     error "You must enable fonts in your terminal !"
     info "See here: https://github.com/romkatv/powerlevel10k#fonts <---"
 }
