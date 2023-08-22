@@ -77,9 +77,9 @@ options_handler () {
         info " --wsl - create tar archive for wsl."
         info " --clean - create clean Arch Linux image."
   #      info " --nspawn - check created image in nspawn container. ( Not working in Alpine Linux )"
-        info " --qemu - check created image in qemu. ( Not working with --wsl key )"
-        info " --vmware - gen image for VMWARE. ( Not working with --wsl key )"
-        info " --hyperv - gen image for HYPER-V. ( Not working with --wsl key )"
+        info " --qemu - check created image in qemu (Not working with --wsl key)"
+        info " --vmware - gen image for VMWARE (Not working with --wsl key)"
+        info " --hyperv - gen image for HYPER-V (Not working with --wsl key)"
     }
 
     # catch arguments from command line
