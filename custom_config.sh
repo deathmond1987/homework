@@ -81,6 +81,8 @@ su - kosh -c "LANG=C yay -S \
                                                     find-the-command \
                                                     ccache \
                                                     qemu-base \
+                                                    bc \
+                                                    cpio
                                                     --noconfirm"
 # админу локалхоста дозволено:)
 usermod -aG docker kosh
