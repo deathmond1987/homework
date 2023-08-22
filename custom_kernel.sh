@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-set -x 
+set -xe 
 KERNEL_VERSION=6.4.11
 # get kernel
 wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-"$KERNEL_VERSION".tar.xz
 tar -xvf linux-"$KERNEL_VERSION".tar.xz
 cd ./linux-"$KERNEL_VERSION"
 zcat /proc/config.gz > ./.config
-set -i 's/CONFIG_DEFAULT_HOSTNAME="archlinux"CONFIG_DEFAULT_HOSTNAME=[KSB] torture"/g' ./config
+sed -i 's/CONFIG_DEFAULT_HOSTNAME="archlinux"CONFIG_DEFAULT_HOSTNAME=[KSB] torture"/g' ./config
 make -j4
 make modules_install
 cp -v arch/x86/boot/bzImage /boot/vmlinuz-linux$KERNEL_VERSION
