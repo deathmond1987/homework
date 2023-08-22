@@ -67,7 +67,7 @@ su - kosh -c "LANG=C yay -S \
                          --noprovides \
                          --answerdiff None \
                          --answerclean None \
-                         --mflags \" --noconfirm\" \
+                         --mflags \" --noconfirm\" --noconfirm \
                                                     docker \
                                                     docker-compose \
                                                     dive \
@@ -82,8 +82,7 @@ su - kosh -c "LANG=C yay -S \
                                                     ccache \
                                                     qemu-base \
                                                     bc \
-                                                    cpio
-                                                    --noconfirm"
+                                                    cpio"
 # админу локалхоста дозволено:)
 usermod -aG docker kosh
 
