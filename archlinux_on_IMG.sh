@@ -37,7 +37,7 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
-set -oe noglob
+set -oxe noglob
 
 reset="\033[0m"
 
@@ -122,7 +122,7 @@ options_handler () {
         error "We cannot check WSL image in HYPERV. Abort"
         exit 1
     fi
-    if [ "$NSPAWN_CHECK" = "true" ] && [ "$ID" = "true" ]; then
+    if [ "$NSPAWN_CHECK" = "true" ] && [ "$ID" = "alpine" ]; then
         error "Alpine Linux does not have systemd nspawn. Abort"
         exit 1
     fi
