@@ -693,8 +693,8 @@ postinstall_config () {
 EOL
         # marking helper script executable
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
-        LANG=C yay -Sc --noprovides --answerdiff None --answerclean None --mflags \" --noconfirm\" --noconfirm
         arch-chroot "$MOUNT_PATH" <<-EOF
+        LANG=C yay -Sc --noprovides --answerdiff None --answerclean None --mflags \" --noconfirm\" --noconfirm
         rm -rf "/var/cache/pacman/pkg/*"
         dd if=/dev/zero of=/zerofile || true
         sync
