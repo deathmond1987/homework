@@ -37,7 +37,7 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
-set -oxe noglob
+set -oe noglob
 
 reset="\033[0m"
 
