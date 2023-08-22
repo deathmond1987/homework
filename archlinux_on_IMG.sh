@@ -773,7 +773,7 @@ export_image_wmware () {
     success "VMDK image for VMWARE created"
     info "VMWARE Workstation create VM without UEFI"
     info "You need enable UEFI for VM manually after create VM"
-    warn "$(ls -l $PWD/vhd.vhdx)"
+    warn "$(ls -l $PWD/vhd.vmdk)"
 }
 
 run_in_qemu () {
