@@ -112,18 +112,26 @@ options_handler () {
     # catch mutually exclusive options
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
         error "We cannot check WSL image in QEMU. Abort"
+        echo ""
+        options_message
         exit 1
     fi
         if [ "$WSL_INSTALL" = "true" ] && [ "$VMWARE_EXPORT" = "true" ]; then
         error "We cannot check WSL image in VWWARE. Abort"
+        echo ""
+        options_message
         exit 1
     fi
     if [ "$WSL_INSTALL" = "true" ] && [ "$HYPERV_EXPORT" = "true" ]; then
         error "We cannot check WSL image in HYPERV. Abort"
+        echo ""
+        options_message
         exit 1
     fi
     if [ "$NSPAWN_CHECK" = "true" ] && [ "$ID" = "alpine" ]; then
         error "Alpine Linux does not have systemd nspawn. Abort"
+        echo ""
+        options_message
         exit 1
     fi
 }
