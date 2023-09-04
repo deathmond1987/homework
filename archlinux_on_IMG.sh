@@ -758,7 +758,7 @@ qemu_install () {
             pacman -S --needed --disable-download-timeout \
                 edk2-ovmf
             if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-                pacman -S --needed --noconfirm --disable-download-timeout qemu-base
+                pacman -S --needed --noconfirm --disable-download-timeout qemu-base edk2-ovmf 
             fi 
     elif [ "$ID" = "debian" ]; then
             apt install -y qemu-utils \
