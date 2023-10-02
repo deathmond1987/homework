@@ -11,7 +11,9 @@ default=kosh
 [automount]
 enabled = true
 options = \"metadata\"
-mountFsTab = true" > "$MOUNT_PATH"/etc/wsl.conf
+mountFsTab = true
+[interop]
+appendWindowsPath = false" > /etc/wsl.conf
     #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
     echo -e "[Unit]
 Description=Periodically drop caches to save memory under WSL.
@@ -22,7 +24,7 @@ Requires=drop_cache.timer
 [Service]
 Type=oneshot
 ExecStartPre=sync
-ExecStart=echo 3 > /proc/sys/vm/drop_caches" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.service
+ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
 
     echo -e "[Unit]
 Description=Periodically drop caches to save memory under WSL.
@@ -35,7 +37,7 @@ OnBootSec=3min
 OnUnitActiveSec=3min
 
 [Install]
-WantedBy=timers.target" > "$MOUNT_PATH"/etc/systemd/system/drop_cache.timer
+WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
 
     systemctl enable drop_cache.timer
     rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
