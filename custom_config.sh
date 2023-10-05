@@ -2,6 +2,7 @@
 set -xe 
 
 . /etc/environment
+
 if [ "$WSL_INSTALL" = "true" ]; then
     echo "Configuring wsl..."
     echo "[boot]
@@ -109,5 +110,7 @@ wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond
 
 # enabling units
 systemctl enable docker.service
-systemctl enable sshd.service
+if [ ! "$WSL_INSTALL" = "true" ]; then
+    systemctl enable sshd.service
+fi
 
