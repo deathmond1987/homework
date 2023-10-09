@@ -85,6 +85,7 @@ su - kosh -c "LANG=C yay -S \
                                                     ccache \
                                                     qemu-base \
                                                     bc \
+                                                    net-tools \
                                                     cpio"
 # админу локалхоста дозволено:)
 usermod -aG docker kosh
@@ -100,7 +101,7 @@ echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
 # workaround slow mc start. long time to create subshell for mc. we will load mc from bash
 echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # habit
-echo 'alias netstat="ss"' >> /home/kosh/.zshrc
+#echo 'alias netstat="ss"' >> /home/kosh/.zshrc
 # not work in wsl with default user in wsl.conf
 echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
         
