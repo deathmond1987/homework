@@ -661,6 +661,9 @@ postinstall_config () {
 
                 # default disk size in this script 10G
                 # after install we want to use all disk space
+                ####################################
+                ## x-systemd.growfs in /etc/fstab ##
+                ####################################
                 echo resizing disk
                 # searching name of partition with mounted root FS
                 ROOT_PARTITION=$(sudo pvs | grep arch | awk '{print $1}')
