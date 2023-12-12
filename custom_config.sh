@@ -14,33 +14,40 @@ enabled = true
 options = \"metadata\"
 mountFsTab = true
 [interop]
-appendWindowsPath = false" > /etc/wsl.conf
+appendWindowsPath = false
+autoMemoryReclaim=gradual
+networkingMode=mirrored
+dnsTunneling=true" > /etc/wsl.conf
+
+    #########################################
+    # deprecated. autoMemoryReclaim=gradual #
+    #########################################
     #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
-    echo -e "[Unit]
-Description=Periodically drop caches to save memory under WSL.
-Documentation=https://github.com/arkane-systems/wsl-drop-caches
-ConditionVirtualization=wsl
-Requires=drop_cache.timer
-
-[Service]
-Type=oneshot
-ExecStartPre=sync
-ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
-
-    echo -e "[Unit]
-Description=Periodically drop caches to save memory under WSL.
-Documentation=https://github.com/arkane-systems/wsl-drop-caches
-ConditionVirtualization=wsl
-PartOf=drop_cache.service
-
-[Timer]
-OnBootSec=3min
-OnUnitActiveSec=3min
-
-[Install]
-WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
-
-    systemctl enable drop_cache.timer
+#    echo -e "[Unit]
+#Description=Periodically drop caches to save memory under WSL.
+#Documentation=https://github.com/arkane-systems/wsl-drop-caches
+#ConditionVirtualization=wsl
+#Requires=drop_cache.timer
+#
+#[Service]
+#Type=oneshot
+#ExecStartPre=sync
+#ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
+#
+#    echo -e "[Unit]
+#Description=Periodically drop caches to save memory under WSL.
+#Documentation=https://github.com/arkane-systems/wsl-drop-caches
+#ConditionVirtualization=wsl
+#PartOf=drop_cache.service
+#
+#[Timer]
+#OnBootSec=3min
+#OnUnitActiveSec=3min
+#
+#[Install]
+#WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
+#
+#    systemctl enable drop_cache.timer
     rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
     rm -f /usr/lib/systemd/system/systemd-firstboot.service
     echo "" > /etc/fstab
