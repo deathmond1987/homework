@@ -772,7 +772,32 @@ qemu_install () {
                 qemu-img \
                 ovmf
     else
-        exit 1
+        if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
+            OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
+        elif [ "$ID" = "arch" ]; then
+            OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
+        else
+            echo "Unknown OS"
+        fi    
+        qemu-img resize ./vhd.img 12G
+        qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
+        success "VHDX image for HYPER-V created."
+        warn "$(ls -la | grep vhd.vhdx)"
+        qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
+        success "VMDK image for VMWARE created."
+        warn "$(ls -la | grep vhd.vmdk)"
+        readlink -p "Execute image in qemu? (y/n)" $answer
+        case $answer in 
+            y)) qemu-system-x86_64 \
+            -enable-kvm \
+            -smp cores=4 \
+            -m 2G \
+            -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
+            -device nvme,drive=drive0,serial=badbeef \
+            -drive if=none,id=drive0,file=./vhd.img
+            ;;
+            n)) true
+            ;;
     fi
 }
 
