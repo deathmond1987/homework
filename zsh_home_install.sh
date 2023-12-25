@@ -178,7 +178,7 @@ install_plugins () {
     #get zsh autosuggections plugin
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     #enabling plugins in .zshrc config file
-    sed -i 's/plugins=(git)/plugins=(docker docker-compose systemd git zsh-autosuggestions zsh-syntax-highlighting sudo)/g' $HOME/.zshrc
+    sed -i 's/plugins=(git)/plugins=(docker docker-compose systemd git zsh-autosuggestions zsh-syntax-highlighting sudo zsh-navigation-tools)/g' $HOME/.zshrc
     success "Done"
 }
 
@@ -286,7 +286,7 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
     done
 
     #create aliases to links new programs to defaults
-    echo -e '    alias htop="btop"
+    echo -e 'alias htop="btop"
     alias du="dust"
     alias df="duf"
     alias cat="bat -pp -P"
