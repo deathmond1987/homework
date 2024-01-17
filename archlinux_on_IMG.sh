@@ -334,7 +334,7 @@ pacstrap_base () {
         # installing base arch files and devel apps
         pacstrap -K "$MOUNT_PATH" base base-devel
 
-    elif [ "$ID" = "debian" ] ; then
+    elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
         success "Download bootstrap arch archive..."
         # installing base arch files and devel apps
         # in debian arch-install-scripts package thereis no pacstrap script, so...
