@@ -161,7 +161,7 @@ prepare_dependecies () {
                            dosfstools \
                            arch-install-scripts \
                            e2fsprogs
-    elif [ "$ID" = "debian" ]; then
+    elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
         success "Installing dependencies for debian..."
         apt install -y arch-install-scripts \
                        e2fsprogs \
