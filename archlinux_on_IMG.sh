@@ -788,7 +788,7 @@ qemu_install () {
         warn "$(ls -la | grep vhd.vmdk)"
         readlink -p "Execute image in qemu? (y/n)" $answer
         case $answer in 
-            y)) qemu-system-x86_64 \
+            y) qemu-system-x86_64 \
             -enable-kvm \
             -smp cores=4 \
             -m 2G \
@@ -796,7 +796,7 @@ qemu_install () {
             -device nvme,drive=drive0,serial=badbeef \
             -drive if=none,id=drive0,file=./vhd.img
             ;;
-            n)) true
+            n) true
             ;;
     fi
 }
