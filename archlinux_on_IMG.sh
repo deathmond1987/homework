@@ -798,6 +798,7 @@ qemu_install () {
             ;;
             n) true
             ;;
+        esac
     fi
 }
 
