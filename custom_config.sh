@@ -111,6 +111,10 @@ echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 #echo 'alias netstat="ss"' >> /home/kosh/.zshrc
 # not work in wsl with default user in wsl.conf
 echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
+
+if [ "$WSL_INSTALL" = "true" ];
+    echo "cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0" > /etc/fstab
+fi
         
 # downloading tor fork for docker
 mkdir -p /opt/tor
