@@ -145,7 +145,7 @@ prepare_dependecies () {
     if [ "$ID" = "fedora" ]; then
         success "Installing dependencies for fedora..."
         # installing dependencies
-        # arch-install-scripts - pacman and his dependencies
+        # arch-install-scripts - pacman and dependencies
         # e2fsprogs - for making fs in image
         # dosfstools - for making fat32 fs in image
         # qemu-kvm-core - for run builded image in qemu-kvm
@@ -169,12 +169,7 @@ prepare_dependecies () {
                        lvm2
     elif [ "$ID" = "alpine" ]; then
         success "Installing dependencies for alpine..."
-        #busybox-losetup dont know about --show flag
-        #installing losetup
-        #installing findmnt dependency for genfstab. not installing default
-        #20 min of my life gone before i understand that genfstab not generating PARTUUID because there is no lsblk in alpine. fuk...
-        #installing gawk because busybox-awk not working with this script
-        #installing grep
+        # we need to install coreutils programs. losetup, findmnt, lsblk, gawk, grep
         apk add pacman \
                 arch-install-scripts \
                 losetup \
