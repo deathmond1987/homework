@@ -1,10 +1,17 @@
 # homework
 
-archlinux_on_IMG.sh - creates RAW img with archlinux installed os from fedora, debian, alpine hosts. 
-Including uefi grub, root on lvm, oh-my-zsh 
+archlinux_on_IMG.sh - для обучения. Создание vhd образа с lvm и последующая установка в образ arch linux. Созданный образ работоспособный и изкоробки будет работать при записи его на флешку и, с некоторыми ограничениями, в виртуальных машинах на основе hyper-v (необходимо отключение secure boot), vmware (необходимо включить uefi) и qemu-kvm. Так же присутствует возможность сборки этого образа в rootfs для импорта в wsl2
 
-bootstrap_rocky.sh - helper to avoid routine work jobs. 
-autoinstall docker, postgresql, netdata, gitlab-runner and proxy config for all of them
+использование:
+    archlinux_on_IMG.sh --wsl --clean 
+ Опции:
+    --wsl - Создать wsl ready .tar.gz архив для wsl2
+    --clean - Создать дефолтную установку arch linux без моего личного скрипта донастройки под себя
+    --qemu - После создания образа диска запустить его в qemu для проверки (не работает с ключом --wsl)
+    --vmware - После создания образа диска сконвертировать его в vmdk (Не работает с ключем --wsl)
+    --hyperv - После создания образа диска сконвертировать его в vhdx (Не работает с ключем --wsl)
 
-zsh_home_install.sh - install helper for oh-my-zsh and custom .zshrc with plugins. 
-Also install some modern app (bat, btop, dust, duf, micro, gdu, fd)
+bootstrap_rocky.sh - рутинный скрипт для настройки rocky linux с типичными программами docker, postgresql, netdata, gitlab-runner и настройкой прокси для этих программ
+
+zsh_home_install.sh - скрипт для установки oh my zsh и кофнигурации к нему которую я использую. Плюс установка программ, которые являются современной заменой классических, которые поставляются в комплекте в большинстве дистрибутивов:
+bat, btop, dust, duf, micro, gdu, fd
