@@ -113,7 +113,25 @@ echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
 
 if [ "$WSL_INSTALL" = "true" ];
+    # fix cgroup2 not mounted for docker
     echo "cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0" > /etc/fstab
+    systemctl enable sshd.service
+    # fix mount x socket in wsl
+    echo '[Unit]
+Description=remount xsocket for wslg
+After=network.target
+
+[Service]
+Type=simple
+ExecStartPre=+/bin/bash -c "if [ -d /mnt/wslg/.X11-unix ]; then [ -d /tmp/.X11-unix ] && rm -rf /tmp/.X11-unix || true; fi"
+ExecStart=/usr/sbin/ln -s /mnt/wslg/.X11-unix /tmp/
+Restart=on-abort
+
+
+[Install]
+WantedBy=multi-user.target' >> /etc/systemd/system/wslg-tmp.service
+    systemctl daemon-reload
+    systemctl enable wslg-tmp.service
 fi
         
 # downloading tor fork for docker
@@ -122,7 +140,3 @@ wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond
 
 # enabling units
 systemctl enable docker.service
-if [ ! "$WSL_INSTALL" = "true" ]; then
-    systemctl enable sshd.service
-fi
-
