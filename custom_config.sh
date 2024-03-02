@@ -74,7 +74,6 @@ sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache ch
 
 # installing packages 
 su - kosh -c "LANG=C yay -S \
-                         --noprovides \
                          --answerdiff None \
                          --answerclean None \
                          --mflags \" --noconfirm\" --noconfirm \
