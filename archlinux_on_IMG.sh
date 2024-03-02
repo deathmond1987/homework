@@ -508,7 +508,6 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
         apps_install () {
             # installing needed packages to working properly
             su - kosh -c "LANG=C yay -S \
-                                      --noprovides \
                                       --answerdiff None \
                                       --answerclean None \
                                       --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" \
