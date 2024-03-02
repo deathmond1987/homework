@@ -238,7 +238,6 @@ APPS=( "btop" "dust" "duf" "bat" "micro" "lsd" "gdu" "fd" )
                 dnf install "$apps" -y >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
             fi
             echo y | LANG=C yay -S \
-            --noprovides \
             --answerdiff None \
             --answerclean None \
             --mflags "--noconfirm" "$apps" >/dev/null 2>&1 && success "$apps found and installed" && INSTALL=true || true
