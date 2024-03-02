@@ -111,7 +111,7 @@ echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
 # not work in wsl with default user in wsl.conf
 echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
 
-if [ "$WSL_INSTALL" = "true" ];
+if [ "$WSL_INSTALL" = "true" ]; then
     # fix cgroup2 not mounted for docker
     echo "cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0" > /etc/fstab
     systemctl enable sshd.service
