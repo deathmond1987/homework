@@ -24,7 +24,7 @@
 # нет в дефолтной поставке alpine либо используются busybox варианты.
 
 # dnf подобные дистрибутивы можно ставить через sudo dnf  --installroot=/mnt/rocky group install core
-# создав /mnt/rocky/etc/yum.repos.d/rocky.conf файл с описанием репозитория:
+# создав /mnt/rocky/etc/yum.repos.d/rocky.repo файл с описанием репозитория:
 # [baseos]
 # name=Rocky Linux $releasever - BaseOS
 # mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever
