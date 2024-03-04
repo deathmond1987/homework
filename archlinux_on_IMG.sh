@@ -797,10 +797,11 @@ run_in_qemu () {
     else
         echo "Unknown OS"
     fi    
-    if ps -aux | grep -v grep | grep file=./vhd-test-qemu.img ; then
+    if ps -aux | grep -v grep | grep file=./vhd-test-qemu.img >/dev/null 2>&1; then
         warn "test image already used. killing process..."
         kill $(ps -aux | grep -v grep | grep file=./vhd-test-qemu.img | awk '{print $2}')
     fi
+    warn "Creating img clone to run in qemu..."
     cp ./vhd.img ./vhd-test-qemu.img
     qemu-system-x86_64 \
                              -enable-kvm \
