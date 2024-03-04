@@ -766,14 +766,9 @@ qemu_install () {
                 qemu-img \
                 ovmf
     else
-        if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
-            OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
-        elif [ "$ID" = "arch" ]; then
-            OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
-        else
-            echo "Unknown OS"
-            exit 1
-        fi    
+        echo "Unknown OS..."
+        exit 1
+    fi
 }
 
 export_image_hyperv () {
