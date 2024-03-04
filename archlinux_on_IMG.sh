@@ -59,6 +59,7 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 . /etc/os-release
 # path where we build new arch linux system
 MOUNT_PATH=/mnt/arch
+IMG_NAME=vhd
 
 options_handler () {
     # declare variables for operate with options
@@ -189,9 +190,9 @@ prepare_dependecies () {
 create_image_wsl () {
     success "Creating image for wsl..."
     # creating empty image
-    dd if=/dev/zero of=./vhd.img bs=1M count=10000
+    dd if=/dev/zero of=./"$IMG_NAME".img bs=1M count=10000
     success "Creating image for wsl..."
-    fdisk ./vhd.img <<-EOF
+    fdisk ./"$IMG_NAME".img <<-EOF
         g
         n
         1
@@ -206,12 +207,12 @@ EOF
 create_image () {
     success "Creating image..."
     # creating empty image
-    dd if=/dev/zero of=./vhd.img bs=1M count=10000
+    dd if=/dev/zero of=./"$IMG_NAME".img bs=1M count=10000
     # creating in image gpt table and 3 partitions
     # first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
     # second one - "boot" partition. we will mount it to /boot later with filesystem fat32
     # third one - "root" partition. we will mount it to / later with lvm and ext4 partition
-    fdisk ./vhd.img <<-EOF
+    fdisk ./"$IMG_NAME".img <<-EOF
         g
         n
         1
@@ -243,7 +244,7 @@ mount_image () {
     # mount img file to loop to interact with created partitions
     # they will be available in /dev/loop_loop-number_partition-number
     # like /dev/loop0p1 or /dev/loop20p3
-    export DISK=$(losetup -P -f --show vhd.img)
+    export DISK=$(losetup -P -f --show "$IMG_NAME".img)
 }
 
 exit_trap_wsl () {
@@ -772,24 +773,24 @@ qemu_install () {
 }
 
 export_image_hyperv () {
-    qemu-img resize -f raw ./vhd.img 11G
-    qemu-img convert -p -f raw -O vhdx ./vhd.img ./vhd.vhdx
+    qemu-img resize -f raw ./"$IMG_NAME".img 11G
+    qemu-img convert -p -f raw -O vhdx ./"$IMG_NAME".img ./"$IMG_NAME".vhdx
     echo ""
     success "VHDX image for HYPER-V created"
     info "Arch Linux does not have official support of UEFI Secure shell"
     info "You need to disable UEFI Secure in HYPER-V"
-    warn "$(ls -l $PWD/vhd.vhdx)"
+    warn "$(ls -l $PWD/"$IMG_NAME".vhdx)"
     echo ""
 }
 
 export_image_wmware () {
-    qemu-img resize -f raw ./vhd.img 11G
-    qemu-img convert -p -f raw -O vmdk ./vhd.img ./vhd.vmdk
+    qemu-img resize -f raw ./"$IMG_NAME".img 11G
+    qemu-img convert -p -f raw -O vmdk ./"$IMG_NAME".img ./"$IMG_NAME".vmdk
     echo ""
     success "VMDK image for VMWARE created"
     info "VMWARE Workstation create VM without UEFI"
     info "You need enable UEFI for VM manually after create VM"
-    warn "$(ls -l $PWD/vhd.vmdk)"
+    warn "$(ls -l $PWD/"$IMG_NAME".vmdk)"
     echo ""
 }
 
@@ -801,19 +802,19 @@ run_in_qemu () {
     else
         echo "Unknown OS"
     fi    
-    if ps -aux | grep -v grep | grep file=./vhd-test-qemu.img >/dev/null 2>&1; then
+    if ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img >/dev/null 2>&1; then
         warn "test image already used. killing process..."
-        kill $(ps -aux | grep -v grep | grep file=./vhd-test-qemu.img | awk '{print $2}')
+        kill $(ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img | awk '{print $2}')
     fi
     warn "Creating img clone to run in qemu..."
-    cp ./vhd.img ./vhd-test-qemu.img
+    cp ./"$IMG_NAME".img ./"$IMG_NAME"-test-qemu.img
     qemu-system-x86_64 \
                              -enable-kvm \
                              -smp cores=4 \
                              -m 2G \
                              -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
                              -device nvme,drive=drive0,serial=badbeef \
-                             -drive if=none,id=drive0,file=./vhd-test-qemu.img &
+                             -drive if=none,id=drive0,file=./"$IMG_NAME"-test-qemu.img &
                              success "Done. if qemu installed in headless mode you should try to connect by vnc client to 127.0.0.1"
 }
 
@@ -846,7 +847,7 @@ nspawn_exec_wsl () {
 }
 
 nspawn_exec_image () {
-    exec systemd-nspawn -b -i ./vhd.img
+    exec systemd-nspawn -b -i ./"$IMG_NAME".img
 }
 
 main () {
