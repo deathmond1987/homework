@@ -23,7 +23,7 @@
 # Так же в alpine изкоробки поломан genfstab так как некоторых стандартных приложений
 # нет в дефолтной поставке alpine либо используются busybox варианты.
 
-# dnf подобные дистрибутивы можно ставить через sudo dnf  --installroot=/mnt/rocky group install core
+# dnf подобные дистрибутивы можно ставить через sudo dnf  --installroot=/mnt/rocky group install core --nogpgcheck
 # создав /mnt/rocky/etc/yum.repos.d/rocky.repo файл с описанием репозитория:
 # [baseos]
 # name=Rocky Linux $releasever - BaseOS
