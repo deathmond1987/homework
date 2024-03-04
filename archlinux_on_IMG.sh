@@ -752,7 +752,7 @@ qemu_install () {
             dnf install -y qemu-kvm-core \
                            edk2-ovmf          
     elif [ "$ID" = "arch" ]; then
-            pacman -S --needed --disable-download-timeout \
+            pacman -S --needed --disable-download-timeout --noconfirm \
                 edk2-ovmf
             if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
                 pacman -S --needed --noconfirm --disable-download-timeout qemu-base edk2-ovmf 
