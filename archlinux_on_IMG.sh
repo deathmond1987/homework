@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # POC
 # fully working arch linux builded from RHEL-like command line on RAW IMAGE
 # with uefi, grub, root partition in lvm with ext4, oh-my-zsh and modern apps
@@ -37,6 +39,14 @@
 # Для apt подобных debootstrap
 # debootstrap --include=sudo,nano,wget buster /mnt/debian  http://deb.debian.org/debian
 
+
+
+rh_deps='arch-install-scripts e2fsprogs dosfstools lvm2'
+arch_deps='lvm2 dosfstools arch-install-scripts e2fsprogs'
+deb_deps='arch-install-scripts e2fsprogs dosfstools lvm2'
+alpine_deps='pacman arch-install-scripts losetup dosfstools lvm2 e2fsprogs findmnt gawk grep lsblk'
+export pacman_opts='--needed --disable-download-timeout --noconfirm'
+export system_packages='lvm2 wget openssh grub efibootmgr parted networkmanager modemmanager usb_modeswitch'
 set -oe noglob
 
 reset="\033[0m"
@@ -151,36 +161,18 @@ prepare_dependecies () {
         # dosfstools - for making fat32 fs in image
         # qemu-kvm-core - for run builded image in qemu-kvm
         # edk2-ovmf - uefi bios for run image in qemu with uefi
-        dnf install -y arch-install-scripts \
-                       e2fsprogs \
-                       dosfstools \
-                       lvm2
+        dnf install -y $rh_deps
     elif [ "$ID" = "arch" ]; then
         success "Installing dependencies for arch..."
-        pacman -S --needed --disable-download-timeout --noconfirm \
-                           lvm2 \
-                           dosfstools \
-                           arch-install-scripts \
-                           e2fsprogs
+        pacman -S $pacman_opts $arch_deps
+                           
     elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
         success "Installing dependencies for debian..."
-        apt install -y arch-install-scripts \
-                       e2fsprogs \
-                       dosfstools \
-                       lvm2
+        apt install -y $deb_deps
     elif [ "$ID" = "alpine" ]; then
         success "Installing dependencies for alpine..."
         # we need to install coreutils programs. losetup, findmnt, lsblk, gawk, grep
-        apk add pacman \
-                arch-install-scripts \
-                losetup \
-                dosfstools \
-                lvm2 \
-                e2fsprogs \
-                findmnt \
-                gawk \
-                grep \
-                lsblk
+        apk add $alpine_deps
     else
         error "This script not working in: $ID"
         exit 1
@@ -244,7 +236,8 @@ mount_image () {
     # mount img file to loop to interact with created partitions
     # they will be available in /dev/loop_loop-number_partition-number
     # like /dev/loop0p1 or /dev/loop20p3
-    export DISK=$(losetup -P -f --show "$IMG_NAME".img)
+    DISK=$(losetup -P -f --show "$IMG_NAME".img)
+    export DISK
 }
 
 exit_trap_wsl () {
@@ -350,7 +343,7 @@ pacstrap_base () {
             #configuring mirrorlist
             sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
             #installing root
-            pacman -Syu --needed --noconfirm --disable-download-timeout base base-devel
+            pacman -Syu $pacman_opts base base-devel
             #ckeaning up root dir. thereis tar archive, list installed packages in root and version file.
             rm -f /archlinux.tar.gz
             rm -f /pkglist.x86_64.txt
@@ -428,7 +421,7 @@ chroot_arch () {
 
         mkinitcpio_install () {
             # install kernel and firmware
-            pacman -S --needed --noconfirm --disable-download-timeout mkinitcpio
+            pacman -S $pacman_opts mkinitcpio
         }
 
         remove_autodetect_hook () {
@@ -438,7 +431,7 @@ chroot_arch () {
 
         kernel_install () {
             # installing kernel and firmware
-            pacman -S --needed --noconfirm --disable-download-timeout linux linux-firmware
+            pacman -S $pacman_opts linux linux-firmware
         }
 
         #we can not use systemd to configure locales, time and so on cause we are in chroot environment
@@ -490,7 +483,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         git_install () {
             # adding git
-            pacman -S --needed --noconfirm --disable-download-timeout git
+            pacman -S $pacman_opts git
         }
 
         yay_install () {
@@ -511,17 +504,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             su - kosh -c "LANG=C yay -S \
                                       --answerdiff None \
                                       --answerclean None \
-                                      --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" \
-                                                               lvm2 \
-                                                               wget \
-                                                               openssh \
-                                                               grub \
-                                                               efibootmgr \
-                                                               parted \
-                                                               networkmanager \
-                                                               modemmanager \
-                                                               usb_modeswitch \
-                                                         --noconfirm"
+                                      --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" $system_packages --noconfirm"
             systemctl enable NetworkManager
             systemctl enable ModemManager
             systemctl enable sshd
@@ -715,7 +698,7 @@ export_wsl () {
     tar -cf ./archfs.tar -C /mnt/arch .
     success "ARCH root filesystem exported to $PWD/archfs.tar"
     echo ""
-    warn "$(ls -l $PWD/archfs.tar)"
+    warn "$(ls -l "$PWD"/archfs.tar)"
     echo ""
     warn "You need to export this file to WSL. Example:"
     warn "wsl --import Arch-linux D:\arch\ D:\archfs.tar"
@@ -753,10 +736,10 @@ qemu_install () {
             dnf install -y qemu-kvm-core \
                            edk2-ovmf          
     elif [ "$ID" = "arch" ]; then
-            pacman -S --needed --disable-download-timeout --noconfirm \
+            pacman -S $pacman_opts \
                 edk2-ovmf
             if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-                pacman -S --needed --noconfirm --disable-download-timeout qemu-base edk2-ovmf 
+                pacman -S $pacman_opts qemu-base edk2-ovmf 
             fi 
     elif [ "$ID" = "debian" ]; then
             apt install -y qemu-utils \
@@ -779,7 +762,7 @@ export_image_hyperv () {
     success "VHDX image for HYPER-V created"
     info "Arch Linux does not have official support of UEFI Secure shell"
     info "You need to disable UEFI Secure in HYPER-V"
-    warn "$(ls -l $PWD/"$IMG_NAME".vhdx)"
+    warn "$(ls -l "$PWD"/"$IMG_NAME".vhdx)"
     echo ""
 }
 
@@ -790,7 +773,7 @@ export_image_wmware () {
     success "VMDK image for VMWARE created"
     info "VMWARE Workstation create VM without UEFI"
     info "You need enable UEFI for VM manually after create VM"
-    warn "$(ls -l $PWD/"$IMG_NAME".vmdk)"
+    warn "$(ls -l "$PWD"/"$IMG_NAME".vmdk)"
     echo ""
 }
 
@@ -804,7 +787,7 @@ run_in_qemu () {
     fi    
     if ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img >/dev/null 2>&1; then
         warn "test image already used. killing process..."
-        kill $(ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img | awk '{print $2}')
+        kill "$(ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img | awk '{print $2}')"
     fi
     warn "Creating img clone to run in qemu..."
     cp ./"$IMG_NAME".img ./"$IMG_NAME"-test-qemu.img
@@ -907,6 +890,8 @@ main () {
     unset QEMU_CHECK
     unset VMWARE_EXPORT
     unset HYPERV_EXPORT
+    unset pacman_opts
+    unset system_packages
 }
 
 main "$@"
