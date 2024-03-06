@@ -72,11 +72,6 @@ sed -i '/Color/s/^#//g' /etc/pacman.conf
 # MAKEPKG CONF
 # Optimizing build config
 sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -)/g' /etc/makepkg.conf
-# enabling ccache
-if [[ $user_packages == *ccache* ]]; then
-    echo "adding ccache config for makepkg"
-    sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
-fi 
 # installing packages 
 su - kosh -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
@@ -84,6 +79,11 @@ if [[ $user_packages == *docker* ]]; then
     echo "adding user to docker group"    
     usermod -aG docker kosh
 fi
+# enabling ccache
+if [[ $user_packages == *ccache* ]]; then
+    echo "adding ccache config for makepkg"
+    sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
+fi 
 
 # adding zsh
 su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
@@ -128,3 +128,4 @@ wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond
 
 # enabling units
 systemctl enable docker.service
+
