@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-set -xe
+set -xe 
 
 . /etc/environment
 
 user_packages='docker docker-compose dive mc pigz docker-buildx polkit strace pacman-contrib pacman-cleanup-hook ccache qemu-base bc net-tools cpio'
-yay_opts='--answerdiff None --answerclean None --mflags \" --noconfirm\" --noconfirm'
+yay_opts='--answerdiff None --answerclean None --noconfirm'
 
 if [ "$WSL_INSTALL" = "true" ]; then
     echo "Configuring wsl..."
@@ -21,15 +21,45 @@ appendWindowsPath = false
 autoMemoryReclaim=gradual
 networkingMode=mirrored
 dnsTunneling=true" > /etc/wsl.conf
+
+    #########################################
+    # deprecated. autoMemoryReclaim=gradual #
+    #########################################
+    #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
+#    echo -e "[Unit]
+#Description=Periodically drop caches to save memory under WSL.
+#Documentation=https://github.com/arkane-systems/wsl-drop-caches
+#ConditionVirtualization=wsl
+#Requires=drop_cache.timer
+#
+#[Service]
+#Type=oneshot
+#ExecStartPre=sync
+#ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
+#
+#    echo -e "[Unit]
+#Description=Periodically drop caches to save memory under WSL.
+#Documentation=https://github.com/arkane-systems/wsl-drop-caches
+#ConditionVirtualization=wsl
+#PartOf=drop_cache.service
+#
+#[Timer]
+#OnBootSec=3min
+#OnUnitActiveSec=3min
+#
+#[Install]
+#WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
+#
+#    systemctl enable drop_cache.timer
     rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
     rm -f /usr/lib/systemd/system/systemd-firstboot.service
     echo "" > /etc/fstab
 else
-
+    
     # changing grub config
     # sed -i 's/GRUB_TIMEOUT_STYLE=menu/GRUB_TIMEOUT_STYLE=countdown/g' /etc/default/grub
     sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"/g' /etc/default/grub
-fi
+fi 
 
 # PACMAN CONF
 # enabling pacman from game
@@ -46,18 +76,18 @@ sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -
 if [[ $user_packages == *ccache* ]]; then
     echo "adding ccache config for makepkg"
     sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
-fi
-# installing packages
+fi 
+# installing packages 
 su - kosh -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
     # админу локалхоста дозволено:)
-    echo "adding user to docker group"
+    echo "adding user to docker group"    
     usermod -aG docker kosh
 fi
 
 # adding zsh
 su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
-if [[ $user_packages == *mc* ]]; then
+if [[ $user_packages == *mc* ]]; then       
     # changing default mc theme
     echo "adding mc config"
     echo "MC_SKIN=gotar" >> /etc/environment
@@ -91,7 +121,7 @@ WantedBy=multi-user.target' >> /etc/systemd/system/wslg-tmp.service
     systemctl daemon-reload
     systemctl enable wslg-tmp.service
 fi
-
+        
 # downloading tor fork for docker
 mkdir -p /opt/tor
 wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
