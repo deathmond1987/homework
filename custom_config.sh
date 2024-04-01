@@ -82,7 +82,7 @@ fi
 # enabling ccache
 if [[ $user_packages == *ccache* ]]; then
     echo "adding ccache config for makepkg"
-    sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !sign)/g' /etc/makepkg.conf
+    sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !debug !sign)/g' /etc/makepkg.conf
 fi 
 
 # adding zsh
