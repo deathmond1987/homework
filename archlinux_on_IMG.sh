@@ -427,13 +427,14 @@ chroot_arch () {
         remove_autodetect_hook () {
             # to run arch in most any environment we need build init image with all we can add to it
             mkinit_conf_path=/etc/mkinitcpio.conf
-            default_hooks='HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)'
-            new_hooks='HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)'
-            sed -i 's/$default_hooks/$new_hooks/g' $mkinit_conf_path
-            if grep -qF $new_hooks $mkinit_conf_path; then
+            default_hooks="HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)"
+            new_hooks="HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)"
+            sed -i "s/$default_hooks/$new_hooks/g" "$mkinit_conf_path"
+            if grep -qF "$new_hooks" "$mkinit_conf_path"; then
                 success "mkinitcpio conf confugured"
             else
                 error "mkinit conf failed. Looks like default conf file changed by maintainer"
+                warn "You need change default_hooks variable woth current HOOKS line in $mkinit_conf_path"
                 exit 1
             fi
         }
