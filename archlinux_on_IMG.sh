@@ -165,7 +165,7 @@ prepare_dependecies () {
     elif [ "$ID" = "arch" ]; then
         success "Installing dependencies for arch..."
         pacman -S $pacman_opts $arch_deps
-                           
+
     elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
         success "Installing dependencies for debian..."
         apt install -y $deb_deps
@@ -195,7 +195,7 @@ create_image_wsl () {
         w
 EOF
 }
-    
+
 create_image () {
     success "Creating image..."
     # creating empty image
@@ -321,7 +321,7 @@ pacstrap_base () {
         pacman-key --populate archlinux
         success "Install base files..."
         # installing base arch files and devel apps
-        pacstrap -K "$MOUNT_PATH" base base-devel
+        pacstrap -K "$MOUNT_PATH" base base-devel dbus-broker-units
 
     elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ]; then
         success "Download bootstrap arch archive..."
@@ -343,7 +343,7 @@ pacstrap_base () {
             #configuring mirrorlist
             sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
             #installing root
-            pacman -Syu $pacman_opts base base-devel
+            pacman -Syu $pacman_opts base base-devel dbus-broker-units
             #ckeaning up root dir. thereis tar archive, list installed packages in root and version file.
             rm -f /archlinux.tar.gz
             rm -f /pkglist.x86_64.txt
@@ -372,7 +372,7 @@ Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
         wget -O /etc/pacman.d/mirrorlist https://archlinux.org/mirrorlist/all/http/
         #configuring mirrors
         sed -i 's/#Server =/Server =/g' /etc/pacman.d/mirrorlist
-        pacstrap -K "$MOUNT_PATH" base base-devel
+        pacstrap -K "$MOUNT_PATH" base base-devel dbus-broker-units
 
     else
         exit 1
@@ -413,7 +413,7 @@ chroot_arch () {
     # go to arch
     arch-chroot "$MOUNT_PATH" <<-EOF
         #!/usr/bin/env bash
-        set -e
+        set -exv
         sudo_config () {
             # temporary disabling ask password
             sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
@@ -426,15 +426,15 @@ chroot_arch () {
 
         remove_autodetect_hook () {
             # to run arch in most any environment we need build init image with all we can add to it
-            mkinit_conf_path=/etc/mkinitcpio.conf
-            default_hooks="HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)"
-            new_hooks="HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)"
-            sed -i "s/$default_hooks/$new_hooks/g" "$mkinit_conf_path"
-            if grep -qF "$new_hooks" "$mkinit_conf_path"; then
-                success "mkinitcpio conf confugured"
+            MKINIT_CONF_PATH=/etc/mkinitcpio.conf
+            DEFAULT_HOOKS="HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)"
+            NEW_HOOKS="HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)"
+            sed -i "s/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g" /etc/mkinitcpio.conf
+            if grep -qF "HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)" /etc/mkinitcpio.conf; then
+                echo "mkinitcpio conf confugured"
             else
-                error "mkinit conf failed. Looks like default conf file changed by maintainer"
-                warn "You need change default_hooks variable woth current HOOKS line in $mkinit_conf_path"
+                echo "mkinit conf failed. Looks like default conf file changed by maintainer"
+                echo "You need change default_hooks variable woth current HOOKS line in /etc/mkinitcpio.conf"
                 exit 1
             fi
         }
@@ -593,9 +593,9 @@ postinstall_config () {
         # adding this script to autoboot after first load arch linux
         if [ "$WITH_CONFIG" = "true" ]; then
             sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
-        else 
+        else
             sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.bashrc
-        fi 
+        fi
         # script body
         cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
             #!/usr/bin/env bash
@@ -625,7 +625,7 @@ postinstall_config () {
                 fi
 
                 # adding autodetect hook to mkinicpio to generate default arch init image
-                sed -i 's/HOOKS=(base systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
+                sed -i 's/HOOKS=(base udev microcode systemd modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/HOOKS=(base systemd autodetect modconf kms keyboard keymap consolefont block lvm2 filesystems fsck)/g' /etc/mkinitcpio.conf
                 # creating initrd image
                 mkinitcpio -P
 
@@ -670,7 +670,7 @@ postinstall_config () {
                 # we have ext4 fs on lvm. resizing ext4 fs
                 resize2fs /dev/arch/root || true
 
-            fi 
+            fi
             # removing helper script from autoload
             if [ "$WITH_CONFIG" = "true" ]; then
                 sed -i '1d' /home/kosh/.zshrc
@@ -687,7 +687,7 @@ postinstall_config () {
 
             if  [ "$WSL_INSTALL" = "false" ]; then
                 # rebooting OS after reconfiguring
-                sudo reboot    
+                sudo reboot
             fi
 EOL
         # marking helper script executable
@@ -744,13 +744,13 @@ unmount_images () {
 qemu_install () {
     if [ "$ID" = "fedora" ]; then
             dnf install -y qemu-kvm-core \
-                           edk2-ovmf          
+                           edk2-ovmf
     elif [ "$ID" = "arch" ]; then
             pacman -S $pacman_opts \
                 edk2-ovmf
             if ! pacman -Qi qemu-desktop > /dev/null 2>&1 ; then
-                pacman -S $pacman_opts qemu-base edk2-ovmf 
-            fi 
+                pacman -S $pacman_opts qemu-base edk2-ovmf
+            fi
     elif [ "$ID" = "debian" ]; then
             apt install -y qemu-utils \
                        qemu-system-x86 \
@@ -794,7 +794,7 @@ run_in_qemu () {
         OVMF_PATH=/usr/share/edk2/x64/OVMF_CODE.fd
     else
         echo "Unknown OS"
-    fi    
+    fi
     if ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img >/dev/null 2>&1; then
         warn "test image already used. killing process..."
         kill "$(ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img | awk '{print $2}')"
@@ -813,13 +813,13 @@ run_in_qemu () {
 
 nspawn_install () {
    if [ "$ID" = "fedora" ]; then
-       true               
+       true
    elif [ "$ID" = "arch" ]; then
        true
    elif [ "$ID" = "debian" ]; then
        apt install -y systemd-container
    elif [ "$ID" = "alpine" ]; then
-       exit 1     
+       exit 1
    else
        exit 1
    fi
@@ -834,7 +834,7 @@ nspawn_exec_wsl () {
     #exec bash -i -c "systemd-nspawn -b -D $TEST_DIR"
     warn "Ready to start nspawn. You need manually run in your terminal:"
     success "sudo systemd-nspawn -b -D $TEST_DIR"
-    
+
     #rm -rf "$TEST_DIR"
     unset TEST_DIR
 }
