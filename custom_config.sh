@@ -72,6 +72,8 @@ sed -i '/Color/s/^#//g' /etc/pacman.conf
 # MAKEPKG CONF
 # Optimizing build config
 sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -)/g' /etc/makepkg.conf
+# disable build debug package 
+sed -i 's/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge !debug lto)' /etc/makepkg.conf
 # installing packages 
 su - kosh -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
@@ -83,7 +85,6 @@ fi
 if [[ $user_packages == *ccache* ]]; then
     echo "adding ccache config for makepkg"
     sed -i 's/BUILDENV=(!distcc color check !sign)/BUILDENV=(!distcc color ccache check !debug !sign)/g' /etc/makepkg.conf
-    sed -i 's/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge !debug lto)' /etc/makepkg.conf
 fi 
 
 # adding zsh
