@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -eo pipefail
-set -x
+
 reset="\033[0m"
 
 red="\033[0;31m"
