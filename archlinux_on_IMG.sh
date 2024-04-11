@@ -441,7 +441,7 @@ chroot_arch () {
 
         kernel_install () {
             # installing kernel and firmware
-            pacman -S $pacman_opts linux linux-firmware
+            pacman -S $pacman_opts linux-zen linux-zen-headers linux-firmware
         }
 
         #we can not use systemd to configure locales, time and so on cause we are in chroot environment
