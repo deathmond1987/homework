@@ -73,7 +73,7 @@ sed -i '/Color/s/^#//g' /etc/pacman.conf
 # Optimizing build config
 sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -)/g' /etc/makepkg.conf
 # disable build debug package 
-sed -i 's/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge !debug lto)' /etc/makepkg.conf
+sed -i 's/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge !debug lto)/g' /etc/makepkg.conf
 # installing packages 
 su - kosh -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
