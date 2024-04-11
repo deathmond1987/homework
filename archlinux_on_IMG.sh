@@ -506,7 +506,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
                           yay -Y --gendb && \
                           yes | yay -Syu --devel && \
                           yay -Y --devel --save && \
-                          yay --editmenu --save"
+                          yay --editmenu --diffmenu=false --save"
         }
 
         apps_install () {
