@@ -182,7 +182,7 @@ prepare_dependecies () {
 create_image_wsl () {
     success "Creating image for wsl..."
     # creating empty image
-    dd if=/dev/zero of=./"$IMG_NAME".img bs=1M count=10000
+    dd if=/dev/zero of=./"$IMG_NAME".img bs=1M count=10000 status=progress
     success "Creating image for wsl..."
     fdisk ./"$IMG_NAME".img <<-EOF
         g
