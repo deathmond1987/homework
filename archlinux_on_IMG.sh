@@ -694,7 +694,7 @@ EOL
         chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
         arch-chroot "$MOUNT_PATH" <<-EOF
         su - kosh -c 'echo yes | LANG=C yay -Sc'
-        rm -rf "/var/cache/pacman/pkg/*"
+        echo -e "y\nn" | pacman -Scc
         dd if=/dev/zero of=/zerofile || true
         sync
         rm -f /zerofile
