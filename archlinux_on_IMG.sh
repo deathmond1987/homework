@@ -725,15 +725,14 @@ export_wsl () {
 }
 
 unmount_wsl () {
-    pkill -en gpg-agent || true
+    pkill -en gpg-agent 1>/dev/null || true
     umount -l "$MOUNT_PATH" || true
     losetup -d "$DISK" || true
-    echo "Done"
     trap '' EXIT
 }
 
 unmount_images () {
-    pkill -en gpg-agent || true
+    pkill -en gpg-agent 1>/dev/null || true
     sync
     #fuser killer may kill wsl...
     umount -l "$MOUNT_PATH"/boot/efi || true
@@ -741,7 +740,6 @@ unmount_images () {
     umount -l "$MOUNT_PATH" || true
     lvchange -an /dev/arch/root || true
     losetup -d "$DISK" || true
-    echo "Done"
     trap '' EXIT
 }
 
