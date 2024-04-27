@@ -1,6 +1,6 @@
 FROM fedora:latest
 COPY ./zsh_home_install.sh .
-RUN dnf install sudo && \
+RUN dnf install sudo 1>/dev/null && \
     chmod 755 ./zsh_home_install.sh && \
     useradd -m -G wheel -s /bin/bash test && \
     echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
