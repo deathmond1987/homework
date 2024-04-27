@@ -220,7 +220,7 @@ linux_2023 () {
 # in arch all apps in aur. we need to change pacman to aur helper
 if [[ "$pm" == pacman* ]]; then
     # shellcheck disable=SC2089
-    pm='echo y | LANG=C yay -S --answerdiff None --answerclean None --mflags "--noconfirm"'
+    pm="yay -S --answerdiff None --answerclean None --noconfirm --mflags \"--noconfirm\""
 fi
 
 # app list
