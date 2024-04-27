@@ -85,12 +85,14 @@ options_handler () {
         info " Usage: script_name.sh --wsl --clean --nspawn ( Create wsl rootfs with clean arch linux and check it in systemd-nspawn )"
         info "        script_name.sh --qemu --vmware ( Create uefi raw image with customizations, execute image in qemu and export image for vmware workstation)"
         info " Options:"
-        info " --wsl - create tar archive for wsl."
-        info " --clean - create clean Arch Linux image."
+        info "     --wsl/-w - create tar archive for wsl."
+        info "     --clean/-c - create clean Arch Linux image."
   #      info " --nspawn - check created image in nspawn container. ( Not working in Alpine Linux )"
-        info " --qemu - check created image in qemu (Not working with --wsl key)"
-        info " --vmware - gen image for VMWARE (Not working with --wsl key)"
-        info " --hyperv - gen image for HYPER-V (Not working with --wsl key)"
+        info "     --qemu/-q - check created image in qemu (Not working with --wsl key)"
+        info "     --vmware/-v - gen image for VMWARE (Not working with --wsl key)"
+        info "     --hyperv/-y - gen image for HYPER-V (Not working with --wsl key)"
+        info "     --user-name/-u - user name in created system"
+        info "     --password/-p - user and root password in created system"
     }
 
     # catch arguments from command line
@@ -110,6 +112,20 @@ options_handler () {
                    ;;
            --help|-h) options_message
                       exit 0
+                   ;;
+      --user-name|-u) shift
+                      if [ "$1" != "" ]; then
+                          USER_NAME=$1
+                      else
+                          USER_NAME=kosh
+                      fi
+                   ;;
+       --password|-p) shift
+                      if [ "$1" != "" ]; then
+                          PASSWORD=$1
+                      else
+                          PASSWORD=qwe
+                      fi
                    ;;
                    *) error "Unknown option: $1"
                       echo ""
@@ -161,6 +177,7 @@ prepare_dependecies () {
         # dosfstools - for making fat32 fs in image
         # qemu-kvm-core - for run builded image in qemu-kvm
         # edk2-ovmf - uefi bios for run image in qemu with uefi
+        # shellcheck disable=SC2086
         dnf install -y $rh_deps
     elif [ "$ID" = "arch" ]; then
         success "Installing dependencies for arch..."
@@ -409,6 +426,8 @@ chroot_arch () {
     echo "WSL_INSTALL=$WSL_INSTALL" >> "$MOUNT_PATH"/etc/environment
     # tell the environment about unnessesary config
     echo "WITH_CONFIG=$WITH_CONFIG" >> "$MOUNT_PATH"/etc/environment
+    echo "USER_NAME=$USER_NAME" >> "$MOUNT_PATH"/etc/environment
+    echo "PASSWORD=$PASSWORD" >> "$MOUNT_PATH"/etc/environment
 
     # go to arch
     arch-chroot "$MOUNT_PATH" <<-EOF
@@ -484,10 +503,10 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         user_config () {
             # create user and add it to wheel group
-            useradd -m -G wheel -s /bin/bash kosh
+            useradd -m -G wheel -s /bin/bash "$USER_NAME"
             # changing password
-            echo "root:qwe" |chpasswd
-            echo "kosh:qwe" |chpasswd
+            echo "root:$PASSWORD" |chpasswd
+            echo "$USER_NAME:$PASSWORD" |chpasswd
             usermod -s /usr/bin/bash root
         }
 
@@ -498,7 +517,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         yay_install () {
             # dropping root user bacause makepkg and yay not working from root user
-            su - kosh -c "git clone https://aur.archlinux.org/yay-bin && \
+            su - $USER_NAME -c "git clone https://aur.archlinux.org/yay-bin && \
                           cd yay-bin && \
                           yes | makepkg -si && \
                           cd .. && \
@@ -511,7 +530,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
 
         apps_install () {
             # installing needed packages to working properly
-            su - kosh -c "LANG=C yay -S \
+            su - $USER_NAME -c "LANG=C yay -S \
                                       --answerdiff None \
                                       --answerclean None \
                                       --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" $system_packages --noconfirm"
@@ -592,12 +611,12 @@ postinstall_config () {
 
         # adding this script to autoboot after first load arch linux
         if [ "$WITH_CONFIG" = "true" ]; then
-            sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.zshrc
+            sed -i "1s#^#sudo /home/$USER_NAME/postinstall.sh\n#" "$MOUNT_PATH"/home/$USER_NAME/.zshrc
         else
-            sed -i '1s#^#sudo /home/kosh/postinstall.sh\n#' "$MOUNT_PATH"/home/kosh/.bashrc
+            sed -i "1s#^#sudo /home/$USER_NAME/postinstall.sh\n#" "$MOUNT_PATH"/home/$USER_NAME/.bashrc
         fi
         # script body
-        cat <<'EOL' >> "$MOUNT_PATH"/home/kosh/postinstall.sh
+        cat <<'EOL' >> "$MOUNT_PATH"/home/$USER_NAME/postinstall.sh
             #!/usr/bin/env bash
             set -xe
             . /etc/environment
@@ -673,13 +692,17 @@ postinstall_config () {
             fi
             # removing helper script from autoload
             if [ "$WITH_CONFIG" = "true" ]; then
-                sed -i '1d' /home/kosh/.zshrc
+                sed -i '1d' /home/$USER_NAME/.zshrc
             else
-                sed -i '1d' /home/kosh/.bashrc
+                sed -i '1d' /home/$USER_NAME/.bashrc
             fi
             # removing helper script itself
-            rm /home/kosh/postinstall.sh
+            rm /home/$USER_NAME/postinstall.sh
 
+            #cleanup env file
+            sed -i '/^PASSWORD/d' /etc/environment
+            sed -i '/^USER_NAME/d' /etc/environment
+            
             # changing sudo rules to disable executing sudo without password
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             # allow wheel group using sudo with password
@@ -695,9 +718,9 @@ postinstall_config () {
             fi
 EOL
         # marking helper script executable
-        chmod 777 "$MOUNT_PATH"/home/kosh/postinstall.sh
+        chmod 777 "$MOUNT_PATH"/home/$USER_NAME/postinstall.sh
         arch-chroot "$MOUNT_PATH" <<-EOF
-        su - kosh -c 'echo yes | LANG=C yay -Sc'
+        su - $USER_NAME -c 'echo yes | LANG=C yay -Sc'
         echo -e "y\nn" | pacman -Scc
         dd if=/dev/zero of=/zerofile || true
         sync
