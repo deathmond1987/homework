@@ -809,13 +809,13 @@ run_in_qemu () {
     cp ./"$IMG_NAME".img ./"$IMG_NAME"-test-qemu.img
     # run qemu
     qemu-system-x86_64 \
-                             -enable-kvm \
-                             -smp cores=4 \
-                             -m 2G \
-                             -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
-                             -device nvme,drive=drive0,serial=badbeef \
-                             -drive if=none,id=drive0,file=./"$IMG_NAME"-test-qemu.img &
-                             success "Done. if qemu installed in headless mode you should try to connect by vnc client to 127.0.0.1"
+        -enable-kvm \
+        -smp cores=4 \
+        -m 2G \
+        -drive if=pflash,format=raw,readonly=on,file="$OVMF_PATH" \
+        -device nvme,drive=drive0,serial=badbeef \
+        -drive if=none,id=drive0,file=./"$IMG_NAME"-test-qemu.img &
+    success "Done. if qemu installed in headless mode you should try to connect by vnc client to 127.0.0.1"
 }
 
 nspawn_install () {
