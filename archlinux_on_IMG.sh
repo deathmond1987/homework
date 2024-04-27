@@ -688,6 +688,10 @@ postinstall_config () {
             if  [ "$WSL_INSTALL" = "false" ]; then
                 # rebooting OS after reconfiguring
                 sudo reboot
+            else
+                cd /opt/tor
+                docker-compose up -d || true
+                cd -
             fi
 EOL
         # marking helper script executable
