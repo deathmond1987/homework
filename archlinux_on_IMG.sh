@@ -742,6 +742,7 @@ unmount_images () {
 }
 
 qemu_install () {
+    # install packages for --qemu 
     if [ "$ID" = "fedora" ]; then
             dnf install -y qemu-kvm-core \
                            edk2-ovmf
@@ -766,6 +767,7 @@ qemu_install () {
 }
 
 export_image_hyperv () {
+    # convert img to hyperv
     qemu-img resize -f raw ./"$IMG_NAME".img 11G
     qemu-img convert -p -f raw -O vhdx ./"$IMG_NAME".img ./"$IMG_NAME".vhdx
     echo ""
@@ -777,6 +779,7 @@ export_image_hyperv () {
 }
 
 export_image_wmware () {
+    # convert img to vmware
     qemu-img resize -f raw ./"$IMG_NAME".img 11G
     qemu-img convert -p -f raw -O vmdk ./"$IMG_NAME".img ./"$IMG_NAME".vmdk
     echo ""
@@ -788,6 +791,7 @@ export_image_wmware () {
 }
 
 run_in_qemu () {
+    # set path to OVMF file
     if [ "$ID" = "fedora" ] || [ "$ID" = "debian" ] || [ "$ID" = "alpine" ] ; then
         OVMF_PATH=/usr/share/OVMF/OVMF_CODE.fd
     elif [ "$ID" = "arch" ]; then
@@ -795,12 +799,15 @@ run_in_qemu () {
     else
         echo "Unknown OS"
     fi
+    # if qemu pid exist - kill it
     if ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img >/dev/null 2>&1; then
         warn "test image already used. killing process..."
         kill "$(ps -aux | grep -v grep | grep file=./"$IMG_NAME"-test-qemu.img | awk '{print $2}')"
     fi
     warn "Creating img clone to run in qemu..."
+    # create img copy for test in qemu
     cp ./"$IMG_NAME".img ./"$IMG_NAME"-test-qemu.img
+    # run qemu
     qemu-system-x86_64 \
                              -enable-kvm \
                              -smp cores=4 \
