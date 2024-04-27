@@ -1,6 +1,6 @@
 FROM archlinux:latest
 COPY --chmod=777 ./zsh_home_install.sh /zsh.sh
-RUN pacman -Syu --needed --noconfirm sudo git zsh base base-devel && \
+RUN pacman -Syu --needed --noconfirm sudo git zsh base base-devel 1>/dev/null && \
     useradd -m -G wheel -s /bin/bash kosh && \
     echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 # sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
