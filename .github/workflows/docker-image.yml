@@ -8,11 +8,17 @@ on:
 
 jobs:
 
-  build:
+  fedora-test:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3           
-    - name: Build the Docker image
+    - name: test zsh autoinstall in fedora
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+  arch-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: test zsh autoinstall in arch
+      run : docker build . --file Dockerfile.arch.zsh-test 
