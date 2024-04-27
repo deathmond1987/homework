@@ -199,7 +199,7 @@ EOF
 create_image () {
     success "Creating image..."
     # creating empty image
-    dd if=/dev/zero of=./"$IMG_NAME".img bs=1M count=10000
+    dd if=/dev/zero of=./"$IMG_NAME".img bs=1M count=10000 status=progress
     # creating in image gpt table and 3 partitions
     # first one - EFI partinion. we will mount it to /boot/efi later with filesystem fat32
     # second one - "boot" partition. we will mount it to /boot later with filesystem fat32
