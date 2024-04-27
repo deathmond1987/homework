@@ -533,7 +533,7 @@ LC_TIME=en_US.UTF-8' > /etc/locale.conf
             su - $USER_NAME -c "LANG=C yay -S \
                                       --answerdiff None \
                                       --answerclean None \
-                                      --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" $system_packages --noconfirm"
+                                      --mflags \" --noconfirm\" --mflags \"--disable-download-timeout\" $system_packages"
             systemctl enable NetworkManager
             systemctl enable ModemManager
             systemctl enable sshd
