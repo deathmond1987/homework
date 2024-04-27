@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3           
     - name: test zsh autoinstall in fedora
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile.fedora.zsh-test
   arch-test:
     runs-on: ubuntu-latest
     steps:
