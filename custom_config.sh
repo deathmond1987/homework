@@ -3,6 +3,7 @@ set -xe
 
 . /etc/environment
 
+USER_NAME=${USER_NAME:-kosh}
 user_packages='docker docker-compose dive mc pigz docker-buildx polkit strace pacman-contrib pacman-cleanup-hook ccache qemu-base bc net-tools cpio'
 yay_opts='--answerdiff None --answerclean None --noconfirm'
 
@@ -75,7 +76,7 @@ sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -
 # disable build debug package 
 sed -i 's/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge !debug lto)/g' /etc/makepkg.conf
 # installing packages 
-su - kosh -c "LANG=C yay -S $yay_opts $user_packages"
+su - $USER_NAME -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
     # админу локалхоста дозволено:)
     echo "adding user to docker group"    
@@ -88,17 +89,17 @@ if [[ $user_packages == *ccache* ]]; then
 fi 
 
 # adding zsh
-su - kosh -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
+su - $USER_NAME -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
 if [[ $user_packages == *mc* ]]; then       
     # changing default mc theme
     echo "adding mc config"
     echo "MC_SKIN=gotar" >> /etc/environment
-    echo "MC_SKIN=gotar" >> /home/kosh/.zshrc
+    echo "MC_SKIN=gotar" >> /home/$USER_NAME/.zshrc
 fi
 # enabling hstr alias
-echo "export HISTFILE=~/.zsh_history" >> /home/kosh/.zshrc
+echo "export HISTFILE=~/.zsh_history" >> /home/$USER_NAME/.zshrc
 # workaround slow mc start. long time to create subshell for mc. we will load mc from bash
-echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/kosh/.zshrc
+echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/$USER_NAME/.zshrc
 # habit
 #echo 'alias netstat="ss"' >> /home/kosh/.zshrc
 
