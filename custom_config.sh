@@ -80,7 +80,7 @@ su - $USER_NAME -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
     # админу локалхоста дозволено:)
     echo "adding user to docker group"    
-    usermod -aG docker kosh
+    usermod -aG docker $USER_NAME
 fi
 # enabling ccache
 if [[ $user_packages == *ccache* ]]; then
