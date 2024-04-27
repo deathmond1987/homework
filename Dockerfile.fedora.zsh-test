@@ -3,7 +3,8 @@ COPY ./zsh_home_install.sh .
 RUN dnf install sudo && \
     chmod 755 ./zsh_home_install.sh && \
     useradd -m -G wheel -s /bin/bash test && \
-    sed -i 's/# %wheel	ALL=(ALL)	NOPASSWD: ALL/%wheel	ALL=(ALL)	NOPASSWD: ALL/g' /etc/sudoers
+    echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
+# sed -i 's/# %wheel	ALL=(ALL)	NOPASSWD: ALL/%wheel	ALL=(ALL)	NOPASSWD: ALL/g' /etc/sudoers
 USER test
 ENV TERM=xterm
 RUN bash -c ./zsh_home_install.sh
