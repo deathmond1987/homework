@@ -18,7 +18,7 @@ USER test
 ENV TERM=xterm
 RUN bash -c /zsh.sh
 
-FROM debian: latest
+FROM debian:latest
 COPY --chmod=777 $SCRIPT /zsh.sh
 RUN apt update -y && apt upgrade -y && \
     apt install zsh sudo -y && \
