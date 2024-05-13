@@ -5,7 +5,7 @@ set -euo pipefail
 
 USER_NAME=${USER_NAME:-kosh}
 user_packages='docker docker-compose dive mc pigz docker-buildx polkit strace pacman-contrib pacman-cleanup-hook ccache qemu-base bc net-tools cpio'
-yay_opts='--answerdiff None --answerclean None --noconfirm'
+yay_opts='--answerdiff None --answerclean None --noconfirm --needed'
 
 if [ "$WSL_INSTALL" = "true" ]; then
     echo "Configuring wsl..."
