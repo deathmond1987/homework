@@ -22,36 +22,6 @@ appendWindowsPath = false
 autoMemoryReclaim=gradual
 networkingMode=mirrored
 dnsTunneling=true" > /etc/wsl.conf
-
-    #########################################
-    # deprecated. autoMemoryReclaim=gradual #
-    #########################################
-    #Under wsl thereis issue in memory cache. We will drop memory caches with systemd unit every 3 minute
-#    echo -e "[Unit]
-#Description=Periodically drop caches to save memory under WSL.
-#Documentation=https://github.com/arkane-systems/wsl-drop-caches
-#ConditionVirtualization=wsl
-#Requires=drop_cache.timer
-#
-#[Service]
-#Type=oneshot
-#ExecStartPre=sync
-#ExecStart=echo 3 > /proc/sys/vm/drop_caches" > /etc/systemd/system/drop_cache.service
-#
-#    echo -e "[Unit]
-#Description=Periodically drop caches to save memory under WSL.
-#Documentation=https://github.com/arkane-systems/wsl-drop-caches
-#ConditionVirtualization=wsl
-#PartOf=drop_cache.service
-#
-#[Timer]
-#OnBootSec=3min
-#OnUnitActiveSec=3min
-#
-#[Install]
-#WantedBy=timers.target" > /etc/systemd/system/drop_cache.timer
-#
-#    systemctl enable drop_cache.timer
     rm -f /etc/systemd/system/network-online.target.wants/systemd-networkd-wait-online.service
     rm -f /usr/lib/systemd/system/systemd-firstboot.service
     echo "" > /etc/fstab
@@ -76,7 +46,7 @@ sed -i 's/COMPRESSZST=(zstd -c -z -q -)/COMPRESSZST=(zstd -c -z -q --threads=0 -
 # disable build debug package 
 sed -i 's/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge debug lto)/OPTIONS=(strip docs !libtool !staticlibs emptydirs zipman purge !debug lto)/g' /etc/makepkg.conf
 # installing packages 
-su - $USER_NAME -c "LANG=C yay -S $yay_opts $user_packages"
+su - "$USER_NAME" -c "LANG=C yay -S $yay_opts $user_packages"
 if [[ $user_packages == *docker* ]]; then
     # админу локалхоста дозволено:)
     echo "adding user to docker group"    
@@ -89,24 +59,23 @@ if [[ $user_packages == *ccache* ]]; then
 fi 
 
 # adding zsh
-su - $USER_NAME -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
+su - "$USER_NAME" -c "wget -qO - https://raw.githubusercontent.com/deathmond1987/homework/main/zsh_home_install.sh | bash"
 if [[ $user_packages == *mc* ]]; then       
     # changing default mc theme
     echo "adding mc config"
     echo "MC_SKIN=gotar" >> /etc/environment
-    echo "MC_SKIN=gotar" >> /home/$USER_NAME/.zshrc
+    echo "MC_SKIN=gotar" >> /home/"$USER_NAME"/.zshrc
 fi
 # enabling hstr alias
-echo "export HISTFILE=~/.zsh_history" >> /home/$USER_NAME/.zshrc
+echo "export HISTFILE=~/.zsh_history" >> /home/"$USER_NAME"/.zshrc
 # workaround slow mc start. long time to create subshell for mc. we will load mc from bash
-echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/$USER_NAME/.zshrc
+echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/"$USER_NAME"/.zshrc
 # habit
 #echo 'alias netstat="ss"' >> /home/kosh/.zshrc
 
 if [ "$WSL_INSTALL" = "true" ]; then
     # fix cgroup2 not mounted for docker
     echo "cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0" > /etc/fstab
-    systemctl enable sshd.service
     # fix mount x socket in wsl
     echo '[Unit]
 Description=remount xsocket for wslg
@@ -131,4 +100,4 @@ wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond
 
 # enabling units
 systemctl enable docker.service
-
+systemctl enable sshd.service
