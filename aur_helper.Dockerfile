@@ -60,7 +60,7 @@ EOF
 # gen entrypoint script
 COPY <<'EOF' $SCRIPT
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 #colors
 reset="\033[0m"
@@ -79,15 +79,17 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
-# keep rolling:)
-info "shoutout to Limp Bizkit"
-su - "$USER" -c "yay -Syua --noconfirm"
-
 # if param not found - then show help and exit
-if [ -z "$0" ]; then
+if [ -z "$1" ]; then
     cat /man
     exit 1
 fi
+
+
+# shoutout to Limp Bizkit
+info "arch is rolling distributive. Upgrading..."
+su - "$USER" -c "yay -Syua --noconfirm"
+success "upgrade complete"
 
 # filter param from package list
 # if params found - do changes
@@ -107,7 +109,7 @@ for arg in "$@"; do
 done
 # aray to string
 pack="${packages[@]}"
-
+info "Searching dor packages: $pack"
 # we need to change output dir owher to work user
 # makepkg work from user
 chown "$USER" -R "$PKGDEST"
