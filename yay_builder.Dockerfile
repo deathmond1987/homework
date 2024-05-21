@@ -115,6 +115,7 @@ chown "$USER" -R "$PKGDEST"
 su - "$USER" -c "yay -S --noconfirm $pack"
 success "Done. Exit from container"
 echo ""
+
 EOF
 RUN chmod 777 "$SCRIPT"
 
