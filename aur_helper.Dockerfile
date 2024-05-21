@@ -8,6 +8,7 @@ RUN <<EOF
     pacman-key --init
     pacman-key --populate
     pacman -Syu --noconfirm --needed base base-devel git
+    rm -rf /var/cache/pacman/pkg/*
 EOF
 
 # disable passwd, set locale, add user for work
@@ -113,7 +114,8 @@ for arg in "$@"; do
 done
 # aray to string
 pack="${packages[@]}"
-info "Searching dor packages: $pack"
+echo ""
+warn "Searching for packages: $pack"
 # we need to change output dir owher to work user
 # makepkg work from user
 chown "$USER" -R "$PKGDEST"
