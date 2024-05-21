@@ -8,11 +8,20 @@ on:
 
 jobs:
 
-  aur_builder_image_build:
+  aur_build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4           
-    - name: build_aur_builder_image
-      run: docker build . --file yay_builder.Dockerfile
+    - uses: actions/checkout@v2
+    - name: docker login
+      env:
+        DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+        DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
+      run: |
+        docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN 
+    - name: Build the Docker image
+      run: DOCKER_BUILDKIT=1 docker build . --file aur_helper.Dockerfile --tag deathmond1987/aur_helper:latest
+      
+    - name: Docker Push
+      run: docker push deathmond1987/aur_helper:latest
