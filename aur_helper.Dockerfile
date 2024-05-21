@@ -4,7 +4,11 @@ FROM archlinux:latest
 ENV USER=build \
     SCRIPT=/usr/bin/run
 # install base packages
-RUN pacman -Syu --noconfirm --needed base base-devel git
+RUN <<EOF
+    pacman-key --init
+    pacman-key --populate
+    pacman -Syu --noconfirm --needed base base-devel git
+EOF
 
 # disable passwd, set locale, add user for work
 RUN <<EOF
