@@ -1,4 +1,4 @@
-name: test script install
+name: aur_builder_build_and_upload
 
 on:
   push:
