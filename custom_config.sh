@@ -12,7 +12,7 @@ if [ "$WSL_INSTALL" = "true" ]; then
     echo "[boot]
 systemd=true
 [user]
-default=kosh
+default=$USER_NAME
 [automount]
 enabled = true
 options = \"metadata\"
