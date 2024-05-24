@@ -350,7 +350,7 @@ pacstrap_base () {
         #donwloading tar archive with bootstrap image to build dir
         wget -qO archlinux.tar.gz https://geo.mirror.pkgbuild.com/iso/latest/archlinux-bootstrap-x86_64.tar.zst
         #extracting archive in current dir with cut root dir
-        tar -zstd -xf ./archlinux.tar.gz --numeric-owner --strip-components=1
+        tar --zstd -xf ./archlinux.tar.gz --numeric-owner --strip-components=1
         #chrooting to bootstrap root
         success "Init pacman from base image system..."
         arch-chroot "$MOUNT_PATH" <<-EOF
