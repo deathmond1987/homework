@@ -39,9 +39,9 @@ EOF
 USER root
 ENV PKGDEST=/out
 RUN <<EOF
-    sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf && \
-    sed -i '/Color/s/^#//g' /etc/pacman.conf && \
-    sed -i "s:^#PKGDEST*:PKGDEST=$PKGDEST:g" /etc/makepkg.conf
+    sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
+    sed -i '/Color/s/^#//g' /etc/pacman.conf
+#    sed -i "s:^#PKGDEST*:PKGDEST=$PKGDEST:g" /etc/makepkg.conf
 EOF
 RUN mkdir -p "$PKGDEST" && chown "$USER":"$USER" "$PKGDEST"
 
@@ -118,7 +118,8 @@ echo ""
 warn "Searching for packages: $pack"
 # we need to change output dir owher to work user
 # makepkg work from user
-chown "$USER" -R "$PKGDEST"
+mkdir -p $PKGDEST
+chown "$USER":"$USER" -R "$PKGDEST"
 # exec yay
 su - "$USER" -c "yay -S --noconfirm $pack"
 success "Done. Exit from container"
