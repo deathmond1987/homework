@@ -42,6 +42,7 @@ RUN <<EOF
     sed -i '/ParallelDownloads = 5/s/^#//g' /etc/pacman.conf
     sed -i '/Color/s/^#//g' /etc/pacman.conf
     sed -i "s:^#PKGDEST=/home/packages:PKGDEST=$PKGDEST:g" /etc/makepkg.conf
+    sed -i 's:#MAKEFLAGS="-j2":MAKEFLAGS="-j$(nproc)":g' /etc/makepkg.conf
 EOF
 RUN mkdir -p "$PKGDEST" && chown "$USER":"$USER" "$PKGDEST"
 
