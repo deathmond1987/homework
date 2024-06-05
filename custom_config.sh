@@ -98,7 +98,7 @@ cd -
 ## download my git repos
 mkdir -p ~/git
 cd ~/git
-CNTX=orgs
+CNTX=users
 NAME=deathmond1987
 PAGE=1
 curl "https://api.github.com/$CNTX/$NAME/repos?page=$PAGE&per_page=100" |
