@@ -71,6 +71,7 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 MOUNT_PATH=/mnt/arch
 IMG_NAME=vhd
 
+
 options_handler () {
     # declare variables for operate with options
     WSL_INSTALL=false
@@ -116,15 +117,11 @@ options_handler () {
       --user-name|-u) shift
                       if [ "$1" != "" ]; then
                           USER_NAME=$1
-                      else
-                          USER_NAME=kosh
                       fi
                    ;;
        --password|-p) shift
                       if [ "$1" != "" ]; then
                           PASSWORD=$1
-                      else
-                          PASSWORD=qwe
                       fi
                    ;;
                    *) error "Unknown option: $1"
@@ -135,6 +132,9 @@ options_handler () {
         esac
         shift
     done
+
+    USER_NAME=${USER_NAME:=kosh}
+    PASSWORD=${PASSWORD:=qwe}
 
     # catch mutually exclusive options
     if [ "$WSL_INSTALL" = "true" ] && [ "$QEMU_CHECK" = "true" ]; then
@@ -702,7 +702,7 @@ postinstall_config () {
             #cleanup env file
             sed -i '/^PASSWORD/d' /etc/environment
             sed -i '/^USER_NAME/d' /etc/environment
-            
+
             # changing sudo rules to disable executing sudo without password
             sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
             # allow wheel group using sudo with password
@@ -767,7 +767,7 @@ unmount_images () {
 }
 
 qemu_install () {
-    # install packages for --qemu 
+    # install packages for --qemu
     if [ "$ID" = "fedora" ]; then
             dnf install -y qemu-kvm-core \
                            edk2-ovmf
