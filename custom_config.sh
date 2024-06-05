@@ -93,6 +93,19 @@ echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/"$USER_NAME"/.zshrc
 cd /opt
 git clone https://github.com/deathmond1987/tor_with_bridges.git
 mv ./tor_with_bridges ./tor
+cd -
+
+## download my git repos
+mkdir -p ~/git
+cd ~/git
+CNTX=orgs
+NAME=deathmond1987
+PAGE=1
+curl "https://api.github.com/$CNTX/$NAME/repos?page=$PAGE&per_page=100" |
+      grep -e 'clone_url*' |
+      cut -d \" -f 4 |
+      xargs -L1 git clone
+cd -
 
 # enabling units
 systemctl enable docker.service
