@@ -90,8 +90,9 @@ echo 'alias mc="SHELL=/bin/bash /usr/bin/mc; zsh"' >> /home/"$USER_NAME"/.zshrc
 #echo 'alias netstat="ss"' >> /home/kosh/.zshrc
        
 # downloading tor fork for docker
-mkdir -p /opt/tor
-wget -qO /opt/tor/docker-compose.yml https://raw.githubusercontent.com/deathmond1987/docker-tor/main/docker-compose.yml
+cd /opt
+git clone https://github.com/deathmond1987/tor_with_bridges.git
+mv ./tor_with_bridges ./tor
 
 # enabling units
 systemctl enable docker.service
