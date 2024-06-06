@@ -98,13 +98,11 @@ cd -
 ## download my git repos
 mkdir -p ~/git
 cd ~/git
-CNTX=users
-NAME=deathmond1987
-PAGE=1
-curl "https://api.github.com/$CNTX/$NAME/repos?page=$PAGE&per_page=100" |
-      grep -e 'clone_url*' |
-      cut -d \" -f 4 |
-      xargs -L1 git clone
+curl https://api.github.com/users/deathmond1987/repos\?page\=1\&per_page\=100 | 
+     grep -e 'clone_url' |
+     cut -d \" -f 4 |
+     sed '/WSA/d' |
+     xargs -L1 git clone
 cd -
 
 # enabling units
