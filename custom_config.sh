@@ -95,9 +95,6 @@ git clone https://github.com/deathmond1987/tor_with_bridges.git
 mv ./tor_with_bridges ./tor
 cd -
 
-## install local mirroring service for my github account
-su - "$USER_NAME" -c "wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i"
-
 # enabling units
 systemctl enable docker.service
 systemctl enable sshd.service
