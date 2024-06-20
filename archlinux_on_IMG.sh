@@ -643,8 +643,7 @@ postinstall_config () {
                             docker-compose up -d
                             cd -
                             ## install local mirroring service for my github account
-                            UID=1000 HOME=/home/kosh USER=kosh wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i
-                            UID=1 HOME=/root USER=root
+                            wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i
                     fi
                 fi
 
