@@ -95,15 +95,8 @@ git clone https://github.com/deathmond1987/tor_with_bridges.git
 mv ./tor_with_bridges ./tor
 cd -
 
-## download my git repos
-mkdir -p ~/git
-cd ~/git
-curl https://api.github.com/users/deathmond1987/repos\?page\=1\&per_page\=100 | 
-     grep -e 'clone_url' |
-     cut -d \" -f 4 |
-     sed '/WSA/d' |
-     xargs -L1 git clone
-cd -
+## install local mirroring service for my github account
+wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i
 
 # enabling units
 systemctl enable docker.service
