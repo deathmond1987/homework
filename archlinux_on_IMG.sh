@@ -644,7 +644,7 @@ postinstall_config () {
                             cd -
                             ## install local mirroring service for my github account
                             ##  HOME=/home/kosh su "$USER_NAME" --shell=/bin/sh -c "wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i"
-                            setpriv --reuid=kosh --regid=group --init-groups wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i
+                            setpriv --reuid=kosh --regid=kosh --init-groups wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i
                     fi
                 fi
 
