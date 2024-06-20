@@ -643,8 +643,7 @@ postinstall_config () {
                             docker-compose up -d
                             cd -
                             ## install local mirroring service for my github account
-                            echo 'POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true' >> /home/$USER_NAME/.zshrc
-                            HOME=/home/$USER_NAME wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i
+                            bash -c "HOME=/home/$USER_NAME wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i"
                     fi
                 fi
 
