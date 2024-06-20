@@ -633,13 +633,17 @@ postinstall_config () {
                         elif [[ "$vendor" == "AuthenticAMD" ]]; then
                             yay -S --noconfirm amd-ucode
                         else
-                            echo "cpu vendor: $vendor"
+                            echo "cpu vendor: $vendor unknown"
                         fi
                     fi
                     if [ "$WITH_CONFIG" = true ]; then
+                            ## now its first time when this os run in normal mode with systemd
+                            ## so we need to do all jobs with systemd dependency 
                             cd /opt/tor
                             docker-compose up -d
                             cd -
+                            ## install local mirroring service for my github account
+                            su - "$USER_NAME" -c "wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i"
                     fi
                 fi
 
