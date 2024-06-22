@@ -642,8 +642,6 @@ postinstall_config () {
                             cd /opt/tor
                             docker-compose up -d
                             cd -
-                            ## install local mirroring service for my github account
-                            bash -c "HOME=/home/$USER_NAME wget -q -O - https://raw.githubusercontent.com/deathmond1987/git_cron/main/git_cron.sh | bash /dev/stdin -u deathmond1987 -i"
                     fi
                 fi
 
