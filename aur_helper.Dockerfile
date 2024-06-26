@@ -86,7 +86,7 @@ warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
 # if param not found - then show help and exit
-if [ -z "$1" ]; then
+if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     cat /man
     exit 1
 fi
