@@ -122,7 +122,7 @@ warn "Searching for packages: $pack"
 mkdir -p $PKGDEST
 chown "$USER":"$USER" -R "$PKGDEST"
 # exec yay
-su - "$USER" -c "yay -S --noconfirm $pack"
+su - "$USER" -c "yay -Syu --noconfirm $pack"
 success "Done. Exit from container"
 echo ""
 EOF
