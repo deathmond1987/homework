@@ -4,7 +4,7 @@ set -euo pipefail
 . /etc/environment
 
 USER_NAME=${USER_NAME:-kosh}
-user_packages='docker docker-compose dive mc pigz docker-buildx polkit strace pacman-contrib pacman-cleanup-hook ccache qemu-base bc net-tools cpio'
+user_packages='docker docker-compose dive mc pigz docker-buildx polkit strace pacman-contrib pacman-cleanup-hook ccache qemu-base bc net-tools cpio etc-update'
 yay_opts='--answerdiff None --answerclean None --noconfirm --needed'
 
 if [ "$WSL_INSTALL" = "true" ]; then
