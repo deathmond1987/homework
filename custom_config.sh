@@ -111,7 +111,6 @@ for project in ${PROJECT_LIST}; do
     fi
     echo "[ $project_name ] done."
 done
-cd /
 
 # enabling units
 systemctl enable docker.service
