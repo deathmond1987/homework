@@ -95,7 +95,7 @@ git clone https://github.com/deathmond1987/tor_with_bridges.git
 mv ./tor_with_bridges ./tor
 cd -
 
-cd /home/"$USER"/
+cd /home/"$USER_NAME"/
 mkdir -p ./.git
 GH_USER=${GH_USER:=deathmond1987}
 PROJECT_LIST=$(curl -s https://api.github.com/users/"$GH_USER"/repos\?page\=1\&per_page\=100 | grep -e 'clone_url' | cut -d \" -f 4 | sed '/WSA/d' | xargs -L1)
