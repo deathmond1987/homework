@@ -414,7 +414,8 @@ disable_swap () {
 
 fstab_gen () {
     # partition tree finished. generating fstab
-    genfstab -U -t PARTUUID "$MOUNT_PATH" > "$MOUNT_PATH"/etc/fstab
+    genfstab -P -U -t PARTUUID "$MOUNT_PATH" | grep -v "^$DISK" > "$MOUNT_PATH"/etc/fstab
+    cat "$MOUNT_PATH"/etc/fstab
 }
 
 ############################################################################################
