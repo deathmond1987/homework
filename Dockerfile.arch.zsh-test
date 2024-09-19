@@ -1,8 +1,0 @@
-FROM archlinux:latest
-COPY --chmod=777 ./zsh_home_install.sh /zsh.sh
-RUN pacman -Syu --needed --noconfirm sudo git zsh base base-devel 1>/dev/null && \
-    useradd -m -G wheel -s /bin/bash kosh && \
-    echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
-# sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-RUN su - kosh -c "git clone https://aur.archlinux.org/yay-bin && cd yay-bin && yes | makepkg -si && cd .. && rm -rf yay-bin && yay -Y --gendb && yes | yay -Syu --devel && yay -Y --devel --save && yay --editmenu --diffmenu=false --save"
-RUN /zsh.sh
