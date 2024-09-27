@@ -162,7 +162,7 @@ install_programs () {
          --needed \
          --answerdiff None \
          --answerclean None \
-         --mflags \"--noconfirm\" --overwrite \* veikk-tablet-bin"   
+         --noconfirm --overwrite \* veikk-tablet-bin"   
     success "Done"
 }
 
