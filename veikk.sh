@@ -15,6 +15,8 @@ error() { printf "${red}    ✖ %s${reset}\n" "$@"
 warn() { printf "${tan}    ➜ %s${reset}\n" "$@"
 }
 
+echo "$0"
+echo "$1"
 ########### BODY ############
 
 check_root () {
