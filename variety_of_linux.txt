@@ -1,0 +1,222 @@
+1. Загрузчики:
+    1. grub
+    2. systemd-boot
+    3. LILO (LInux LOader)
+    4. Syslinux (используется в rufus)
+    5. Uboot (arm)
+    6. rEFInd
+    7. clover (hackintosh)
+
+2. Ядро
+    1. чистое Ядро
+    2. ядро с initramfs
+    3. ядро с initramfs и прошивками процессоров
+    4. ядро с initramfs в которую встроена прошивка процессоров
+    5. uki - ядро, initramfs в одном файле
+
+3. ramfs
+    1. dracut (Fedora, RHEL, CentOS, openSUSE, Arch Linux )
+    2. initramfs-tools (debian, ubuntu)
+    3. mkinitcpio (arch)
+    4. booster
+    5. μgRD
+
+4. filesystems
+    1. ext4
+    2. ext3
+    3. ext2
+    4. btrfs
+    5. xfs
+    6. f2fs (android)
+    7. reiserfs (ганс рейзер, создатель. Убил жену, сидит в тюрьме, учит физику, комп иметь не положено)
+    8. jfs
+    9. fat (fat,fat32,vfat и тд)
+    10. ntfs
+    11. zfs
+    ---------
+    12. tmpfs (оперативка смонтированная в /tmp)
+    13. procfs (процессы смонтированные в /proc)
+    14. overlayfs
+    15. swap
+    ---------
+    16. fuse
+
+5. init
+    1. systemd
+    2. runit
+    3. s6
+    4. openRC
+    5. SysVinit
+    6. busybox init
+    7. upstart (ubuntu, dead)
+    8. systemd-sysvcompat
+
+6. libC
+    1. glibc (base)
+    2. musl (small)
+    3. uClibc-ng
+    4. bionic (android)
+    5. dietlib
+    6. newlib (rhel)
+
+7. utils
+    1. coreutils
+    2. busybox
+    3. toybox
+    4. sbase (+ moreutils)
+    5. uutils (rust)
+
+8. internet
+    1. NetworkManager
+    2. systemd-networkd
+    3. ifupdown
+    4. wicd
+    5. connman
+    6. netctl
+    7. iproute
+    8. wpa-supplicant
+    9. iwctl
+    10. netplan
+
+9. sh
+    1. ash
+    2. bash
+    3. dash
+    4. nsh
+    5. oil shell
+    6. yash
+    7. zsh
+    8. ksh
+    9. csh
+    10.xsh
+    --------
+    8. tcsh
+    9. elvish
+    10. fish
+    11. ion
+    12. murex
+    13. nushell
+    14. powershell
+    15. oh
+    16. xonsh
+
+10. package managers
+    1. apt (dpkg)
+    2. dnf (rpm)
+    3. apt (rpm) альт...
+    4. mdnf (rpm)
+    5.yum
+    6. pacman 
+    7. zypper, yast (rpm)
+    8. nix
+    9. portage
+    10. xbps
+    11. guix
+    12. opkg
+    13. flatpak и snap
+
+11. disks
+    1. lvm
+    2. mdadm
+    3. cryptsetup
+    4. fdisk
+    5. sfdisk
+    6. gptfdisk
+    7. parted
+    ...
+
+12. compilators (c)
+    1. gcc
+    2. LLVM (clang)
+    3. icc/icpc (intel)
+    4. sdcc
+    5. tcc
+    6. lcc
+    7. compcert
+
+13. awk
+    1. gawk
+    2. mawk
+    3. nawk
+    4. busybox awk
+
+14. cron 
+    1. vixie cron
+    2. anacron
+    3. dcron
+    4. fcron
+    5. systemd timers
+    6. busybox crond
+    7. at
+    8. mcron
+
+15. tar
+    1. tar
+
+16. archives
+    1. gzip
+    2. bzip2
+    3. xz
+    4. p7zip
+    5. zip
+    6. lrzip
+    7. lz4
+    8. pigz
+    9. pbzip2
+    10.zstd
+
+16. tz
+    1. tz-data
+    2. timezones
+
+17. dbus
+
+18. su
+    1. sudo
+    2. doas
+
+19. ssh
+    1. openssh
+    2. dropbear
+
+20. ssl/tls
+    1. openssl
+    2. gnutls
+    3. libressl
+    4. boringssl
+    5. mbed tls
+    6. wolfssl
+
+
+21. Xorg
+    1. xorg
+    2. wayland
+    3. mir (ubuntu, dead)
+
+22. mesa
+
+23. DE
+    1. gnome
+    2. kde
+    3. cinnamon
+    5. xfce
+    6. lxde (lxqt)
+    7. mate
+    8. pantheon
+    9. budgie
+    10. enlightment (E)
+    11. deepin
+    12. unity (ubuntu, dead)
+    ----------
+    13. i3
+    14. bspwm
+    15. dwm
+    16. awesome
+    17. herbstluftwm
+    18. xmonad
+    19. Qtile
+    20. sway
+    21. spectrwm
+    22. ratpoison
+    23. paperWM
+    24. hyprland
