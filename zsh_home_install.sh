@@ -235,6 +235,7 @@ alias cat="bat -pp -P"
 alias nano="micro"
 alias ls="lsd"
 alias ncdu="gdu"' >> "$HOME"/.zshrc
+
     # installing apps
     for apps in "${APPS[@]}"; do
         INSTALL=failed
@@ -251,29 +252,29 @@ alias ncdu="gdu"' >> "$HOME"/.zshrc
             if [ "$apps" = "btop" ]; then
                 if [ "$TERMUX_PATCH" = "true" ]; then
                     info "btop not working in termux due /proc/stat restricted on android"
-                    sed -i '/[alias htop="btop"]/d' "$HOME"/.zshrc
+                    sed -i '/alias htop=/d' "$HOME"/.zshrc
                 else
                     info "Install $apps manually from: https://github.com/aristocratos/btop/releases"
-                    sed -i '/[alias htop="btop"]/d' "$HOME"/.zshrc
+                    sed -i '/alias htop=/d' "$HOME"/.zshrc
                 fi
             elif [ "$apps" = "dust" ]; then
                 info "Install $apps manually from: https://github.com/bootandy/dust/releases"
-                sed -i '/[alias du="dust"]/d' "$HOME"/.zshrc
+                sed -i '/alias du=/d' "$HOME"/.zshrc
             elif [ "$apps" = "duf" ]; then
                 info "Install $apps manually from: https://github.com/muesli/duf/releases"
-                sed -i '/[alias df="duf"]/d' "$HOME"/.zshrc
+                sed -i '/alias df=/d' "$HOME"/.zshrc
             elif [ "$apps" = "bat" ]; then
                 info "Install $apps manually from: https://github.com/sharkdp/bat/releases"
-                sed -i '/[alias cat="bat -pp -P"]/d' "$HOME"/.zshrc
+                sed -i '/alias cat=/d' "$HOME"/.zshrc
             elif [ "$apps" = "micro" ]; then
                 info "Install $apps manually from: https://github.com/zyedidia/micro/releases"
-                sed -i '/[alias nano="micro"]/d' "$HOME"/.zshrc
+                sed -i '/alias nano=/d' "$HOME"/.zshrc
             elif [ "$apps" = "lsd" ]; then
                 info "Install $apps manually from: https://github.com/lsd-rs/lsd/releases"
-                sed -i '/[alias ls="lsd"]/d' "$HOME"/.zshrc
+                sed -i '/alias ls=/d' "$HOME"/.zshrc
             elif [ "$apps" = "gdu" ]; then
                 info "Install $apps manually from: https://github.com/dundee/gdu/releases"
-                sed -i '/[alias ncdu="gdu"]/d' "$HOME"/.zshrc
+                sed -i '/alias ncdu=/d' "$HOME"/.zshrc
             fi
         fi
     done
